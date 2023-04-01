@@ -10,17 +10,21 @@ const rsync_philips_mri = async (jobId) => {
     const system_data = await get_phil_mri_systems(jobId);
 
     for await (const system of system_data) {
-      await exec_remote_rsync(jobId, "SME15805", "./read/sh/rsync_mmb.sh", [
-        "avante",
-        "172.31.3.51",
+      console.log(system);
+
+      await exec_remote_rsync(jobId, system.id, "./read/sh/rsync_mmb.sh", [
+        system.user_id,
+        system.ip_address,
         system.hhm_config.file_path,
       ]);
-     await rsync_local(jobId,
-        `${system.hhm_config.file_path}/host_logfiles`, system
+      await rsync_local(
+        jobId,
+        `${system.hhm_config.file_path}/host_logfiles`,
+        system
       );
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     await log("error", jobId, "NA", "redisClient", `ON ERROR`, {
       error: error,
     });
@@ -28,3 +32,20 @@ const rsync_philips_mri = async (jobId) => {
 };
 
 module.exports = rsync_philips_mri;
+/*
+system in for loop
+
+{
+  id: 'SME15805',
+  hhm_config: {
+    modality: 'MRI',
+    data_acqu: 'mmb',
+    file_path: '/opt/files/SME15805/hhm',
+    run_group: 1
+  },
+  hhm_file_config: [ { logcurrent: [Object] }, { monitoring: [Array] } ],
+  ip_address: '172.31.3.51',
+  user_id: 'avante'
+}
+
+*/
