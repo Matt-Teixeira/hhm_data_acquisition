@@ -3,14 +3,14 @@ const fsp = require("node:fs/promises");
 const exec_local_rsync = require("../read/exec-copy_local");
 
 async function rsync_local(jobId, rsync_path, system_config) {
-  console.log(system_config.hhm_file_config);
+ 
   try {
     await log("info", jobId, system_config.id, "rsync_local", "FN CALL");
     // const files = await fsp.readdir(rsync_path);
 
     for (const file of system_config.hhm_file_config) {
       let key = Object.keys(file);
-      console.log(key[0]);
+      
       if (key[0] === "monitoring") {
         for (const monitor_file of file.monitoring) {
           await exec_local_rsync(
