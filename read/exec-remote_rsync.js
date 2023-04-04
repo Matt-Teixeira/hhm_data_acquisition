@@ -18,6 +18,7 @@ const exec_remote_rsync = async (jobId, sme, rsyncShPath, rsyncShArgs) => {
     });
     return; //fileSizeAfterRsync;
   } catch (err) {
+    console.log(err)
     await log("error", jobId, sme, "exec_remote_rsync", "FN CATCH", {
       error: err,
     });
