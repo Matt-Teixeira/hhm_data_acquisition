@@ -8,7 +8,7 @@ set -ue
 # "ssh -o KexAlgorithms=ecdh-sha2-nistp521"
 # rsync -e ssh -r avante@172.31.3.51:/home/avante/host_logfiles /home/matt-teixeira/hep3/hhm_data_acquisition/test/15805
 # echo $4 | sudo -S 
-rsync -e ssh -rz $1@$2:/home/avante/host_logfiles $3
+rsync --timeout=10 -e ssh -rz $1@$2:/home/avante/host_logfiles $3
 
 
 # sudo chown -R remoteservices:ansible_users /opt/files/SMEXXXXX
