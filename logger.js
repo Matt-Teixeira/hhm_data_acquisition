@@ -12,7 +12,7 @@ const logger = createLogger({
    format: combine(timestamp(), customFormat),
    transports: [
       new transports.File({
-         filename: `./data-processor.${process.env.LOGGER}.log`,
+         filename: `./data_acquisition.${process.env.LOGGER}.log`,
       }),
    ],
 });
