@@ -43,4 +43,3 @@ rsync --timeout=20 -e ssh -rz $1@$2:/home/avante/host_logfiles $3
 # The owner will have read and write permission.
 # The group will have read and write permission.
 # Others will have read permission.
-

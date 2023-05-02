@@ -12,7 +12,7 @@ module.exports = {
     ipAddress: sql("system/ip-address.sql"),
   },
   system_data: {
-    smeNumber: sql("system/system-data.sql"),
+    smeNumber: sql("system/phil_mri_systems.sql"),
   },
   pg_table: {
     smeNumber: sql("system/getPgTable.sql"),

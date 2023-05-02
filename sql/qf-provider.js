@@ -14,9 +14,9 @@ const getSystemIpAddress = async (uuid, sme) => {
   return db.any(system_ip.ipAddress, sme);
 };
 
-const get_phil_mri_systems = async (uuid) => {
-  await logQf(uuid, "get_phil_mri_systems", "n/a");
-  return db.any(system_data.smeNumber);
+const get_phil_mri_systems = async () => {
+  await logQf('ID', "get_phil_mri_systems", "n/a");
+  return await db.any(system_data.smeNumber);
 };
 
 const getPgTable = async (uuid, sme) => {

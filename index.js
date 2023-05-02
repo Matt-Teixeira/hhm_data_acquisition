@@ -2,7 +2,8 @@
 require("dotenv").config();
 const { log } = require("./logger");
 const rsync_philips_mri = require("./jobs/rsync_philips-mri");
-const crypto = require("crypto");
+const short = require("short-uuid");
+const onBootMMB = require("./mmb");
 
 const onBoot = async () => {
   log("info", "NA", "NA", "onBoot", `FN CALL`, {
@@ -11,16 +12,17 @@ const onBoot = async () => {
     PG_USER: process.env.PG_USER,
     PG_DB: process.env.PG_DB,
   });
-  let jobId = crypto.randomUUID();
 
   try {
     console.time("RUN TIME");
 
-    await rsync_philips_mri(jobId);
+    rsync_philips_mri();
+
+    //await onBootMMB();
 
     console.timeEnd("RUN TIME");
   } catch (error) {
-    await log("error", jobId, "NA", "redisClient", `ON ERROR`, {
+    await log("error", "JobID", "NA", "onBoot", `ON ERROR`, {
       error: error,
     });
   }
