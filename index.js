@@ -2,8 +2,25 @@
 require("dotenv").config();
 const { log } = require("./logger");
 const rsync_philips_mri = require("./jobs/rsync_philips-mri");
-const short = require("short-uuid");
 const onBootMMB = require("./mmb");
+
+function runJob(run_group, schedule) {
+  log("info", "NA", "NA", "onBoot", `FN CALL`, {
+    run_group,
+    schedule,
+  });
+  switch (run_group) {
+    case "mmb":
+      onBootMMB(parseInt(schedule));
+      break;
+    case "philips":
+      rsync_philips_mri();
+      break;
+
+    default:
+      break;
+  }
+}
 
 const onBoot = async () => {
   log("info", "NA", "NA", "onBoot", `FN CALL`, {
@@ -16,9 +33,11 @@ const onBoot = async () => {
   try {
     console.time("RUN TIME");
 
-    rsync_philips_mri();
+    //rsync_philips_mri();
+    const run_group = process.argv[2];
+    const schedule = process.argv[3] || null;
 
-    //await onBootMMB();
+    runJob(run_group, schedule);
 
     console.timeEnd("RUN TIME");
   } catch (error) {

@@ -61,7 +61,7 @@ const runJob = async (config) => {
   }
 };
 
-const onBootMMB = async () => {
+const onBootMMB = async (shell) => {
   await log("info", "NA", "onBoot", "FN CALL", {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
@@ -91,10 +91,16 @@ const onBootMMB = async () => {
     let schedules = [];
     switch (process.env.PG_DB) {
       case "dev_hhm":
-        schedules = await buildProdSchedules(
+        const sh1Configs = machineConfigs.filter(({ schedule }) => schedule === shell);
+        for (const config of sh1Configs) {
+          const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
+            config;
+          runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
+        }
+        /* schedules = await buildProdSchedules(
           runJob,
           machineConfigs
-        );
+        ); */
         break;
       case "staging":
         schedules = await buildStagingSchedules(
