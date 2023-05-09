@@ -15,6 +15,7 @@ const getOnBootData = async () => {
    try {
       return Promise.all([db.any(boot.getSystemsConfigs)]);
    } catch (error) {
+      console.log(error);
       // TODO: I'M NOT SURE THIS CAN EVEN BE CALLED
       // CHECK VIA USING PG_DB = dev_ml
       throw new Error(`getOnBootData FN CATCH -> ${error.message}`, {

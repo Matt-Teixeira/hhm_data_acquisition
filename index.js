@@ -1,8 +1,8 @@
 ("use strict");
 require("dotenv").config();
 const { log } = require("./logger");
-const rsync_philips_mri = require("./jobs/rsync_philips-mri");
-const onBootMMB = require("./mmb");
+const rsync_philips_mri = require("./jobs/philips_mri/rsync_philips-mri");
+const onBootMMB = require('./jobs/mmb');
 
 function runJob(run_group, schedule) {
   log("info", "NA", "NA", "onBoot", `FN CALL`, {

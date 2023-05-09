@@ -7,14 +7,17 @@ const customFormat = printf(({ level, timestamp, message }) => {
    return msg;
 });
 
+let now = new Date();
+now = now.toISOString();
+
 const logger = createLogger({
-   level: 'info',
-   format: combine(timestamp(), customFormat),
-   transports: [
-      new transports.File({
-         filename: `./data_acquisition.${process.env.LOGGER}.log`,
-      }),
-   ],
+  level: "info",
+  format: combine(timestamp(), customFormat),
+  transports: [
+    new transports.File({
+      filename: `./logs/adp.${process.env.LOGGER}_${now}.log`,
+    }),
+  ],
 });
 
 if (process.env.LOGGER === 'dev') {

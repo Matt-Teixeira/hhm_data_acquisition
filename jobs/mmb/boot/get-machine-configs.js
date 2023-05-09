@@ -1,4 +1,4 @@
-const { log } = require("../../logger");
+const { log } = require("../../../logger");
 
 const getMachineConfigs = async (rows) => {
   await log("info", "NA", "getMachineConfigs", "FN CALL", null);
@@ -12,10 +12,17 @@ const getMachineConfigs = async (rows) => {
         missing_config.push(row.id);
         continue;
       }
+
       const {
         id: sme, // RE-ASSIGN NAME
         mmb_config: { rpp_configs, ssh }, // NESTED DESTRUCTURE
       } = row;
+      if (!rpp_configs || !ssh) {
+        await log("error", "NA", "getMachineConfigs", "FN CALL", {
+          message: "Missing Config Data",
+          system: row.sme,
+        });
+      }
       for (const config of rpp_configs) {
         const { schedule, mmbScript, pgTable, regexModels } = config;
         machine_configs.push({
@@ -25,12 +32,10 @@ const getMachineConfigs = async (rows) => {
           pgTable: pgTable,
           regexModels: regexModels,
           ip_address: ssh.ip_address,
-          user_id: ssh.user_id
+          user_id: ssh.user_id,
         });
       }
     }
-
-    console.log(machine_configs)
 
     await log("info", "NA", "getMachineConfigs", "FN CALL", {
       machine_configs: machine_configs,
@@ -39,6 +44,7 @@ const getMachineConfigs = async (rows) => {
 
     return machine_configs;
   } catch (error) {
+    console.log(error);
     throw new Error(`getMachineConfigs FN CATCH -> ${error.message}`, {
       cause: error,
     });

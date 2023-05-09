@@ -4,7 +4,7 @@ const {
    mmb_siemens,
    mmb_siemens_non_tim,
    mmb_edu2,
-} = require('../../parse/_helpers/pg-schemas');
+} = require('../parse/_helpers/pg-schemas');
 const pgp = require('pg-promise')();
 
 const pg_tables = {

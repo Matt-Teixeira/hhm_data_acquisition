@@ -1,16 +1,13 @@
 ("use strict");
 //require("dotenv").config();
-const { log, loudPrint } = require("../logger");
-const { getOnBootData } = require("./db/sql/qf-provider");
+const { log } = require("../../logger");
+const { getOnBootData } = require("./sql/qf-provider");
 // BOOT
 const getMachineConfigs = require("./boot/get-machine-configs");
-const {
-  buildProdSchedules,
-  buildStagingSchedules,
-} = require("./boot/build-schedules");
 // READ
 const short = require("short-uuid");
 const execRsync = require("./read/exec-rsync");
+const { filter_schedules } = require("./helpers");
 
 const runJob = async (config) => {
   // UUID FOR EACH JOB
@@ -22,7 +19,8 @@ const runJob = async (config) => {
 
     // ["SME01096","v2_edu2","mmb_ge_mm3",["RE_GE_MM3_A"]]
     // TODO: RENAME machineRegexTags TO regexModels
-    const [sme, mmbScript, pgTable, machineRegexTags, ip_address, user_id] = config;
+    const [sme, mmbScript, pgTable, machineRegexTags, ip_address, user_id] =
+      config;
     if (!(sme && mmbScript && pgTable && machineRegexTags)) {
       await log(
         "info",
@@ -36,10 +34,17 @@ const runJob = async (config) => {
 
     // **************************************************** READ ****************************************************
     // RSYNC FILE FROM REMOTE TO LOCAL AND GET THE NEWLY SYNC FILE SIZE
-    const rsyncShPath = `./mmb/read/sh/rsync_mmb.sh`;
+    console.log(`./files/${sme}.${mmbScript}.log`);
+    const rsyncShPath = `./jobs/mmb/read/sh/rsync_mmb.sh`;
     const rsyncLocalPath = `./files/${sme}.${mmbScript}.log`; // EX. /home/prod/mmb-rpp/files/SME01113/v2_rdu_9600.log
     const rsyncRemotePath = `${mmbScript}.log`; // EX. v2_rdu_9600.log -> ~/v2_rdu_9600.log -> /home/avante/v2_rdu_9600.log
-    const rsyncShArgs = [sme, rsyncRemotePath, rsyncLocalPath, ip_address, user_id];
+    const rsyncShArgs = [
+      sme,
+      rsyncRemotePath,
+      rsyncLocalPath,
+      ip_address,
+      user_id,
+    ];
 
     const fileSizeAfterRsync = await execRsync(
       jobId,
@@ -47,7 +52,7 @@ const runJob = async (config) => {
       rsyncShPath,
       rsyncShArgs
     );
-    console.log(fileSizeAfterRsync)
+    console.log(fileSizeAfterRsync);
     // HALT JOB DUE TO BAD fileSizeAfterRsync
     if (fileSizeAfterRsync === null) {
       await log("info", jobId, "runJob", "JOB HALTED", {
@@ -61,7 +66,7 @@ const runJob = async (config) => {
   }
 };
 
-const onBootMMB = async (shell) => {
+const onBootMMB = async (process_argv) => {
   await log("info", "NA", "onBoot", "FN CALL", {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
@@ -69,13 +74,9 @@ const onBootMMB = async (shell) => {
     PG_DB: process.env.PG_DB,
   });
 
-  let redisClient;
-
   try {
     // ON BOOT GET DATA AND CONFIGS
     const [systems_configs] = await getOnBootData("onBoot");
-
-    
 
     await log("info", "NA", "onBoot", "FN DETAILS", {
       systems_configs: systems_configs,
@@ -84,29 +85,31 @@ const onBootMMB = async (shell) => {
     // BUILD CONFIGS FOR runJob
     const machineConfigs = await getMachineConfigs(systems_configs);
 
-    console.log("machineConfigs")
-    console.log(machineConfigs)
-
     // BUILD JOB SCHEDULES
     let schedules = [];
     switch (process.env.PG_DB) {
-      case "dev_hhm":
-        const sh1Configs = machineConfigs.filter(({ schedule }) => schedule === shell);
-        for (const config of sh1Configs) {
+      case "prod":
+        const prodConfigs = machineConfigs.filter(
+          ({ schedule }) => schedule === process_argv
+        );
+        for (const config of prodConfigs) {
           const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
             config;
           runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
         }
-        /* schedules = await buildProdSchedules(
-          runJob,
-          machineConfigs
-        ); */
         break;
       case "staging":
-        schedules = await buildStagingSchedules(
-          runJob,
-          machineConfigs
+        filter_schedules(runJob, machineConfigs, process_argv)
+        break;
+      case "dev_hhm":
+        const devConfigs = machineConfigs.filter(
+          ({ schedule }) => schedule === process_argv
         );
+        for (const config of devConfigs) {
+          const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
+            config;
+          runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
+        }
         break;
       case "mig_profiles_units_prod":
         await log(
@@ -118,11 +121,14 @@ const onBootMMB = async (shell) => {
         );
         break;
       default:
-        redisClient.disconnect();
         throw new Error("onBoot FN CATCH -> NON-CONFORMANT process.env.PG_DB");
     }
 
-    if (process.env.PG_DB === "prod" || process.env.PG_DB === "staging" || process.env.PG_DB === "dev_hhm") {
+    if (
+      process.env.PG_DB === "prod" ||
+      process.env.PG_DB === "staging" ||
+      process.env.PG_DB === "dev_hhm"
+    ) {
       // || process.env.PG_DB === "dev_hhm"
       // START SCHEDULES
       for (const schedule of schedules) {
@@ -178,7 +184,7 @@ const onBootMMB = async (shell) => {
 
       // MAYBE DON'T CONVERT runJob FN TO ERROR THROW TO
       // PARENT PATTERN UNTIL WE REMOVE INTERNAL SCHEDULES
-      runJob(dev_job_config, redisClient);
+      runJob(dev_job_config);
     }
   } catch (error) {
     console.log(error);

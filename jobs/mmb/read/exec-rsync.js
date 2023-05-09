@@ -1,4 +1,4 @@
-const { log } = require("../../logger");
+const { log } = require("../../../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 

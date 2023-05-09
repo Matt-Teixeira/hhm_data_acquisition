@@ -1,7 +1,7 @@
-const { log } = require("../logger");
-const exec_remote_rsync = require("../read/exec-remote_rsync");
-const rsync_local = require("../relocate_files/rsync_local");
-const { get_phil_mri_systems } = require("../sql/qf-provider");
+const { log } = require("../../logger");
+const exec_remote_rsync = require("../../read/exec-remote_rsync");
+const rsync_local = require("../../relocate_files/rsync_local");
+const { get_phil_mri_systems } = require("../../sql/qf-provider");
 const short = require("short-uuid");
 
 const rsync_philips_mri = async () => {
@@ -11,19 +11,19 @@ const rsync_philips_mri = async () => {
   try {
     const system_data = await get_phil_mri_systems(jobId);
 
-    for await (const system of system_data) {
+    for (const system of system_data) {
       console.log(system);
       console.log([
         system.user_id,
         system.ip_address,
         system.hhm_config.file_path,
       ]);
-      await exec_remote_rsync(jobId, system.id, "./read/sh/rsync_mmb.sh", [
+       exec_remote_rsync(jobId, system.id, "./read/sh/rsync_mmb.sh", [
         system.user_id,
         system.ip_address,
         system.hhm_config.file_path,
       ]);
-      await rsync_local(
+       rsync_local(
         jobId,
         `${system.hhm_config.file_path}/host_logfiles`,
         system
