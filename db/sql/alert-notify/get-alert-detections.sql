@@ -1,0 +1,1 @@
+SELECT * FROM alert.detections_dev_util_app;

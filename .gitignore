@@ -2,4 +2,7 @@
 node_modules/
 *.log
 /test
+/test*
 /files
+/system_enrollment
+/NOTES

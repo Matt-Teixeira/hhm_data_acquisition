@@ -1,0 +1,1 @@
+SELECT * FROM hhm_credentials WHERE manufacturer = $1 AND modality = $2;

@@ -4,7 +4,8 @@
    "description": "",
    "main": "index.js",
    "scripts": {
-      "start": "node index.js"
+      "start": "node index.js",
+      "hhm_man": "node jobs/hhm/run_manual.js "
    },
    "keywords": [],
    "author": "",
