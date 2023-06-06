@@ -19,17 +19,19 @@ function decryptString(encryptedText) {
 // Example usage
 
 /* 
-ge_cv_user_1: 'DLService'
-ge_cv_pass_1: 'HEROIC'
-ge_cv_user_2: 'DL_Service'
-ge_cv_pass_2: 'HEROIC'
+philips_mr_user_1: 'remote'
+philips_mr_pass_1: 'manager'
+philips_mr_user_2: 'remote'
+philips_mr_pass_2: 'Manager'
+philips_mr_user_3: 'remote'
+philips_mr_pass_3: 'MANAGER'
 */
 /*  
-const plainText = 'HEROIC';
+const plainText = 'MANAGER';
 const encryptedText = encryptString(plainText);
 console.log('Encrypted:', encryptedText);
 const decryptedText = decryptString(encryptedText);
-console.log('Decrypted:', decryptedText); 
-
+console.log('Decrypted:', decryptedText);  
  */
+
 module.exports = { encryptString, decryptString };

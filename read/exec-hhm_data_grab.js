@@ -8,10 +8,16 @@ const exec_hhm_data_grab = async (jobId, sme, execPath, args) => {
     args: args,
   });
 
+  console.log("\nBash Args");
+  console.log(args);
+
   try {
     const { stdout, stderr } = await execFile(execPath, args);
 
+    console.log("\nSTDOUT\n");
     console.log(stdout);
+    console.log("\nSTDERR\n");
+    console.log(stderr);
 
     if (stdout.trim() == '22_failed') {
       await log("error", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
@@ -20,14 +26,14 @@ const exec_hhm_data_grab = async (jobId, sme, execPath, args) => {
     }
     if (stdout.trim() == '21_failed') {
       await log("error", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
-        message: "Port 21 is not open"
+        message: "Ports 21 & 22 are not open"
       });
     }
 
     return;
   } catch (error) {
     console.log(error);
-    await log("erroror", jobId, sme, "exec_hhm_data_grab", "FN CATCH", {
+    await log("error", jobId, sme, "exec_hhm_data_grab", "FN CATCH", {
       error: error,
     });
     return null;

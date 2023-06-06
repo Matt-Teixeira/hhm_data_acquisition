@@ -12,7 +12,7 @@ const {
 } = require("./logger/enums");
 const [addLogEvent, writeLogEvents] = require("./logger/log");
 
-function runJob(run_id, run_group, schedule, modality) {
+function runJob(run_id, run_group, schedule, manufacturer, modality) {
   log("info", "NA", "NA", "onBoot", `FN CALL`, {
     run_group,
     schedule,
@@ -33,7 +33,7 @@ function runJob(run_id, run_group, schedule, modality) {
       rsync_philips_mri(run_id);
       break;
     case "hhm":
-      get_hhm_data(run_id, modality);
+      get_hhm_data(run_id, manufacturer, modality);
       break;
 
     default:
@@ -63,11 +63,12 @@ const onBoot = async () => {
     //rsync_philips_mri();
     const run_group = process.argv[2];
     const schedule = process.argv[3] || null;
-    const modality = process.argv[4] || null;
+    const manufacturer = process.argv[4] || null;
+    const modality = process.argv[5] || null;
 
-    console.log(run_group, schedule, modality);
+    console.log(run_group, schedule, manufacturer, modality);
 
-    runJob(run_id, run_group, schedule, modality);
+    runJob(run_id, run_group, schedule, manufacturer, modality);
   } catch (error) {
     console.log(error);
     await log("error", "JobID", "NA", "onBoot", `ON ERROR`, {
@@ -75,6 +76,6 @@ const onBoot = async () => {
     });
   }
 };
-onBoot();
+//onBoot();
 
-//run_system_manual(["SME01075"], ["GE", "CT"], 2);
+run_system_manual(["SME14520"], ["GE", "CT"], 0);

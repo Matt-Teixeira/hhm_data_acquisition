@@ -1,12 +1,4 @@
 # { GE CT
-ge_ct_user_1='service'
-ge_ct_pass_1='4rhelp'
-ge_ct_user_2='insite'
-ge_ct_pass_2='2getin'
-ge_ct_user_3='root'
-ge_ct_pass_3='#bigguy'
-
-IP_ADDRESS='10.184.14.203'
 
 # ----------------------------------------------------------------------------------------
 # (SCP)

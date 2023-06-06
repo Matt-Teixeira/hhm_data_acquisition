@@ -34,21 +34,3 @@ timeout 120 sshpass -p $PASS_3 scp -o StrictHostKeyChecking=accept-new $USER_3@$
 #  PLAINTEXT CREDS.
 # So, these are normally stored in the ansible vault, made variables at playbook execution, and called directly with sshpass or lftp as per situation requirement.
 # To be fair, I have concerns about the approach I use, but I lack the time, or knowledge, to effectively put those concerns to rest, particularly as it relates to the project's deadlines.
-
-ge_cv_user_1: 'DLService'
-ge_cv_pass_1: 'HEROIC'
-ge_cv_user_2: 'DL_Service'
-ge_cv_pass_2: 'HEROIC'
-ge_ct_user_1: 'service'
-ge_ct_pass_1: '4rhelp'
-ge_ct_user_2: 'insite'
-ge_ct_pass_2: '2getin'
-ge_ct_user_3: 'root'
-ge_ct_pass_3: '#bigguy'
-ge_mr_user_1: 'service'
-ge_mr_pass_1: '4rhelp'
-ge_mr_user_2: 'insite'
-ge_mr_pass_2: '2getin'
-ge_mr_user_3: 'root'
-ge_mr_pass_3: 'operator'
-
