@@ -1,7 +1,7 @@
 SELECT
     id,
     ip_address,
-    hhm_config -> 'hhm_credentials_group' AS credential_id
+    hhm_config -> 'data_acquisition' AS data_acquisition
 FROM
     systems
 WHERE

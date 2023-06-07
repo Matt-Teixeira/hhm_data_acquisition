@@ -5,27 +5,27 @@ if [ $? -eq 0 ]; then
     # Connection to PORT 22 succeeded
     variable="22 open"
     #echo $variable
-    [ ! -d "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/" ] && mkdir /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/
+    [ ! -d "$4/" ] && mkdir $4/
 
-    cd /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4
+    cd $4
     timeout 60 lftp sftp://$2:$3@$1 -e "cd /cygdrive/d/Data_Logger; get Logger.mdb; bye" && cp ./Logger.mdb ./Output.mdb
 
-    chmod +0644 /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb
+    chmod +0644 $4/Output.mdb
     # { BEGIN CONVERSION
     now_ISO8601=$(date -u +"%Y-%m-%dT%H:%M:00Z")
 
-    test "$(ls -l /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb | awk '{print $5}')" -gt "0" && chmod +0644 /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb
+    test "$(ls -l $4/Output.mdb | awk '{print $5}')" -gt "0" && chmod +0644 $4/Output.mdb
 
-    EALINFO_TABLEVAR=$(mdb-tables /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb | sed 's/ /\n/g' | sed -n 1p)
-    EVENTS_TABLEVAR=$(mdb-tables /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb | sed 's/ /\n/g' | sed -n 2p)
+    EALINFO_TABLEVAR=$(mdb-tables $4/Output.mdb | sed 's/ /\n/g' | sed -n 1p)
+    EVENTS_TABLEVAR=$(mdb-tables $4/Output.mdb | sed 's/ /\n/g' | sed -n 2p)
     # { ACCOUNT FOR EXISTING LOGS
-    touch /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Events.output
-    test "$(ls -l /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Events.output | awk '{print $5}')" -gt "0" && echo -n "" >/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Events.output
+    touch $4/Events.output
+    test "$(ls -l $4/Events.output | awk '{print $5}')" -gt "0" && echo -n "" >$4/Events.output
 
-    touch /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/EALInfo.output
-    test "$(ls -l /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/EALInfo.output | awk '{print $5}')" -gt "0" && echo -n "" >/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/EALInfo.output
+    touch $4/EALInfo.output
+    test "$(ls -l $4/EALInfo.output | awk '{print $5}')" -gt "0" && echo -n "" >$4/EALInfo.output
 
-    echo "Type,Level,Module,TStampNum,DataTime,Msg,EAL,BLOB,EventTime" >>/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Events.output
+    echo "Type,Level,Module,TStampNum,DataTime,Msg,EAL,BLOB,EventTime" >>$4/Events.output
     # IN ORDER PIPED COMMANDS:
     # EXPORT FROM MDB
     # REMOVE ALL NON-ALPHANUMERIC CHARACTERS, KEEP THOSE IN SINGLE QUOTES
@@ -33,14 +33,14 @@ if [ $? -eq 0 ]; then
     # SORT REORDERED COLUMNS
     # REMOVE ALL NON-COMPLIANT ROWS
     # OUTPUT FILE
-    mdb-export /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb $EVENTS_TABLEVAR | tr -cd [:alnum:]'\n''\ ''"'',''['']'':''\-''_''.''/''=' | awk -v FS="," '{print $9, $1, $2, $3, $4, $5, $6, $7, $8}' | sort | sed -n -e "/^\"[0-9][0-9]\/.*/p" >>/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Events.output
+    mdb-export $4/Output.mdb $EVENTS_TABLEVAR | tr -cd [:alnum:]'\n''\ ''"'',''['']'':''\-''_''.''/''=' | awk -v FS="," '{print $9, $1, $2, $3, $4, $5, $6, $7, $8}' | sort | sed -n -e "/^\"[0-9][0-9]\/.*/p" >>$4/Events.output
     #echo "[/reading] : $EVENTS_TABLEVAR" >> /opt/files/$PATH/Events.output
     #echo "[END CAPTURE BLOCK : ${now_ISO8601}]" >> /opt/files/$PATH/Events.output
     #echo "[START CAPTURE BLOCK : ${now_ISO8601}]" >> /opt/files/$PATH/EALInfo.output
     #echo "[reading] : $EALINFO_TABLEVAR" >> /opt/files/$PATH/EALInfo.output
     # MAY HAVE TO FUDGE HEADERS IN BELOW THIS COMMENTED LINE
-    echo "DTime,Controller,DataType,LogNumber,TmStamp,ERR_TYPE,ErrNum,vxwErrNo,File,Line,Param1,Param2,Info,EalTime" >>/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/EALInfo.output
-    mdb-export /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/Output.mdb $EALINFO_TABLEVAR | tail -n +2 | sort | awk 'NF > 2' >>/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Philips/CT/$4/EALInfo.output
+    echo "DTime,Controller,DataType,LogNumber,TmStamp,ERR_TYPE,ErrNum,vxwErrNo,File,Line,Param1,Param2,Info,EalTime" >>$4/EALInfo.output
+    mdb-export $4/Output.mdb $EALINFO_TABLEVAR | tail -n +2 | sort | awk 'NF > 2' >>$4/EALInfo.output
 
 else
     # PORT 22 connection failed

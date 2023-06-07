@@ -76,6 +76,7 @@ const onBoot = async () => {
     });
   }
 };
-//onBoot();
 
-run_system_manual(["SME14520"], ["GE", "CT"], 0);
+onBoot();
+
+//run_system_manual(["SME12411"], ["GE", "CT"], 1);

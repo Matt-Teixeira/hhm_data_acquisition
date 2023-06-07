@@ -7,18 +7,18 @@ if [ $? -eq 0 ]; then
     # Connection succeeded
     variable=true
 
-    [ ! -d "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4" ] && mkdir /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4
-    timeout 3 sshpass -p $3 scp -o StrictHostKeyChecking=accept-new -oKexAlgorithms=diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1 $2@$1:'/C/Program\ Files/GE\ Medical\ Systems/DL/Log/sysError.log' /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4
-    [ -s "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError.log" ] && chmod +644 /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError.log
+    [ ! -d "$4" ] && mkdir $4
+    timeout 3 sshpass -p $3 scp -o StrictHostKeyChecking=accept-new -oKexAlgorithms=diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1 $2@$1:'/C/Program\ Files/GE\ Medical\ Systems/DL/Log/sysError.log' $4
+    [ -s "$4/sysError.log" ] && chmod +644 $4/sysError.log
 else
     # Connection failed
     result_21=$(timeout 2 nc -zv $1 21 2>&1)
 
     if [ $? -eq 0 ]; then
-        [ ! -d "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4" ] && mkdir /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4
-        timeout 10 lftp ftp://$2:$3@$1 -e "set net:reconnect-interval-base 5; set net:max-retries 2; mirror --only-newer --include='sys*' --newer-than=now-7days /C/Program\ Files/GE\ Medical\ Systems/DL/Log/ /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4"
-        [ -s "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError.log" ] && mv /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError.log /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError/sysError.log
-        [ -s "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError.log" ] && chmod +644 /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/GE/CV/$4/sysError/sysError.log
+        [ ! -d "$4" ] && mkdir $4
+        timeout 10 lftp ftp://$2:$3@$1 -e "set net:reconnect-interval-base 5; set net:max-retries 2; mirror --only-newer --include='sys*' --newer-than=now-7days /C/Program\ Files/GE\ Medical\ Systems/DL/Log/ $4"
+        [ -s "$4/sysError.log" ] && mv $4/sysError.log $4/sysError/sysError.log
+        [ -s "$4/sysError.log" ] && chmod +644 $4/sysError/sysError.log
         variable='22_failed'
         echo $variable
     else

@@ -3,18 +3,18 @@ const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../utils");
 
-async function get_ge_cv_data() {
+async function get_ge_cv_data(run_id) {
   try {
-    await log("info", "jobId", "GE_CV", "get_ge_cv_data", "FN CALL");
-    const systems = await getGeCtHhm(["GE", "CV/IR"]);
-    const credentials = await getHhmCreds(["GE", "CV"]);
-    console.log(systems);
-    console.log(credentials);
+    await log("info", run_id, "GE_CV", "get_ge_cv_data", "FN CALL");
+    const manufacturer = "GE";
+    const modality = "CV";
+    const systems = await getGeCtHhm([manufacturer, "CV/IR"]);
+    const credentials = await getHhmCreds([manufacturer, modality]);
 
     const cv_path = "./read/sh/ge_cv_data_grab.sh";
 
     for await (const system of systems) {
-      await log("info", "jobId", system.id, "get_ge_cv_data", "FN CALL", {
+      await log("info", run_id, system.id, "get_ge_cv_data", "FN CALL", {
         exec_path: cv_path,
       });
 
@@ -27,8 +27,7 @@ async function get_ge_cv_data() {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      //jobId, sme, execPath, args
-      exec_hhm_data_grab("JOBID", "SME00001", cv_path, [
+      exec_hhm_data_grab(run_id, system.id, cv_path, manufacturer, modality, [
         system.ip_address,
         user,
         pass,
@@ -37,7 +36,7 @@ async function get_ge_cv_data() {
     }
   } catch (error) {
     console.log(error);
-    await log("error", "jobId", "GE_CV", "get_ge_cv_data", "FN CALL", {
+    await log("error", run_id, "GE_CV", "get_ge_cv_data", "FN CALL", {
       error,
     });
   }
