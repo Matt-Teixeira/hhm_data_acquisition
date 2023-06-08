@@ -11,12 +11,14 @@ async function get_ge_ct_data(run_id) {
     const systems = await getGeCtHhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
 
+    const runable_systems = [];
     for (const system of systems) {
       console.log(system);
       const ct_path = "./read/sh/GE/ge_ct_data_grab.sh";
 
       // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
       if (system.data_acquisition && system.ip_address) {
+        runable_systems.push(system);
         const system_creds = credentials.find((credential) => {
           if (credential.id == system.data_acquisition.hhm_credentials_group)
             return true;
@@ -33,6 +35,11 @@ async function get_ge_ct_data(run_id) {
         ]);
       }
     }
+    console.log(systems.length);
+    console.log(systems);
+    console.log("*** RAN SYSTEMS ***");
+    console.log(runable_systems.length);
+    console.log(runable_systems);
   } catch (error) {
     console.log(error);
     await log("error", run_id, "GE_CT", "get_ge_ct_data", "FN CALL", {
