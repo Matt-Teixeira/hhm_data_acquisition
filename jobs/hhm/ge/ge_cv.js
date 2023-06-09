@@ -10,30 +10,38 @@ async function get_ge_cv_data(run_id) {
     const modality = "CV";
     const systems = await getGeCtHhm([manufacturer, "CV/IR"]);
     const credentials = await getHhmCreds([manufacturer, modality]);
+    const cv_path = "./read/sh/GE/ge_cv_data_grab.sh";
 
-    const cv_path = "./read/sh/ge_cv_data_grab.sh";
+    await log("info", run_id, "SYSTEMS_NUMBER", "get_ge_ct_data", "FN CALL", {
+      number: systems.length,
+    });
 
-    for await (const system of systems) {
-      await log("info", run_id, system.id, "get_ge_cv_data", "FN CALL", {
-        exec_path: cv_path,
-      });
+    const runable_systems = [];
+    for (const system of systems) {
+      // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
+      if (system.data_acquisition && system.ip_address) {
+        runable_systems.push(system);
+        const system_creds = credentials.find((credential) => {
+          if (credential.id == system.data_acquisition.hhm_credentials_group)
+            return true;
+        });
 
-      console.log(system.id + "\n");
+        const user = decryptString(system_creds.user_enc);
+        const pass = decryptString(system_creds.password_enc);
 
-      const system_creds = credentials.find((credential) => {
-        if (credential.id == system.credential_id) return true;
-      });
-
-      const user = decryptString(system_creds.user_enc);
-      const pass = decryptString(system_creds.password_enc);
-
-      exec_hhm_data_grab(run_id, system.id, cv_path, manufacturer, modality, [
-        system.ip_address,
-        user,
-        pass,
-        system.id,
-      ]);
+        exec_hhm_data_grab(run_id, system.id, cv_path, manufacturer, modality, [
+          system.ip_address,
+          user,
+          pass
+        ]);
+      }
     }
+
+    console.log(systems.length);
+    console.log(systems);
+    console.log("*** RAN SYSTEMS ***");
+    console.log(runable_systems.length);
+    console.log(runable_systems);
   } catch (error) {
     console.log(error);
     await log("error", run_id, "GE_CV", "get_ge_cv_data", "FN CALL", {

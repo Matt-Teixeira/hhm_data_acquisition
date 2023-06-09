@@ -6,40 +6,53 @@ const { decryptString } = require("../../../utils");
 async function get_philips_mri_data(run_id) {
   try {
     await log("info", run_id, "Philips_MRI", "get_philips_mri_data", "FN CALL");
-    const systems = await getGeCtHhm(["Philips", "MRI"]);
-    const credentials = await getHhmCreds(["Philips", "MRI"]);
-    console.log(systems);
-    console.log(credentials);
+    const manufacturer = "Philips";
+    const modality = "MRI";
+    const systems = await getGeCtHhm([manufacturer, modality]);
+    const credentials = await getHhmCreds([manufacturer, modality]);
 
-    const cv_path = "./read/sh/philips/phil_mri_data.sh";
+    const runable_systems = [];
+    for (const system of systems) {
+      // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
+      if (system.data_acquisition && system.ip_address) {
+        const mri_path = `./read/sh/philips/${system.data_acquisition.script}`;
 
-    for await (const system of systems) {
-      await log("info", "jobId", system.id, "get_philips_mri_data", "FN CALL", {
-        exec_path: cv_path,
-      });
+        runable_systems.push(system);
+        const system_creds = credentials.find((credential) => {
+          if (credential.id == system.data_acquisition.hhm_credentials_group)
+            return true;
+        });
 
-      console.log(system.id + "\n");
+        const user = decryptString(system_creds.user_enc);
+        const pass = decryptString(system_creds.password_enc);
 
-      const system_creds = credentials.find((credential) => {
-        if (credential.id == system.credential_id) return true;
-      });
-
-      const user = decryptString(system_creds.user_enc);
-      const pass = decryptString(system_creds.password_enc);
-
-      //jobId, sme, execPath, args
-      exec_hhm_data_grab(run_id, system.id, cv_path, [
-        system.ip_address,
-        user,
-        pass,
-        system.id,
-      ]);
+        exec_hhm_data_grab(
+          run_id,
+          system.id,
+          mri_path,
+          manufacturer,
+          modality,
+          [system.ip_address, user, pass]
+        );
+      }
     }
+    console.log(systems.length);
+    console.log(systems);
+    console.log("*** RAN SYSTEMS ***");
+    console.log(runable_systems.length);
+    console.log(runable_systems);
   } catch (error) {
     console.log(error);
-    await log("error", run_id, "Philips_MRI", "get_philips_mri_data", "FN CALL", {
-      error,
-    });
+    await log(
+      "error",
+      run_id,
+      "Philips_MRI",
+      "get_philips_mri_data",
+      "FN CALL",
+      {
+        error,
+      }
+    );
   }
 }
 

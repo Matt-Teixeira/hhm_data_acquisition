@@ -11,20 +11,13 @@ async function get_ge_mri_data(run_id) {
     const systems = await getGeCtHhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
 
-    console.log("\n*** START: GE MRI SYSTEMS ***");
-    console.log(systems);
-    console.log("*** END: GE MRI SYSTEMS ***\n");
-
     const mri_path = "./read/sh/GE/ge_mri_data_grab.sh";
 
+    const runable_systems = [];
     for (const system of systems) {
-      console.log(system);
-      await log("info", run_id, system.id, "get_ge_mri_data", "FN CALL", {
-        exec_path: mri_path,
-      });
-
       // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
       if (system.data_acquisition && system.ip_address) {
+        runable_systems.push(system);
         const system_creds = credentials.find((credential) => {
           if (credential.id == system.data_acquisition.hhm_credentials_group)
             return true;
@@ -33,14 +26,19 @@ async function get_ge_mri_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        exec_hhm_data_grab(run_id, system.id, ct_path, manufacturer, modality, [
+        exec_hhm_data_grab(run_id, system.id, mri_path, manufacturer, modality, [
           system.ip_address,
           user,
-          pass,
-          system.id,
+          pass
         ]);
       }
     }
+
+    console.log(systems.length);
+    console.log(systems);
+    console.log("*** RAN SYSTEMS ***");
+    console.log(runable_systems.length);
+    console.log(runable_systems);
   } catch (error) {
     console.log(error);
     await log("error", run_id, "SYSTEM", "get_ge_mri_data", "FN CALL", {
