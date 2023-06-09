@@ -8,14 +8,14 @@
 ### "--tls-max 1.[1-3]"
 
 # Test PORT 80 connection
-result_80=$(timeout 1 nc -zv $2 80 2>&1)
+result_80=$(timeout 1 nc -zv $1 80 2>&1)
 
 if [ $? -eq 0 ]; then
     # PORT 80 connection succeeded
 
-    [ ! -d "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Siemens/$3" ] && mkdir /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Siemens/$3
+    [ ! -d "$2" ] && mkdir $2
 
-    curl $(echo -n "$POS_ARGS") "http://$2/service/autoreport/hold/EvtApplication_Today.txt" >"/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Siemens/$3/Application.log"
+    curl $(echo -n "$POS_ARGS") "http://$1/service/autoreport/hold/EvtApplication_Today.txt" >"$2/Application.log"
 
     # { DIFF CODE, LIKELY DOES NOT WORK, INCLUDED JUST IN CASE.
     # touch /opt/files/$PATH/Compare.log
@@ -26,14 +26,14 @@ if [ $? -eq 0 ]; then
 else
     # PORT 88 connection failed
     # Test PORT 443 connection
-    result_443=$(timeout 2 nc -zv $2 443 2>&1)
+    result_443=$(timeout 2 nc -zv $1 443 2>&1)
 
     if [ $? -eq 0 ]; then
         # PORT 443 connection succeeded
 
-        [ ! -d "/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Siemens/$3" ] && mkdir /home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Siemens/$3
+        [ ! -d "$2" ] && mkdir $2
 
-        curl $(echo -n "$POS_ARGS") "https://$2/service/autoreport/hold/EvtApplication_Today.txt" >"/home/matt-teixeira/hep3/hhm_data_acquisition/test_hhm/Siemens/$3/Application.log"
+        curl $(echo -n "$POS_ARGS") "https://$1/service/autoreport/hold/EvtApplication_Today.txt" >"$2/Application.log"
 
         # { DIFF CODE, LIKELY DOES NOT WORK, INCLUDED JUST IN CASE.
         # touch /opt/files/$PATH/Compare.log
