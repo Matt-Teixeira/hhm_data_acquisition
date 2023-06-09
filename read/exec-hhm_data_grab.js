@@ -13,6 +13,7 @@ const exec_hhm_data_grab = async (
   await log("info", jobId, sme, "exec_hhm_data_grab", "FN CALL", {
     execPath: execPath,
     args: args,
+    sme,
   });
 
   let data_store_path = "";
@@ -39,10 +40,27 @@ const exec_hhm_data_grab = async (
   try {
     const { stdout, stderr } = await execFile(execPath, args);
 
-    if (stdout.trim() == "22_failed") {
+    if (stdout.trim() == "22_failed") { //443_failed
       await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
         message: "Port 22 is not open",
         args,
+        sme,
+      });
+    }
+
+    if (stdout.trim() == "443_failed") {
+      await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
+        message: "Port 443 is not open",
+        args,
+        sme,
+      });
+    }
+
+    if (stdout.trim() == "80_failed") {
+      await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
+        message: "Port 80 is not open",
+        args,
+        sme,
       });
     }
 
@@ -50,6 +68,7 @@ const exec_hhm_data_grab = async (
       await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
         message: "Ports 21 & 22 are not open",
         args,
+        sme,
       });
     }
 
@@ -59,6 +78,7 @@ const exec_hhm_data_grab = async (
     await log("error", jobId, sme, "exec_hhm_data_grab", "FN CATCH", {
       error: error,
       args,
+      sme,
     });
     return null;
   }

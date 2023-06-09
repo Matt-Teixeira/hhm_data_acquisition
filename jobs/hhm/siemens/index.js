@@ -1,5 +1,7 @@
 const { log } = require("../../../logger");
-const get_siemens_ct_data = require("./siemens_ct")
+const get_siemens_ct_data = require("./siemens_ct");
+const get_siemens_cv_data = require("./siemens_cv");
+const get_siemens_mri_data = require("./siemens_mri");
 
 async function get_siemens_data(run_id, modality) {
   log("info", "NA", "NA", "get_ge_data", `FN CALL`, {
@@ -12,10 +14,10 @@ async function get_siemens_data(run_id, modality) {
         get_siemens_ct_data(run_id);
         break;
       case "CV":
-        //get_siemens_cv_data(run_id);
+        get_siemens_cv_data(run_id);
         break;
       case "MRI":
-        //get_siemens_mri_data(run_id);
+        get_siemens_mri_data(run_id);
         break;
       default:
         break;

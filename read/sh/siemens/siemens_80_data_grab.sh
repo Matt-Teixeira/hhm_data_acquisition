@@ -41,7 +41,7 @@ else
         # cp /opt/files/$PATH/EvtApplication_Today.txt /opt/files/$PATH/Compare.log
         # } END DIFF CODE
 
-        variable='22_failed'
+        variable='80_failed'
         echo $variable
     else
         # Catch fail in js logs
