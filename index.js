@@ -68,6 +68,11 @@ const onBoot = async () => {
 
     console.log(run_group, schedule, manufacturer, modality);
 
+    // Supply one or more SMEs in first arg array, but must be same manufac. & modality
+    if (run_group === "manual") {
+      run_system_manual(["SME12424"], ["GE", "MRI"]);
+    }
+
     runJob(run_id, run_group, schedule, manufacturer, modality);
   } catch (error) {
     console.log(error);
@@ -78,5 +83,3 @@ const onBoot = async () => {
 };
 
 onBoot();
-
-//run_system_manual(["SME12411"], ["GE", "CT"], 1);

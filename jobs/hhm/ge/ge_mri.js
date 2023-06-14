@@ -11,10 +11,9 @@ async function get_ge_mri_data(run_id) {
     const systems = await getGeCtHhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
 
-    const mri_path = "./read/sh/GE/ge_mri_data_grab.sh";
-
     const runable_systems = [];
     for (const system of systems) {
+      const mri_path = `./read/sh/GE/${system.data_acquisition.script}`;
       // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
       if (system.data_acquisition && system.ip_address) {
         runable_systems.push(system);
@@ -26,11 +25,14 @@ async function get_ge_mri_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        exec_hhm_data_grab(run_id, system.id, mri_path, manufacturer, modality, [
-          system.ip_address,
-          user,
-          pass
-        ]);
+        exec_hhm_data_grab(
+          run_id,
+          system.id,
+          mri_path,
+          manufacturer,
+          modality,
+          [system.ip_address, user, pass]
+        );
       }
     }
 

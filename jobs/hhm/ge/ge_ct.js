@@ -1,5 +1,6 @@
 const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
+const exec_hhm_data_grab_2 = require("../../../read/exec-hhm_data_grab_2");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../utils");
 
@@ -10,7 +11,7 @@ async function get_ge_ct_data(run_id) {
     const modality = "CT";
     const systems = await getGeCtHhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
-    const ct_path = "./read/sh/GE/ge_ct_data_grab.sh";
+    const ct_path = "./read/sh/GE/ge_ct_22.sh";
 
     await log("info", run_id, "SYSTEMS_NUMBER", "get_ge_ct_data", "FN CALL", {
       number: systems.length,
@@ -29,7 +30,7 @@ async function get_ge_ct_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        exec_hhm_data_grab(run_id, system.id, ct_path, manufacturer, modality, [
+        exec_hhm_data_grab_2(run_id, system.id, ct_path, manufacturer, modality, [
           system.ip_address,
           user,
           pass,
