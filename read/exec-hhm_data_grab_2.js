@@ -17,6 +17,17 @@ const exec_hhm_data_grab_2 = async (
     sme,
   });
 
+  if (!args[0]) {
+    await log("error", jobId, sme, "exec_hhm_data_grab_2", "FN CALL", {
+      execPath: execPath,
+      ip: args[0],
+      sme,
+      error: "No IP address",
+    });
+    console.log("ERROR: No IP address!!! " + args[0]);
+    return;
+  }
+
   let data_store_path = "";
   switch (process.env.RUN_ENV) {
     case "dev":
@@ -46,6 +57,13 @@ const exec_hhm_data_grab_2 = async (
 
     console.log("\n********* stderr *********");
     console.log(stderr);
+    console.log("\n********* stderr *********\n");
+
+    const ssh_test_re = /Connection timed out/;
+    if (ssh_test_re.test(stderr)) {
+      // args[0] is IP Address
+      await add_to_redis_queue(args[0]);
+    }
 
     return;
   } catch (error) {
@@ -58,8 +76,14 @@ const exec_hhm_data_grab_2 = async (
       args,
       sme,
     });
-    // args[0] is IP Address
-    await add_to_redis_queue(args[0]);
+
+    const ssh_test_re = /Connection timed out/;
+    console.log(error.message);
+    console.log(ssh_test_re.test(error.message));
+    if (ssh_test_re.test(error.message)) {
+      // args[0] is IP Address
+      await add_to_redis_queue(args[0]);
+    }
   }
 };
 

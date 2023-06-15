@@ -1,7 +1,7 @@
 const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
-const { decryptString } = require("../../../utils");
+const { decryptString } = require("../../../util");
 
 async function get_philips_mri_data(run_id) {
   try {

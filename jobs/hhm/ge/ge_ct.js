@@ -2,7 +2,7 @@ const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const exec_hhm_data_grab_2 = require("../../../read/exec-hhm_data_grab_2");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
-const { decryptString } = require("../../../utils");
+const { decryptString } = require("../../../util");
 
 async function get_ge_ct_data(run_id) {
   try {
@@ -21,6 +21,7 @@ async function get_ge_ct_data(run_id) {
     for (const system of systems) {
       // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
       if (system.data_acquisition && system.ip_address) {
+        const cv_path = `./read/sh/GE/${system.data_acquisition.script}`;
         runable_systems.push(system);
         const system_creds = credentials.find((credential) => {
           if (credential.id == system.data_acquisition.hhm_credentials_group)

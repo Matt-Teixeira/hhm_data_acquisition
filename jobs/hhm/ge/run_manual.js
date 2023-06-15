@@ -3,7 +3,7 @@ const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const exec_hhm_data_grab_2 = require("../../../read/exec-hhm_data_grab_2");
 const { getHhmCreds, getAllSystem } = require("../../../sql/qf-provider");
-const { decryptString } = require("../../../utils");
+const { decryptString } = require("../../../util");
 
 async function run_system_manual(systemArray, man_mod) {
   try {
@@ -13,6 +13,10 @@ async function run_system_manual(systemArray, man_mod) {
 
     for (const sys of systemArray) {
       const system = await getAllSystem(sys);
+      if (!system[0].hhm_config) {
+        console.log("NO CONFIG!! " + system[0].id);
+        return;
+      }
       console.log(system[0]);
       console.log(system[0].hhm_config.data_acquisition.script);
 

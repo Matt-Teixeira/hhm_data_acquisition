@@ -6,13 +6,19 @@ const rsync_philips_mri = require("./jobs/philips_mri/rsync_philips-mri");
 const onBootMMB = require("./jobs/mmb");
 const get_hhm_data = require("./jobs/hhm");
 const run_system_manual = require("./jobs/hhm/ge/run_manual");
+const [
+  addLogEvent,
+  writeLogEvents,
+  dbInsertLogEvents,
+  makeAppRunLog,
+] = require("./utils/logger/log");
+
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
-} = require("./logger/enums");
-const [addLogEvent, writeLogEvents] = require("./logger/log");
+} = require("./utils/logger/enums");
 
-function runJob(run_id, run_group, schedule, manufacturer, modality) {
+function runJob(run_log, run_group, schedule, manufacturer, modality) {
   log("info", "NA", "NA", "onBoot", `FN CALL`, {
     run_group,
     schedule,
@@ -23,26 +29,28 @@ function runJob(run_id, run_group, schedule, manufacturer, modality) {
     modality: modality,
   };
 
-  addLogEvent(I, run_id, "onBoot", det, note, null);
-  writeLogEvents();
+  addLogEvent(I, run_log, "onBoot", det, note, null);
+  
   switch (run_group) {
     case "mmb":
-      onBootMMB(parseInt(run_id, schedule));
+      onBootMMB(parseInt(run_log, schedule));
       break;
     case "philips":
-      rsync_philips_mri(run_id);
+      rsync_philips_mri(run_log);
       break;
     case "hhm":
-      get_hhm_data(run_id, manufacturer, modality);
+      get_hhm_data(run_log, manufacturer, modality);
       break;
 
     default:
       break;
   }
+  writeLogEvents(run_log);
 }
 
 const onBoot = async () => {
-  const run_id = short.uuid();
+  const run_log = await makeAppRunLog();
+
   log("info", "NA", "NA", "onBoot", `FN CALL`, {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
@@ -57,7 +65,7 @@ const onBoot = async () => {
     PG_DB: process.env.PG_DB,
   };
 
-  addLogEvent(I, run_id, "onBoot", det, note, null);
+  addLogEvent(I, run_log, "onBoot", cal, note, null);
 
   try {
     //rsync_philips_mri();
@@ -70,10 +78,10 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(["SME12424"], ["GE", "MRI"]);
+      run_system_manual(["SME10056"], ["Philips", "CT"]);
     }
 
-    runJob(run_id, run_group, schedule, manufacturer, modality);
+    runJob(run_log, run_group, schedule, manufacturer, modality);
   } catch (error) {
     console.log(error);
     await log("error", "JobID", "NA", "onBoot", `ON ERROR`, {
