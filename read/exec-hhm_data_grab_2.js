@@ -1,7 +1,8 @@
 const { log } = require("../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
-const add_to_redis_queue = require("../redis/ip_queue");
+const { add_to_redis_queue } = require("../redis");
+const { update_last_dir_date } = require("../redis");
 
 const exec_hhm_data_grab_2 = async (
   jobId,
@@ -44,7 +45,8 @@ const exec_hhm_data_grab_2 = async (
   }
 
   // EXAMPLE: /home/prod/hhm_data_acquisition/files/prod_hhm/GE/CT/SME00001
-  args.push(`${data_store_path}/${manufacturer}/${modality}/${sme}`);
+  const dir_path = `${data_store_path}/${manufacturer}/${modality}/${sme}`;
+  args.push(dir_path);
 
   console.log("\nBash Args");
   console.log(args);
@@ -63,7 +65,10 @@ const exec_hhm_data_grab_2 = async (
     if (ssh_test_re.test(stderr)) {
       // args[0] is IP Address
       await add_to_redis_queue(args[0]);
+      return;
     }
+
+    //await update_last_dir_date(sme, dir_path);
 
     return;
   } catch (error) {
