@@ -4,7 +4,7 @@ const execFile = util.promisify(require("child_process").execFile);
 const { add_to_redis_queue } = require("../redis");
 const { update_last_dir_date } = require("../redis");
 
-const exec_hhm_data_grab_2 = async (
+const exec_phil_cv_data_grab = async (
   jobId,
   sme,
   execPath,
@@ -12,14 +12,14 @@ const exec_hhm_data_grab_2 = async (
   modality,
   args
 ) => {
-  await log("info", jobId, sme, "exec_hhm_data_grab_2", "FN CALL", {
+  await log("info", jobId, sme, "exec_phil_cv_data_grab", "FN CALL", {
     execPath: execPath,
     args: args,
     sme,
   });
 
   if (!args[0]) {
-    await log("error", jobId, sme, "exec_hhm_data_grab_2", "FN CALL", {
+    await log("error", jobId, sme, "exec_phil_cv_data_grab", "FN CALL", {
       execPath: execPath,
       ip: args[0],
       sme,
@@ -68,15 +68,15 @@ const exec_hhm_data_grab_2 = async (
       return;
     }
 
-    //await update_last_dir_date(sme, dir_path);
+    await update_last_dir_date(sme, args[3]);
 
     return;
   } catch (error) {
-    console.log("\n***** ERROR START: exec_hhm_data_grab_2 *****\n");
+    console.log("\n***** ERROR START: exec_phil_cv_data_grab *****\n");
     console.log(error);
-    console.log("\n***** ERROR END: exec_hhm_data_grab_2 *****\n");
+    console.log("\n***** ERROR END: exec_phil_cv_data_grab *****\n");
     console.log(error.stderr);
-    await log("error", jobId, sme, "exec_hhm_data_grab_2", "FN CATCH", {
+    await log("error", jobId, sme, "exec_phil_cv_data_grab", "FN CATCH", {
       error: error,
       args,
       sme,
@@ -92,7 +92,7 @@ const exec_hhm_data_grab_2 = async (
   }
 };
 
-module.exports = exec_hhm_data_grab_2;
+module.exports = exec_phil_cv_data_grab;
 
 // Example of ssh tunnel reset example
 // ssh: connect to host 167.171.115.90 port 22: Connection timed out

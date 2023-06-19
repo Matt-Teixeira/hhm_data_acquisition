@@ -1,7 +1,7 @@
 set -ue
-[ ! -d "$4" ] && mkdir $4
-files=$(lftp -c "open ftp://$2:$3@$1; cd SaveDevData; ls -l");
-lftp -c "set net:timeout 5; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; open ftp://Pks.4AA:37Dbt5.FMt@172.16.30.137; cd /SaveDevData/daily_$5;mget Event.zip -O $4/'$5'_daily"
+[ ! -d "$5" ] && mkdir $5
+[ ! -d "$5/$4" ] && mkdir $5/$4
+lftp -c "set net:timeout 5; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; open ftp://Pks.4AA:37Dbt5.FMt@172.16.30.137; cd /SaveDevData/$4;mget Event.zip -O $5/$4"
 #lftp -c "set net:timeout 5; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; open ftp://Pks.4AA:37Dbt5.FMt@10.50.8.203; cd /SaveDevData/daily_2023_06_15;get Event.zip"
 
 ## --{ WORKS
@@ -11,8 +11,8 @@ lftp -c "set net:timeout 5; set ftp:ssl-allow off; set net:reconnect-interval-ba
 #     echo "Connection timed out" >&2
 #     exit
 # fi
-# RECENTFILE="$(find $5/*/* -type f -name 'Event.zip' -printf "%T+ - %p\n" | sort -n | tail -1 | awk '{print $3}')"
-# unzip -o "$RECENTFILE" -d $5
+RECENTFILE="$(find $5/*/* -type f -name 'Event.zip' -printf "%T+ - %p\n" | sort -n | tail -1 | awk '{print $3}')"
+unzip -o "$RECENTFILE" -d $5
 
 
 ## --{ NOTES
