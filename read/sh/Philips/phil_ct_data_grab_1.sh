@@ -1,10 +1,16 @@
-set -ue
+# set -ue
 [ ! -d "$4" ] && mkdir $4
 
 # lftp -c "open ftp://$2:$3@$1; cd /C/Program\ Files/GE\ Medical\ Systems/DL/Log/; mget -e sysError.log -O $4/sysError"
 # lftp sftp://$2:$3@$1 -e "set xfer:clobber on; cd /cygdrive/d/Data_Logger/;lcd $4/; get Output.mdb; exit"
 
 timeout 10 lftp -c "set net:timeout 10; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
+
+if [ $? -ne 0 ]; then
+    echo "Connection timed out" >&2
+    exit
+fi
+
 chmod +0644 $4/Output.mdb
 # { BEGIN CONVERSION
 now_ISO8601=$(date -u +"%Y-%m-%dT%H:%M:00Z")
@@ -40,4 +46,4 @@ mdb-export $4/Output.mdb $EALINFO_TABLEVAR | tail -n +2 | sort | awk 'NF > 2' >>
 exit
 
 # mget: Access failed: No such file (Output.mdb)
-## set net:timeout 10; 
+## set net:timeout 10;

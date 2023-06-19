@@ -1,13 +1,18 @@
-set -ue
+#set -ue
 
 [ ! -d "$4" ] && mkdir $4
 
 ## lftp -c "set net:timeout 10; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
 ## lftp sftp://$2:$3@$1 "cd /cygdrive/d/Data_Logger; get Logger.mdb; bye" && cp ./Logger.mdb ./Output.mdb
 cd $4
-timeout 11 lftp -c "open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger; get Logger.mdb;"
+timeout 10 lftp -c "open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger; get Logger.mdb;"
 
-chmod +0644 $4/Output.mdb
+if [ $? -ne 0 ]; then
+    echo "Connection timed out" >&2
+    exit
+fi
+mv Logger.mdb Output.mdb
+#chmod +0644 $4/Output.mdb
 # { BEGIN CONVERSION
 now_ISO8601=$(date -u +"%Y-%m-%dT%H:%M:00Z")
 
