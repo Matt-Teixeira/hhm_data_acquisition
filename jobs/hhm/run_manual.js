@@ -67,7 +67,7 @@ async function run_system_manual(systemArray, man_mod) {
       // { END: Philips CV Specific Code
 
       // Remove last (file) arg if not running Philips CV
-      for (const file of new_files) {
+      for (let file of new_files) {
         exec_phil_cv_data_grab(
           "JOBID",
           system[0].id,
