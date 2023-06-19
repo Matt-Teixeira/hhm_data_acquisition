@@ -1,11 +1,10 @@
 ("use strict");
 require("dotenv").config();
-const short = require("short-uuid");
 const { log } = require("./logger");
 const rsync_philips_mri = require("./jobs/philips_mri/rsync_philips-mri");
 const onBootMMB = require("./jobs/mmb");
 const get_hhm_data = require("./jobs/hhm");
-const run_system_manual = require("./jobs/hhm/ge/run_manual");
+const run_system_manual = require("./jobs/hhm/run_manual");
 const [
   addLogEvent,
   writeLogEvents,
@@ -45,7 +44,7 @@ function runJob(run_log, run_group, schedule, manufacturer, modality) {
     default:
       break;
   }
-  writeLogEvents(run_log);
+  //writeLogEvents(run_log);
 }
 
 const onBoot = async () => {
@@ -68,7 +67,6 @@ const onBoot = async () => {
   addLogEvent(I, run_log, "onBoot", cal, note, null);
 
   try {
-    //rsync_philips_mri();
     const run_group = process.argv[2];
     const schedule = process.argv[3] || null;
     const manufacturer = process.argv[4] || null;
@@ -78,7 +76,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(["SME10056"], ["Philips", "CT"]);
+      run_system_manual(["SME00782"], ["Philips", "CV"]);
     }
 
     runJob(run_log, run_group, schedule, manufacturer, modality);
