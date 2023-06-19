@@ -1,5 +1,5 @@
 const { log } = require("../logger");
-const initRedis = require("./index");
+const initRedis = require("./redis_instance");
 
 async function add_to_redis_queue(ip_address) {
   const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
