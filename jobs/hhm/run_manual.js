@@ -55,8 +55,13 @@ async function run_system_manual(systemArray, man_mod) {
         pass
       );
 
-      if (!new_files) {
+      if (new_files === null) {
         //LOG
+        console.log("No new files for: " + system[0].id);
+        return;
+      }
+      if (new_files === false) {
+        console.log("System needs tunnel reset: " + system[0].id);
         return;
       }
       // { END: Philips CV Specific Code

@@ -10,6 +10,8 @@ async function list_new_files(sme, ip_address, last_file, user, pass) {
     `${process.env.DEV_HHM_FILES}/Philips/CV/${sme}`,
   ]);
 
+  if (files_list === false) return false;
+
   const dirs = files_list.split(" ");
   if (!dirs) return null;
 
