@@ -2,13 +2,14 @@ const { error } = require("winston");
 const { log } = require("../../logger");
 const exec_hhm_data_grab = require("../../read/exec-hhm_data_grab");
 const exec_phil_cv_data_grab = require("../../read/exec-phil_cv_data_grab");
-const exec_child_process = require("../../read/exec-child_process");
+const exec_child_process = require("../../read/exec-list_dirs");
 const { getHhmCreds, getAllSystem } = require("../../sql/qf-provider");
 const {
   decryptString,
   phil_ct_file_date_formatter,
   list_new_files,
 } = require("../../util");
+const { get_last_dir_date } = require("../../redis/redis_helpers");
 
 async function run_system_manual(systemArray, man_mod) {
   try {
@@ -37,23 +38,30 @@ async function run_system_manual(systemArray, man_mod) {
       }
       const path = `./read/sh/${man_mod[0]}/${system[0].hhm_config.data_acquisition.script}`;
 
+      // { START: Philips CV Specific Code
+
+      // Get last dir from Redis
+      const last_aquired_dir = await get_last_dir_date(system[0].id);
+      console.log("last_aquired_dir");
+      console.log(last_aquired_dir);
+      // Example: daily_2023_06_19 or daily_20230619
+
+      // Pass last_aquired_dir to list new files post last_aquired_dir
       const new_files = await list_new_files(
         system[0].id,
         system[0].ip_address,
-        "daily_2023_06_16",
+        last_aquired_dir,
         user,
         pass
       );
 
-      console.log(system[0].hhm_config.data_acquisition);
+      if (!new_files) {
+        //LOG
+        return;
+      }
+      // { END: Philips CV Specific Code
 
-      /* let formatted_date = "";
-      if (man_mod[0] === "Philips" && man_mod[1] === "CV") {
-        formatted_date = phil_ct_file_date_formatter(
-          system[0].hhm_config.data_acquisition.date_format
-        );
-      } */
-
+      // Remove last (file) arg if not running Philips CV
       for (const file of new_files) {
         exec_phil_cv_data_grab(
           "JOBID",
@@ -66,7 +74,7 @@ async function run_system_manual(systemArray, man_mod) {
       }
     }
   } catch (error) {
-    console.log("HELLO ERROR In CATCH");
+    console.log("ERROR IN MANUAL CATCH");
     console.log(error);
   }
 }

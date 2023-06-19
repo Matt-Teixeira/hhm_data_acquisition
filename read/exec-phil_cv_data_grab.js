@@ -61,8 +61,8 @@ const exec_phil_cv_data_grab = async (
     console.log(stderr);
     console.log("\n********* stderr *********\n");
 
-    const ssh_test_re = /Connection timed out/;
-    if (ssh_test_re.test(stderr)) {
+    const connection_test = /Connection timed out/;
+    if (connection_test.test(stderr)) {
       // args[0] is IP Address
       await add_to_redis_queue(args[0]);
       return;
