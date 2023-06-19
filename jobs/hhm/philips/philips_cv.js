@@ -26,6 +26,10 @@ async function get_philips_cv_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
+        console.log("system.data_acquisition.date_format");
+        console.log(system.data_acquisition.date_format);
+        return;
+
         exec_hhm_data_grab(run_id, system.id, cv_path, manufacturer, modality, [
           system.ip_address,
           user,
