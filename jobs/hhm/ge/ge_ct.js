@@ -1,6 +1,6 @@
 const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
-const exec_hhm_data_grab_2 = require("../../../read/exec-hhm_data_grab_2");
+const exec_hhm_data_grab_2 = require("../../../read/exec-phil_cv_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
 
