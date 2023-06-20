@@ -6,7 +6,12 @@
    "scripts": {
       "start": "node index.js",
       "man": "node index.js manual",
-      "philips_cv": "node index.js hhm null Philips CV"
+      "ge_ct": "node index.js hhm null GE CT",
+      "ge_cv": "node index.js hhm null GE CV",
+      "ge_mri": "node index.js hhm null GE MRI",
+      "philips_ct": "node index.js hhm null Philips CT",
+      "philips_cv": "node index.js hhm null Philips CV",
+      "ip": "node index.js ip_reset"
    },
    "keywords": [],
    "author": "",

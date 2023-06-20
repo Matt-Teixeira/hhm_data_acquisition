@@ -4,7 +4,7 @@
 # lftp -c "open ftp://$2:$3@$1; cd /C/Program\ Files/GE\ Medical\ Systems/DL/Log/; mget -e sysError.log -O $4/sysError"
 # lftp sftp://$2:$3@$1 -e "set xfer:clobber on; cd /cygdrive/d/Data_Logger/;lcd $4/; get Output.mdb; exit"
 
-timeout 10 lftp -c "set net:timeout 10; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
+lftp -c "set net:timeout 20; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
 
 if [ $? -ne 0 ]; then
     echo "Connection timed out" >&2

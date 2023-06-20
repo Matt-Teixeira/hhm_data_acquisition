@@ -11,13 +11,14 @@ const [
   dbInsertLogEvents,
   makeAppRunLog,
 ] = require("./utils/logger/log");
+const reset_tunnel = require("./jobs/tunnel_reset");
 
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("./utils/logger/enums");
 
-function runJob(run_log, run_group, schedule, manufacturer, modality) {
+async function runJob(run_log, run_group, schedule, manufacturer, modality) {
   log("info", "NA", "NA", "onBoot", `FN CALL`, {
     run_group,
     schedule,
@@ -29,7 +30,7 @@ function runJob(run_log, run_group, schedule, manufacturer, modality) {
   };
 
   addLogEvent(I, run_log, "onBoot", det, note, null);
-  
+
   switch (run_group) {
     case "mmb":
       onBootMMB(parseInt(run_log, schedule));
@@ -39,6 +40,9 @@ function runJob(run_log, run_group, schedule, manufacturer, modality) {
       break;
     case "hhm":
       get_hhm_data(run_log, manufacturer, modality);
+      break;
+    case "ip_reset":
+      await reset_tunnel(run_log);
       break;
 
     default:
@@ -76,7 +80,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(["SME00508"], ["Philips", "CV"]);
+      run_system_manual(["SME00445"], ["Philips", "CV"]);
     }
 
     runJob(run_log, run_group, schedule, manufacturer, modality);

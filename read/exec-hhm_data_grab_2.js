@@ -1,7 +1,6 @@
 const { log } = require("../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
-const { add_to_redis_queue } = require("../redis");
 
 const exec_hhm_data_grab = async (
   jobId,
@@ -11,9 +10,6 @@ const exec_hhm_data_grab = async (
   modality,
   args
 ) => {
-  const connection_test_1 = /Connection timed out/;
-  const connection_test_2 = /error: max-retries exceeded/;
-
   await log("info", jobId, sme, "exec_hhm_data_grab", "FN CALL", {
     execPath: execPath,
     args: args,
@@ -44,18 +40,39 @@ const exec_hhm_data_grab = async (
   try {
     const { stdout, stderr } = await execFile(execPath, args);
 
-    // If connection is closed, return false
-    if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
-      // args[0] is IP Address
-      const data = {
-        sme: sme,
-        ip: args[0],
-      };
-      await add_to_redis_queue(JSON.stringify(data));
-      return false;
+    if (stdout.trim() == "22_failed") { //443_failed
+      await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
+        message: "Port 22 is not open",
+        args,
+        sme,
+      });
     }
 
-    return stdout;
+    if (stdout.trim() == "443_failed") {
+      await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
+        message: "Port 443 is not open",
+        args,
+        sme,
+      });
+    }
+
+    if (stdout.trim() == "80_failed") {
+      await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
+        message: "Port 80 is not open",
+        args,
+        sme,
+      });
+    }
+
+    if (stdout.trim() == "21_failed") {
+      await log("warn", jobId, sme, "exec_hhm_data_grab", "FN DETAILS", {
+        message: "Ports 21 & 22 are not open",
+        args,
+        sme,
+      });
+    }
+
+    return;
   } catch (error) {
     console.log(error);
     await log("error", jobId, sme, "exec_hhm_data_grab", "FN CATCH", {
@@ -63,18 +80,6 @@ const exec_hhm_data_grab = async (
       args,
       sme,
     });
-    if (
-      connection_test_1.test(error.message) ||
-      connection_test_2.test(error.message)
-    ) {
-      // args[0] is IP Address
-      const data = {
-        sme: sme,
-        ip: args[0],
-      };
-      await add_to_redis_queue(JSON.stringify(data));
-      return false;
-    }
     return null;
   }
 };

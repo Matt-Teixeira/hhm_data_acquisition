@@ -3,11 +3,11 @@ const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
 
-async function get_philips_ct_data(run_id) {
+async function get_philips_mri_data(run_id) {
   try {
-    await log("info", run_id, "Philips_CT", "get_philips_ct_data", "FN CALL");
+    await log("info", run_id, "Philips_MRI", "get_philips_mri_data", "FN CALL");
     const manufacturer = "Philips";
-    const modality = "CT";
+    const modality = "MRI";
     const systems = await getGeCtHhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
 
@@ -15,7 +15,8 @@ async function get_philips_ct_data(run_id) {
     for (const system of systems) {
       // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
       if (system.data_acquisition && system.ip_address) {
-        const ct_path = `./read/sh/Philips/${system.data_acquisition.script}`;
+        const mri_path = `./read/sh/philips/${system.data_acquisition.script}`;
+
         runable_systems.push(system);
         const system_creds = credentials.find((credential) => {
           if (credential.id == system.data_acquisition.hhm_credentials_group)
@@ -25,11 +26,14 @@ async function get_philips_ct_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        exec_hhm_data_grab(run_id, system.id, ct_path, manufacturer, modality, [
-          system.ip_address,
-          user,
-          pass,
-        ]);
+        exec_hhm_data_grab(
+          run_id,
+          system.id,
+          mri_path,
+          manufacturer,
+          modality,
+          [system.ip_address, user, pass]
+        );
       }
     }
     console.log(systems.length);
@@ -39,10 +43,17 @@ async function get_philips_ct_data(run_id) {
     console.log(runable_systems);
   } catch (error) {
     console.log(error);
-    await log("error", run_id, "Philips_CT", "get_philips_ct_data", "FN CALL", {
-      error,
-    });
+    await log(
+      "error",
+      run_id,
+      "Philips_MRI",
+      "get_philips_mri_data",
+      "FN CALL",
+      {
+        error,
+      }
+    );
   }
 }
 
-module.exports = get_philips_ct_data;
+module.exports = get_philips_mri_data;

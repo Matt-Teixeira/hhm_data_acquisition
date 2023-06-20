@@ -3,7 +3,7 @@ const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const { add_to_redis_queue } = require("../redis");
 
-const exec_list_dirs = async (jobId, sme, path, args) => {
+const exec_list_dirs = async (jobId, sme, path, system, args) => {
   const connection_test_1 = /Connection timed out/;
   const connection_test_2 = /error: max-retries exceeded/;
 
@@ -25,7 +25,7 @@ const exec_list_dirs = async (jobId, sme, path, args) => {
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
       // args[0] is IP Address
-      await add_to_redis_queue(args[0]);
+      await add_to_redis_queue(JSON.stringify(system));
       return false;
     }
 
@@ -41,7 +41,7 @@ const exec_list_dirs = async (jobId, sme, path, args) => {
       connection_test_2.test(error.message)
     ) {
       // args[0] is IP Address
-      await add_to_redis_queue(args[0]);
+      await add_to_redis_queue(JSON.stringify(system));
       return false;
     }
     return null;

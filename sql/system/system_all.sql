@@ -1,6 +1,8 @@
 SELECT
-    *
+    id,
+    ip_address,
+    hhm_config -> 'data_acquisition' AS data_acquisition
 FROM
     systems
 WHERE
-    id = $1;
+    id IN ($1);
