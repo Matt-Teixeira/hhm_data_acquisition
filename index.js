@@ -29,11 +29,13 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
     modality: modality,
   };
 
+  console.log(note)
+
   addLogEvent(I, run_log, "onBoot", det, note, null);
 
   switch (run_group) {
     case "mmb":
-      onBootMMB(parseInt(run_log, schedule));
+      onBootMMB(parseInt(schedule));
       break;
     case "philips":
       rsync_philips_mri(run_log);

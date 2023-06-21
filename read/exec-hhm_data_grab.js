@@ -37,7 +37,8 @@ const exec_hhm_data_grab = async (
   }
 
   // EXAMPLE: /home/prod/hhm_data_acquisition/files/prod_hhm/GE/CT/SME00001
-  args.push(`${data_store_path}/${manufacturer}/${modality}/${sme}`);
+  // DEV: args.push(`${data_store_path}/${manufacturer}/${modality}/${sme}`);
+  args.push(`${data_store_path}/${sme}`);
 
   console.log("\nBash Args");
   console.log(args);
