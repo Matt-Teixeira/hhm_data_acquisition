@@ -2,11 +2,8 @@ const getTunnelsByIP = require("../../utils/vpn/get-tunnels-by-ip");
 const resetTunnels = require("../../utils/vpn/reset-tunnels");
 const { get_redis_ip_queue, clear_redis_ip_queue } = require("../../redis");
 const { group_queue_keys } = require("../../util");
-const {
-  get_philips_cv_data,
-  get_philips_ct_data,
-  get_philips_mri_data,
-} = require("./philips");
+const get_philips_data = require("./philips");
+const get_ge_data = require("./ge");
 const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -18,10 +15,19 @@ async function reset_tunnel(run_log) {
   try {
     // Get Redis systems that need tunnel resets
     const ip_queue = await get_redis_ip_queue();
+    if (!ip_queue.length) {
+      let note = { message: "No IP addresses in queue" };
+      addLogEvent(I, run_log, "reset_tunnel", det, note, null);
+      return;
+    }
+    console.log(ip_queue);
     addLogEvent(I, run_log, "reset_tunnel", det, { ip_queue }, null);
 
     // Parse system data to get array of ip addresses
     const parsed_data = group_queue_keys(ip_queue);
+
+    console.log("\nparsed_data");
+    console.log(parsed_data);
 
     // Group IP by tunnel id
     const tunnels_by_ip = await getTunnelsByIP(run_log, parsed_data.ip_address);
@@ -38,12 +44,12 @@ async function reset_tunnel(run_log) {
     // Reset tunnels
     await resetTunnels(run_log, tunnels_by_ip);
 
-    console.log("Start of timer")
-    await setTimeout(5000);
-    console.log("End of timer")
+    console.log("Start of timer");
+    await setTimeout(10_000);
+    console.log("End of timer");
 
     // Clear tunnel reset queue
-    //await clear_redis_ip_queue();
+    await clear_redis_ip_queue();
 
     // Run data acquisition
     const ran_systems = [];
@@ -52,13 +58,16 @@ async function reset_tunnel(run_log) {
       let is_duplicate = ran_systems.indexOf(system.id);
       if (is_duplicate !== -1) continue;
 
-      const key = `${system.manufacturer}_${system.modality}`;
-      addLogEvent(I, run_log, "reset_tunnel", det, { key }, null);
-      switch (key) {
-        case "Philips_CV/IR":
-          get_philips_cv_data(run_log, system);
+      switch (system.manufacturer) {
+        case "GE":
+          get_ge_data(run_log, system);
           break;
-
+        case "Philips":
+          get_philips_data(run_log, system);
+          break;
+        case "Siemens":
+          get_philips_data(run_log, system);
+          break;
         default:
           break;
       }

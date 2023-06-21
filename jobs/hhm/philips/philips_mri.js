@@ -32,6 +32,7 @@ async function get_philips_mri_data(run_id) {
           mri_path,
           manufacturer,
           modality,
+          system,
           [system.ip_address, user, pass]
         );
       }

@@ -1,4 +1,3 @@
-const { log } = require("../../../logger");
 const exec_phil_cv_data_grab = require("../../../read/exec-phil_cv_data_grab");
 const { getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString, list_new_files } = require("../../../util");
@@ -12,7 +11,8 @@ const {
 async function get_philips_cv_data(run_log, system) {
   console.log("INSIDE get_philips_cv_data")
   try {
-    addLogEvent(I, run_log, "get_philips_cv_data", cal, null, null);
+    let note = {system: system}
+    addLogEvent(I, run_log, "get_philips_cv_data", cal, note, null);
     const manufacturer = "Philips";
     const credentials = await getHhmCreds([manufacturer, "CV"]); // Change modality in hhm_credentials table to CV/IR
 
@@ -52,7 +52,7 @@ async function get_philips_cv_data(run_log, system) {
 
       for (const file of new_files) {
         exec_phil_cv_data_grab(
-          "JOBID",
+          "PLACEHOLDER run_job",
           system.id,
           cv_path,
           manufacturer,

@@ -1,37 +1,33 @@
-const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
-const { getGeCtHhm } = require("../../../sql/qf-provider");
+const [addLogEvent] = require("../../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../../utils/logger/enums");
 
-async function get_siemens_mri_data(run_id) {
+async function get_siemens_mri_data(run_log, system) {
   try {
-    await log("info", run_id, "Siemens_MRI", "get_siemens_mri_data", "FN CALL");
+    let note = { system: system };
+    addLogEvent(I, run_log, "get_siemens_mri_data", cal, note, null);
+
     const manufacturer = "Siemens";
     const modality = "MRI";
-    const systems = await getGeCtHhm([manufacturer, modality]);
 
-    console.log("********** SYSTEMS **********");
-    console.log(systems);
+    if (system.data_acquisition && system.ip_address) {
+      const mri_path = `./read/sh/siemens/${system.data_acquisition.script}`;
 
-    const runable_systems = [];
-    for (const system of systems) {
-      // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
-      if (system.data_acquisition && system.ip_address) {
-        const mri_path = `./read/sh/siemens/${system.data_acquisition.script}`;
-        runable_systems.push(system);
-
-        exec_hhm_data_grab(run_id, system.id, mri_path, manufacturer, modality, [system.ip_address]);
-      }
+      exec_hhm_data_grab(
+        "PLACEHOLDER run_log",
+        system.id,
+        mri_path,
+        manufacturer,
+        modality,
+        system,
+        [system.ip_address]
+      );
     }
-    console.log(systems.length);
-    console.log(systems);
-    console.log("*** RAN SYSTEMS ***");
-    console.log(runable_systems.length);
-    console.log(runable_systems);
   } catch (error) {
     console.log(error);
-    await log("error", run_id, "Siemens_MRI", "get_siemens_mri_data", "FN CALL", {
-      error,
-    });
   }
 }
 

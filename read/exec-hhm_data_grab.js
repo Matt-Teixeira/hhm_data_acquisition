@@ -9,6 +9,7 @@ const exec_hhm_data_grab = async (
   execPath,
   manufacturer,
   modality,
+  system,
   args
 ) => {
   const connection_test_1 = /Connection timed out/;
@@ -46,12 +47,7 @@ const exec_hhm_data_grab = async (
 
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
-      // args[0] is IP Address
-      const data = {
-        sme: sme,
-        ip: args[0],
-      };
-      await add_to_redis_queue(JSON.stringify(data));
+      await add_to_redis_queue(JSON.stringify(system));
       return false;
     }
 
@@ -67,12 +63,7 @@ const exec_hhm_data_grab = async (
       connection_test_1.test(error.message) ||
       connection_test_2.test(error.message)
     ) {
-      // args[0] is IP Address
-      const data = {
-        sme: sme,
-        ip: args[0],
-      };
-      await add_to_redis_queue(JSON.stringify(data));
+      await add_to_redis_queue(JSON.stringify(system));
       return false;
     }
     return null;

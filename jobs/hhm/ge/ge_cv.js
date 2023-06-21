@@ -35,6 +35,7 @@ async function get_ge_cv_data(run_id) {
           cv_path,
           manufacturer,
           modality,
+          system,
           [system.ip_address, user, pass]
         );
 

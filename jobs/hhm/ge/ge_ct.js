@@ -34,6 +34,7 @@ async function get_ge_ct_data(run_id) {
           ct_path,
           manufacturer,
           modality,
+          system,
           [system.ip_address, user, pass]
         );
       }

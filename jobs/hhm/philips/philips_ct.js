@@ -25,7 +25,7 @@ async function get_philips_ct_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        exec_hhm_data_grab(run_id, system.id, ct_path, manufacturer, modality, [
+        exec_hhm_data_grab(run_id, system.id, ct_path, manufacturer, modality, system, [
           system.ip_address,
           user,
           pass,

@@ -11,6 +11,8 @@
       "ge_mri": "node index.js hhm null GE MRI",
       "philips_ct": "node index.js hhm null Philips CT",
       "philips_cv": "node index.js hhm null Philips CV",
+      "siemens_ct": "node index.js hhm null Siemens CT",
+      "siemens_mri": "node index.js hhm null Siemens MRI",
       "ip": "node index.js ip_reset"
    },
    "keywords": [],
