@@ -3,18 +3,13 @@ const exec_remote_rsync = require("../../read/exec-remote_rsync");
 const rsync_local = require("../../relocate_files/rsync_local");
 const { get_phil_mri_systems } = require("../../sql/qf-provider");
 const short = require("short-uuid");
-
+const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
-} = require("../../logger/enums");
-const [addLogEvent, writeLogEvents] = require("../../logger/log");
+} = require("../../utils/logger/enums");
 
 const rsync_philips_mri = async (run_id) => {
-  
-  log("info", run_id, "NA", "rsync_philips_mri", `FN CALL`);
-
-  addLogEvent(I, run_id, "rsync_philips_mri", det, null, null);
 
   try {
     const system_data = await get_phil_mri_systems(run_id);

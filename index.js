@@ -1,43 +1,38 @@
 ("use strict");
 require("dotenv").config();
-const { log } = require("./logger");
 const rsync_philips_mri = require("./jobs/philips_mri/rsync_philips-mri");
 const onBootMMB = require("./jobs/mmb");
 const get_hhm_data = require("./jobs/hhm");
 const run_system_manual = require("./jobs/hhm/run_manual");
+const reset_tunnel = require("./jobs/tunnel_reset");
 const [
   addLogEvent,
   writeLogEvents,
   dbInsertLogEvents,
   makeAppRunLog,
 ] = require("./utils/logger/log");
-const reset_tunnel = require("./jobs/tunnel_reset");
-
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("./utils/logger/enums");
 
 async function runJob(run_log, run_group, schedule, manufacturer, modality) {
-  log("info", "NA", "NA", "onBoot", `FN CALL`, {
-    run_group,
-    schedule,
-  });
   let note = {
     run_group: run_group,
     schedule: schedule,
     modality: modality,
   };
 
-  console.log(note)
+  console.log(note);
 
-  addLogEvent(I, run_log, "onBoot", det, note, null);
+  await addLogEvent(I, run_log, "onBoot", det, note, null);
 
   switch (run_group) {
     case "mmb":
       onBootMMB(parseInt(schedule));
       break;
     case "philips":
+      console.log(run_log);
       rsync_philips_mri(run_log);
       break;
     case "hhm":
@@ -50,18 +45,10 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
     default:
       break;
   }
-  //writeLogEvents(run_log);
 }
 
 const onBoot = async () => {
   const run_log = await makeAppRunLog();
-
-  log("info", "NA", "NA", "onBoot", `FN CALL`, {
-    LOGGER: process.env.LOGGER,
-    REDIS_IP: process.env.REDIS_IP,
-    PG_USER: process.env.PG_USER,
-    PG_DB: process.env.PG_DB,
-  });
 
   let note = {
     LOGGER: process.env.LOGGER,
@@ -70,7 +57,7 @@ const onBoot = async () => {
     PG_DB: process.env.PG_DB,
   };
 
-  addLogEvent(I, run_log, "onBoot", cal, note, null);
+  await addLogEvent(I, run_log, "onBoot", cal, note, null);
 
   try {
     const run_group = process.argv[2];
@@ -85,12 +72,10 @@ const onBoot = async () => {
       run_system_manual(["SME00445"], ["Philips", "CV"]);
     }
 
-    runJob(run_log, run_group, schedule, manufacturer, modality);
+    await runJob(run_log, run_group, schedule, manufacturer, modality);
+    //await writeLogEvents(run_log);
   } catch (error) {
     console.log(error);
-    await log("error", "JobID", "NA", "onBoot", `ON ERROR`, {
-      error: error,
-    });
   }
 };
 

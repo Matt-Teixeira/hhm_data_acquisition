@@ -2,21 +2,31 @@ const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
+const [
+  addLogEvent,
+  writeLogEvents,
+  dbInsertLogEvents,
+  makeAppRunLog,
+] = require("../../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../../utils/logger/enums");
 
-async function get_ge_ct_data(run_id) {
-  try {
-    await log("info", run_id, "GE_CV", "get_ge_ct_data", "FN CALL");
-    const manufacturer = "GE";
-    const modality = "CT";
-    const systems = await getGeCtHhm([manufacturer, modality]);
-    const credentials = await getHhmCreds([manufacturer, modality]);
+async function get_ge_ct_data(run_log) {
+  await addLogEvent(I, run_log, "get_ge_ct_data", cal, null, null);
 
-    await log("info", run_id, "SYSTEMS_NUMBER", "get_ge_ct_data", "FN CALL", {
-      number: systems.length,
-    });
+  const manufacturer = "GE";
+  const modality = "CT";
+  const systems = await getGeCtHhm([manufacturer, modality]);
+  const credentials = await getHhmCreds([manufacturer, modality]);
 
-    for (const system of systems) {
-      // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
+  for (const system of systems) {
+    let note = {
+      system,
+    };
+    try {
+      await addLogEvent(I, run_log, "get_ge_ct_data", det, note, null);
       if (system.data_acquisition && system.ip_address) {
         const ct_path = `./read/sh/GE/${system.data_acquisition.script}`;
 
@@ -29,7 +39,7 @@ async function get_ge_ct_data(run_id) {
         const pass = decryptString(system_creds.password_enc);
 
         exec_hhm_data_grab(
-          run_id,
+          run_log,
           system.id,
           ct_path,
           manufacturer,
@@ -38,12 +48,10 @@ async function get_ge_ct_data(run_id) {
           [system.ip_address, user, pass]
         );
       }
+    } catch (error) {
+      await addLogEvent(E, run_log, "get_ge_ct_data", cat, note, error);
+      await writeLogEvents(run_log);
     }
-  } catch (error) {
-    console.log(error);
-    await log("error", run_id, "GE_CT", "get_ge_ct_data", "FN CALL", {
-      error,
-    });
   }
 }
 

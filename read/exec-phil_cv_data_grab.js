@@ -67,7 +67,7 @@ const exec_phil_cv_data_grab = async (
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
       // args[0] is IP Address
-      await add_to_redis_queue(JSON.stringify(system));
+      await add_to_redis_queue(system);
       return false;
     }
 
@@ -90,7 +90,7 @@ const exec_phil_cv_data_grab = async (
       connection_test_2.test(error.message)
     ) {
       // args[0] is IP Address
-      await add_to_redis_queue(JSON.stringify(system));
+      await add_to_redis_queue(system);
       return false;
     }
     return null;

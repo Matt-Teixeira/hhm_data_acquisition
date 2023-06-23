@@ -1,25 +1,43 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm } = require("../../../sql/qf-provider");
+const [
+  addLogEvent,
+  writeLogEvents,
+  dbInsertLogEvents,
+  makeAppRunLog,
+] = require("../../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../../utils/logger/enums");
 
-async function get_siemens_cv_data(run_id) {
+async function get_siemens_cv_data(run_log) {
   try {
     const manufacturer = "Siemens";
     const modality = "CV/IR";
     const systems = await getGeCtHhm([manufacturer, modality]);
 
     for (const system of systems) {
-      if (system.data_acquisition && system.ip_address) {
-        const cv_path = `./read/sh/siemens/${system.data_acquisition.script}`;
+      let note = {
+        system,
+      };
+      try {
+        if (system.data_acquisition && system.ip_address) {
+          const cv_path = `./read/sh/siemens/${system.data_acquisition.script}`;
 
-        exec_hhm_data_grab(
-          run_id,
-          system.id,
-          cv_path,
-          manufacturer,
-          "CV",
-          system,
-          [system.ip_address]
-        );
+          exec_hhm_data_grab(
+            run_log,
+            system.id,
+            cv_path,
+            manufacturer,
+            "CV",
+            system,
+            [system.ip_address]
+          );
+        }
+      } catch (error) {
+        await addLogEvent(E, run_log, "get_siemens_ct_data", cat, note, error);
+        await writeLogEvents(run_log);
       }
     }
   } catch (error) {

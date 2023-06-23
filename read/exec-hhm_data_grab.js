@@ -1,10 +1,19 @@
-const { log } = require("../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const { add_to_redis_queue } = require("../redis");
+const [
+  addLogEvent,
+  writeLogEvents,
+  dbInsertLogEvents,
+  makeAppRunLog,
+] = require("../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../utils/logger/enums");
 
 const exec_hhm_data_grab = async (
-  jobId,
+  run_log,
   sme,
   execPath,
   manufacturer,
@@ -12,14 +21,15 @@ const exec_hhm_data_grab = async (
   system,
   args
 ) => {
+  let note = {
+    system_id: system.id,
+    execute_path: execPath,
+    args,
+  };
+  await addLogEvent(I, run_log, "exec_hhm_data_grab", cal, note, null);
+
   const connection_test_1 = /Connection timed out/;
   const connection_test_2 = /error: max-retries exceeded/;
-
-  await log("info", jobId, sme, "exec_hhm_data_grab", "FN CALL", {
-    execPath: execPath,
-    args: args,
-    sme,
-  });
 
   let data_store_path = "";
   switch (process.env.RUN_ENV) {
@@ -46,27 +56,50 @@ const exec_hhm_data_grab = async (
   try {
     const { stdout, stderr } = await execFile(execPath, args);
 
-    // If connection is closed, return false
+    let note = {
+      system_id: system.id,
+      stdout,
+      stderr,
+    };
+
+    await addLogEvent(I, run_log, "exec_hhm_data_grab", det, note, null);
+
+    // If connection is closed, return false. Any other error, return null.
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
-      await add_to_redis_queue(JSON.stringify(system));
+      let note = {
+        system_id: system.id,
+        stdout,
+        stderr,
+      };
+
+      await addLogEvent(W, run_log, "exec_hhm_data_grab", det, note, null);
+      await add_to_redis_queue(run_log, system);
+      //await writeLogEvents(run_log);
       return false;
     }
+
+    console.log("\n ************************* HIT writeLogEvents *************************\n")
+    //await writeLogEvents(run_log);
 
     return stdout;
   } catch (error) {
     console.log(error);
-    await log("error", jobId, sme, "exec_hhm_data_grab", "FN CATCH", {
-      error: error,
-      args,
-      sme,
-    });
+
     if (
       connection_test_1.test(error.message) ||
       connection_test_2.test(error.message)
     ) {
-      await add_to_redis_queue(JSON.stringify(system));
+      let note = {
+        system_id: system.id,
+      };
+
+      await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
+      await add_to_redis_queue(run_log, system);
+      await writeLogEvents(run_log);
       return false;
     }
+    await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
+    await writeLogEvents(run_log);
     return null;
   }
 };

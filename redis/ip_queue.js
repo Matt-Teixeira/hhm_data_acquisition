@@ -1,8 +1,22 @@
-const { log } = require("../logger");
 const initRedis = require("./redis_instance");
+const [
+  addLogEvent,
+  writeLogEvents,
+  dbInsertLogEvents,
+  makeAppRunLog,
+] = require("../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../utils/logger/enums");
 
-async function add_to_redis_queue(system) {
+async function add_to_redis_queue(run_log, system) {
   //const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+
+  let note = {
+    system_id: system.id,
+  };
+  await addLogEvent(I, run_log, "add_to_redis_queue", cal, note, null);
 
   console.log("System sent to Redis");
   console.log(system);
@@ -12,11 +26,29 @@ async function add_to_redis_queue(system) {
     process.env.REDIS_IP
   );
   try {
-    await redisClient.sendCommand(["RPUSH", "ip:queue", system]);
+    await redisClient.sendCommand([
+      "RPUSH",
+      "ip:queue",
+      JSON.stringify(system),
+    ]);
+    let note = {
+      system_id: system.id,
+      queue: "ip:queue",
+      message: "Sent to Redis queue",
+    };
+    await addLogEvent(I, run_log, "add_to_redis_queue", det, note, null);
+    //await writeLogEvents(run_log);
     await redisClient.quit();
   } catch (error) {
     console.log(error);
     await redisClient.quit();
+    let note = {
+      system_id: system.id,
+      queue: "ip:queue",
+      message: "Queue insert failed",
+    };
+    await addLogEvent(E, run_log, "add_to_redis_queue", cat, note, error);
+    await writeLogEvents(run_log);
   }
 }
 
