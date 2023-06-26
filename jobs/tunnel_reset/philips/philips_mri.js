@@ -37,11 +37,7 @@ async function get_philips_mri_data(run_id) {
         );
       }
     }
-    console.log(systems.length);
-    console.log(systems);
-    console.log("*** RAN SYSTEMS ***");
-    console.log(runable_systems.length);
-    console.log(runable_systems);
+
   } catch (error) {
     console.log(error);
     await log(

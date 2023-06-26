@@ -12,4 +12,3 @@ timeout 120 sshpass -p $3 scp -o StrictHostKeyChecking=accept-new $2@$1:/cygdriv
 timeout 120 sshpass -p $3 scp -o StrictHostKeyChecking=accept-new $2@$1:/cygdrive/g/Site/rmmu* $4/rmmu_long
 timeout 120 sshpass -p $3 scp -o StrictHostKeyChecking=accept-new $2@$1:/cygdrive/g/Site/monitor_* $4/monitoring
 timeout 120 sshpass -p $3 scp -o StrictHostKeyChecking=accept-new $2@$1:/cygdrive/g/monitoring/monitor_* $4/monitoring
-

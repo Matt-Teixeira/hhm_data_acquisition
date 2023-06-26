@@ -1,9 +1,9 @@
 const exec_list_dirs = require("../../read/exec-list_dirs");
 
-async function list_new_files(sme, ip_address, last_file, user, pass, system) {
+async function list_new_files(run_log, sme, ip_address, last_file, user, pass, system) {
   const file_re = /daily_\d{4}_\d{2}_\d{2}|daily_\d{4}\d{2}\d{2}/;
   const list_path = "./read/sh/Philips/phil_cv_file_list.sh";
-  const files_list = await exec_list_dirs("jobID", sme, list_path, system, [
+  const files_list = await exec_list_dirs(run_log, sme, list_path, system, [
     ip_address,
     user,
     pass,
@@ -11,6 +11,9 @@ async function list_new_files(sme, ip_address, last_file, user, pass, system) {
   ]);
 
   if (files_list === false) return false;
+
+  console.log("\n*** files_list");
+  console.log(files_list);
 
   const dirs = files_list.split(" ");
   if (!dirs) return null;

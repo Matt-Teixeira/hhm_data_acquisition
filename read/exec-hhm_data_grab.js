@@ -1,26 +1,14 @@
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const { add_to_redis_queue } = require("../redis");
-const [
-  addLogEvent,
-  writeLogEvents,
-  dbInsertLogEvents,
-  makeAppRunLog,
-] = require("../utils/logger/log");
+const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("../utils/logger/enums");
 
-const exec_hhm_data_grab = async (
-  run_log,
-  sme,
-  execPath,
-  manufacturer,
-  modality,
-  system,
-  args
-) => {
+const exec_hhm_data_grab = async (run_log, sme, execPath, system, args) => {
+
   let note = {
     system_id: system.id,
     execute_path: execPath,
@@ -56,6 +44,11 @@ const exec_hhm_data_grab = async (
   try {
     const { stdout, stderr } = await execFile(execPath, args);
 
+    console.log("\n*********** stdout *****************");
+    console.log(stdout);
+    console.log("\n*********** stderr *****************");
+    console.log(stderr);
+
     let note = {
       system_id: system.id,
       stdout,
@@ -74,12 +67,9 @@ const exec_hhm_data_grab = async (
 
       await addLogEvent(W, run_log, "exec_hhm_data_grab", det, note, null);
       await add_to_redis_queue(run_log, system);
-      //await writeLogEvents(run_log);
+
       return false;
     }
-
-    console.log("\n ************************* HIT writeLogEvents *************************\n")
-    //await writeLogEvents(run_log);
 
     return stdout;
   } catch (error) {
@@ -95,11 +85,10 @@ const exec_hhm_data_grab = async (
 
       await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
       await add_to_redis_queue(run_log, system);
-      await writeLogEvents(run_log);
+
       return false;
     }
     await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
-    await writeLogEvents(run_log);
     return null;
   }
 };

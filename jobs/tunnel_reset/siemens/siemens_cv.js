@@ -11,20 +11,14 @@ async function get_siemens_cv_data(run_log, system) {
     let note = { system: system };
     addLogEvent(I, run_log, "get_siemens_cv_data", cal, note, null);
 
-    const manufacturer = "Siemens";
-    const modality = "CV/IR";
-
-    // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
     if (system.data_acquisition && system.ip_address) {
       const cv_path = `./read/sh/siemens/${system.data_acquisition.script}`;
 
-      exec_hhm_data_grab(
-        "PLACEHOLDER run_log",
+      await exec_hhm_data_grab(
+        run_log,
         system.id,
         cv_path,
-        manufacturer,
         system,
-        "CV",
         [system.ip_address]
       );
     }

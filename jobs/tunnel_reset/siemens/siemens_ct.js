@@ -9,23 +9,20 @@ async function get_siemens_ct_data(run_log, system) {
   try {
     let note = { system: system };
     addLogEvent(I, run_log, "get_siemens_ct_data", cal, note, null);
-    const manufacturer = "Siemens";
-    const modality = "CT";
 
     if (system.data_acquisition && system.ip_address) {
       const cv_path = `./read/sh/siemens/${system.data_acquisition.script}`;
-      exec_hhm_data_grab(
-        "PLACEHOLDER run_log",
+      await exec_hhm_data_grab(
+        run_log,
         system.id,
         cv_path,
-        manufacturer,
-        modality,
         system,
         [system.ip_address]
       );
     }
   } catch (error) {
     console.log(error);
+    addLogEvent(E, run_log, "get_siemens_ct_data", cal, null, error);
   }
 }
 

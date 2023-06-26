@@ -1,10 +1,5 @@
 const initRedis = require("./redis_instance");
-const [
-  addLogEvent,
-  writeLogEvents,
-  dbInsertLogEvents,
-  makeAppRunLog,
-] = require("../utils/logger/log");
+const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
@@ -12,6 +7,9 @@ const {
 
 async function add_to_redis_queue(run_log, system) {
   //const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+
+  console.log("\n ********** system");
+  console.log(system);
 
   let note = {
     system_id: system.id,
@@ -31,14 +29,13 @@ async function add_to_redis_queue(run_log, system) {
       "ip:queue",
       JSON.stringify(system),
     ]);
+    await redisClient.quit();
     let note = {
       system_id: system.id,
       queue: "ip:queue",
       message: "Sent to Redis queue",
     };
     await addLogEvent(I, run_log, "add_to_redis_queue", det, note, null);
-    //await writeLogEvents(run_log);
-    await redisClient.quit();
   } catch (error) {
     console.log(error);
     await redisClient.quit();
@@ -48,7 +45,6 @@ async function add_to_redis_queue(run_log, system) {
       message: "Queue insert failed",
     };
     await addLogEvent(E, run_log, "add_to_redis_queue", cat, note, error);
-    await writeLogEvents(run_log);
   }
 }
 

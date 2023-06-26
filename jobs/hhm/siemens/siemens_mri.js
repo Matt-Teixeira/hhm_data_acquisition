@@ -1,11 +1,6 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm } = require("../../../sql/qf-provider");
-const [
-  addLogEvent,
-  writeLogEvents,
-  dbInsertLogEvents,
-  makeAppRunLog,
-] = require("../../../utils/logger/log");
+const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
@@ -18,6 +13,7 @@ async function get_siemens_mri_data(run_log) {
   const modality = "MRI";
   const systems = await getGeCtHhm([manufacturer, modality]);
 
+  const child_processes = [];
   for await (const system of systems) {
     let note = {
       system,
@@ -27,20 +23,25 @@ async function get_siemens_mri_data(run_log) {
       if (system.data_acquisition && system.ip_address) {
         const mri_path = `./read/sh/siemens/${system.data_acquisition.script}`;
 
-        exec_hhm_data_grab(
-          run_log,
-          system.id,
-          mri_path,
-          manufacturer,
-          modality,
-          system,
-          [system.ip_address]
+        child_processes.push(
+          async () =>
+            await exec_hhm_data_grab(run_log, system.id, mri_path, system, [
+              system.ip_address,
+            ])
         );
       }
     } catch (error) {
       await addLogEvent(E, run_log, "get_siemens_mri_data", cat, note, error);
-      await writeLogEvents(run_log);
     }
+  }
+  try {
+    // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
+    const promises = child_processes.map((child_process) => child_process());
+
+    // AWAIT PROMISIS
+    await Promise.all(promises);
+  } catch (error) {
+    addLogEvent(E, run_log, "get_siemens_ct_data", cat, null, error);
   }
 }
 

@@ -27,15 +27,11 @@ async function get_philips_ct_data(run_log, system) {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      exec_hhm_data_grab(
-        "PLACEHOLDER run_job",
-        system.id,
-        ct_path,
-        manufacturer,
-        modality,
-        system,
-        [system.ip_address, user, pass]
-      );
+      await exec_hhm_data_grab(run_log, system.id, ct_path, system, [
+        system.ip_address,
+        user,
+        pass,
+      ]);
     }
   } catch (error) {
     console.log(error);

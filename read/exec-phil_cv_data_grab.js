@@ -1,36 +1,22 @@
-const { log } = require("../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const { add_to_redis_queue, update_last_dir_date } = require("../redis");
+const [addLogEvent] = require("../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../utils/logger/enums");
 
-const exec_phil_cv_data_grab = async (
-  jobId,
-  sme,
-  execPath,
-  manufacturer,
-  modality,
-  system,
-  args
-) => {
+const exec_phil_cv_data_grab = async (run_log, sme, execPath, system, args) => {
+  let note = {
+    system_id: system.id,
+    execute_path: execPath,
+    args,
+  };
+  await addLogEvent(I, run_log, "exec_phil_cv_data_grab", cal, note, null);
+
   const connection_test_1 = /Connection timed out/;
   const connection_test_2 = /error: max-retries exceeded/;
-
-  await log("info", jobId, sme, "exec_phil_cv_data_grab", "FN CALL", {
-    execPath: execPath,
-    args: args,
-    sme,
-  });
-
-  if (!args[0]) {
-    await log("error", jobId, sme, "exec_phil_cv_data_grab", "FN CALL", {
-      execPath: execPath,
-      ip: args[0],
-      sme,
-      error: "No IP address",
-    });
-    console.log("ERROR: No IP address!!! " + args[0]);
-    return;
-  }
 
   let data_store_path = "";
   switch (process.env.RUN_ENV) {
@@ -57,42 +43,47 @@ const exec_phil_cv_data_grab = async (
   try {
     const { stdout, stderr } = await execFile(execPath, args);
 
-    console.log("\n********* stdout *********");
-    console.log(stdout);
+    let note = {
+      system_id: system.id,
+      stdout,
+      stderr,
+    };
 
-    console.log("\n********* stderr *********");
-    console.log(stderr);
-    console.log("\n********* stderr *********\n");
+    await addLogEvent(I, run_log, "exec_phil_cv_data_grab", det, note, null);
 
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
-      // args[0] is IP Address
-      await add_to_redis_queue(system);
+      let note = {
+        system_id: system.id,
+        stdout,
+        stderr,
+      };
+
+      await addLogEvent(E, run_log, "exec_phil_cv_data_grab", det, note, null);
+      await add_to_redis_queue(run_log, system);
       return false;
     }
 
     await update_last_dir_date(sme, args[3]);
 
-    return;
+    return stdout;
   } catch (error) {
-    console.log("\n***** ERROR START: exec_phil_cv_data_grab *****\n");
     console.log(error);
-    console.log("\n***** ERROR END: exec_phil_cv_data_grab *****\n");
-    console.log(error.stderr);
-    await log("error", jobId, sme, "exec_phil_cv_data_grab", "FN CATCH", {
-      error: error,
-      args,
-      sme,
-    });
 
     if (
       connection_test_1.test(error.message) ||
       connection_test_2.test(error.message)
     ) {
-      // args[0] is IP Address
-      await add_to_redis_queue(system);
+      let note = {
+        system_id: system.id,
+      };
+
+      await addLogEvent(E, run_log, "exec_phil_cv_data_grab", cat, note, error);
+      await add_to_redis_queue(run_log, system);
+
       return false;
     }
+    await addLogEvent(E, run_log, "exec_phil_cv_data_grab", cat, note, error);
     return null;
   }
 };

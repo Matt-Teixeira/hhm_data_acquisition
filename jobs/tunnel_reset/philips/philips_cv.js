@@ -9,12 +9,12 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_philips_cv_data(run_log, system) {
-  console.log("INSIDE get_philips_cv_data")
   try {
-    let note = {system: system}
+    let note = { system: system };
     addLogEvent(I, run_log, "get_philips_cv_data", cal, note, null);
     const manufacturer = "Philips";
-    const credentials = await getHhmCreds([manufacturer, "CV"]); // Change modality in hhm_credentials table to CV/IR
+    const modality = "CV/IR";
+    const credentials = await getHhmCreds([manufacturer, modality]); // Change modality in hhm_credentials table to CV/IR
 
     if (system.data_acquisition && system.ip_address) {
       const cv_path = `./read/sh/Philips/${system.data_acquisition.script}`;
@@ -32,6 +32,7 @@ async function get_philips_cv_data(run_log, system) {
 
       // Pass last_aquired_dir to list new files post last_aquired_dir
       const new_files = await list_new_files(
+        run_log,
         system.id,
         system.ip_address,
         last_aquired_dir,
@@ -42,7 +43,11 @@ async function get_philips_cv_data(run_log, system) {
 
       if (new_files === null) {
         //LOG
-        console.log("No new files for: " + system.id);
+        let note = {
+          system_id: system.id,
+          message: "No new files",
+        };
+        addLogEvent(I, run_log, "get_philips_cv_data", cal, note, null);
         return;
       }
       if (new_files === false) {
@@ -51,15 +56,12 @@ async function get_philips_cv_data(run_log, system) {
       }
 
       for (const file of new_files) {
-        exec_phil_cv_data_grab(
-          "PLACEHOLDER run_job",
-          system.id,
-          cv_path,
-          manufacturer,
-          "CV",
-          system,
-          [system.ip_address, user, pass, file]
-        );
+        await exec_phil_cv_data_grab(run_log, system.id, cv_path, system, [
+          system.ip_address,
+          user,
+          pass,
+          file,
+        ]);
       }
     }
   } catch (error) {

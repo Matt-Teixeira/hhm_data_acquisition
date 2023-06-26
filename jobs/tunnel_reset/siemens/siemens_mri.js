@@ -10,18 +10,13 @@ async function get_siemens_mri_data(run_log, system) {
     let note = { system: system };
     addLogEvent(I, run_log, "get_siemens_mri_data", cal, note, null);
 
-    const manufacturer = "Siemens";
-    const modality = "MRI";
-
     if (system.data_acquisition && system.ip_address) {
       const mri_path = `./read/sh/siemens/${system.data_acquisition.script}`;
 
-      exec_hhm_data_grab(
-        "PLACEHOLDER run_log",
+      await exec_hhm_data_grab(
+        run_log,
         system.id,
         mri_path,
-        manufacturer,
-        modality,
         system,
         [system.ip_address]
       );

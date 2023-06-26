@@ -11,13 +11,13 @@ async function get_ge_data(run_id, modality) {
   try {
     switch (modality) {
       case "CT":
-        get_ge_ct_data(run_id);
+        await get_ge_ct_data(run_id);
         break;
       case "CV":
-        get_ge_cv_data(run_id);
+        await get_ge_cv_data(run_id);
         break;
       case "MRI":
-        get_ge_mri_data(run_id);
+        await get_ge_mri_data(run_id);
         break;
       default:
         break;

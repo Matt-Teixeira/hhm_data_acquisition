@@ -16,7 +16,6 @@ async function get_ge_ct_data(run_log, system) {
     const modality = "CT";
     const credentials = await getHhmCreds([manufacturer, modality]);
 
-    // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
     if (system.data_acquisition && system.ip_address) {
       const ct_path = `./read/sh/GE/${system.data_acquisition.script}`;
 
@@ -28,7 +27,7 @@ async function get_ge_ct_data(run_log, system) {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      exec_hhm_data_grab("PLACEHOLDER run_job", system.id, ct_path, manufacturer, modality, system, [
+      await exec_hhm_data_grab(run_log, system.id, ct_path, system, [
         system.ip_address,
         user,
         pass,

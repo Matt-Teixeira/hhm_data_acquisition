@@ -4,6 +4,7 @@ const { get_redis_ip_queue, clear_redis_ip_queue } = require("../../redis");
 const { group_queue_keys } = require("../../util");
 const get_philips_data = require("./philips");
 const get_ge_data = require("./ge");
+const get_siemens_data = require("./siemens");
 const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -44,7 +45,7 @@ async function reset_tunnel(run_log) {
     // Reset tunnels
     await resetTunnels(run_log, tunnels_by_ip);
 
-    console.log("Start of timer");
+    console.log("Start of 10 second timer");
     await setTimeout(10_000);
     console.log("End of timer");
 
@@ -52,7 +53,12 @@ async function reset_tunnel(run_log) {
     await clear_redis_ip_queue();
 
     // Run data acquisition
+
+    // Store and prevent run of duplicate systems
     const ran_systems = [];
+
+    const jobs = [];
+
     for (const system of ip_queue) {
       // Check for possible duplicates in queue and prevent double runs
       let is_duplicate = ran_systems.indexOf(system.id);
@@ -60,18 +66,44 @@ async function reset_tunnel(run_log) {
 
       switch (system.manufacturer) {
         case "GE":
-          get_ge_data(run_log, system);
+          jobs.push(async () => await get_ge_data(run_log, system));
           break;
         case "Philips":
-          get_philips_data(run_log, system);
+          jobs.push(async () => await get_philips_data(run_log, system));
           break;
         case "Siemens":
-          get_philips_data(run_log, system);
+          jobs.push(async () => await get_siemens_data(run_log, system));
           break;
         default:
           break;
       }
       ran_systems.push(system.id);
+    }
+
+    try {
+      // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
+      const promises = jobs.map((job) => job());
+
+      // AWAIT PROMISIS
+      await Promise.all(promises);
+
+      // Check queue and log systems that were added again. (Tunnel resets did not resolve connection issue)
+      const ip_queue_post_reset = await get_redis_ip_queue();
+      if (!ip_queue_post_reset.length) {
+        let note = {
+          message: "No IP addresses in queue after tunnel resets",
+          ip_queue_post_reset,
+        };
+        addLogEvent(I, run_log, "reset_tunnel", det, note, null);
+        return;
+      }
+      let note = {
+        message: "Data not acquired post tunnel reset",
+        ip_queue_post_reset,
+      };
+      addLogEvent(I, run_log, "reset_tunnel", det, note, null);
+    } catch (error) {
+      addLogEvent(E, run_log, "get_ge_ct_data", cat, null, error);
     }
   } catch (error) {
     console.log(error);

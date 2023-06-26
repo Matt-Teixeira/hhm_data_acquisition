@@ -1,26 +1,29 @@
-const { log } = require("../../../logger");
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
+const [addLogEvent] = require("../../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../../utils/logger/enums");
 
-async function get_ge_cv_data(run_id) {
-  try {
-    await log("info", run_id, "GE_CV", "get_ge_cv_data", "FN CALL");
-    const manufacturer = "GE";
-    const modality = "CV";
-    const systems = await getGeCtHhm([manufacturer, "CV/IR"]);
-    const credentials = await getHhmCreds([manufacturer, modality]);
+async function get_ge_cv_data(run_log) {
+  await addLogEvent(I, run_log, "get_ge_cv_data", cal, null, null);
 
-    await log("info", run_id, "SYSTEMS_NUMBER", "get_ge_ct_data", "FN CALL", {
-      number: systems.length,
-    });
+  const manufacturer = "GE";
+  const modality = "CV/IR";
+  const systems = await getGeCtHhm([manufacturer, modality]);
+  const credentials = await getHhmCreds([manufacturer, modality]);
 
-    const runable_systems = [];
-    for (const system of systems) {
-      // REMOVE THIS CONDITION. USED TO SKIP OVER SYSTEMS WITHOUT AN ACQUISITION CONFIG
+  const child_processes = [];
+  for (const system of systems) {
+    let note = {
+      system,
+    };
+    try {
+      await addLogEvent(I, run_log, "get_ge_cv_data", det, note, null);
       if (system.data_acquisition && system.ip_address) {
         const cv_path = `./read/sh/GE/${system.data_acquisition.script}`;
-        runable_systems.push(system);
         const system_creds = credentials.find((credential) => {
           if (credential.id == system.data_acquisition.hhm_credentials_group)
             return true;
@@ -29,34 +32,26 @@ async function get_ge_cv_data(run_id) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        exec_hhm_data_grab(
-          run_id,
-          system.id,
-          cv_path,
-          manufacturer,
-          modality,
-          system,
-          [system.ip_address, user, pass]
+        child_processes.push(async () =>
+        await exec_hhm_data_grab(run_log, system.id, cv_path, system, [
+            system.ip_address,
+            user,
+            pass,
+          ])
         );
-
-        /* exec_hhm_data_grab(run_id, system.id, cv_path, manufacturer, modality, [
-          system.ip_address,
-          user,
-          pass
-        ]); */
       }
+    } catch (error) {
+      await addLogEvent(E, run_log, "get_ge_cv_data", cat, note, error);
     }
+  }
+  try {
+    // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
+    const promises = child_processes.map((child_process) => child_process());
 
-    console.log(systems.length);
-    console.log(systems);
-    console.log("*** RAN SYSTEMS ***");
-    console.log(runable_systems.length);
-    console.log(runable_systems);
+    // AWAIT PROMISIS
+    await Promise.all(promises);
   } catch (error) {
-    console.log(error);
-    await log("error", run_id, "GE_CV", "get_ge_cv_data", "FN CALL", {
-      error,
-    });
+    addLogEvent(E, run_log, "get_ge_cv_data", cat, null, error);
   }
 }
 

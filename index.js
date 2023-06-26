@@ -15,6 +15,7 @@ const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("./utils/logger/enums");
+const { setTimeout } = require("timers/promises");
 
 async function runJob(run_log, run_group, schedule, manufacturer, modality) {
   let note = {
@@ -36,7 +37,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
       rsync_philips_mri(run_log);
       break;
     case "hhm":
-      get_hhm_data(run_log, manufacturer, modality);
+      await get_hhm_data(run_log, manufacturer, modality);
       break;
     case "ip_reset":
       await reset_tunnel(run_log);
@@ -73,7 +74,9 @@ const onBoot = async () => {
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
-    //await writeLogEvents(run_log);
+
+    //await setTimeout(60_000);
+    await writeLogEvents(run_log);
   } catch (error) {
     console.log(error);
   }

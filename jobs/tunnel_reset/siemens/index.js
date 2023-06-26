@@ -6,13 +6,13 @@ async function get_siemens_data(run_log, system) {
   try {
     switch (system.modality) {
       case "CT":
-        get_siemens_ct_data(run_log, system);
+        await get_siemens_ct_data(run_log, system);
         break;
       case "CV/IR":
-        get_siemens_cv_data(run_log, system);
+        await get_siemens_cv_data(run_log, system);
         break;
       case "MRI":
-        get_siemens_mri_data(run_log, system);
+        await get_siemens_mri_data(run_log, system);
         break;
       default:
         break;

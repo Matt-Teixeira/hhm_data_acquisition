@@ -12,7 +12,7 @@ async function get_ge_cv_data(run_log, system) {
     let note = { system: system };
     addLogEvent(I, run_log, "get_ge_ct_data", cal, note, null);
     const manufacturer = "GE";
-    const modality = "CV";
+    const modality = "CV/IR";
     const credentials = await getHhmCreds([manufacturer, modality]);
 
     if (system.data_acquisition && system.ip_address) {
@@ -25,18 +25,18 @@ async function get_ge_cv_data(run_log, system) {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      exec_hhm_data_grab(
-        "PLACEHOLDER run_job",
+      await exec_hhm_data_grab(
+        run_log,
         system.id,
         cv_path,
-        manufacturer,
-        modality,
         system,
         [system.ip_address, user, pass]
       );
     }
   } catch (error) {
     console.log(error);
+    note["txt"] = "Error";
+    addLogEvent(E, run_log, "get_ge_cv_data", cat, note, error);
   }
 }
 

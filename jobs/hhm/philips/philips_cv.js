@@ -1,32 +1,45 @@
-const { log } = require("../../../logger");
 const exec_phil_cv_data_grab = require("../../../read/exec-phil_cv_data_grab");
 const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString, list_new_files } = require("../../../util");
 const { get_last_dir_date } = require("../../../redis/redis_helpers");
+const [addLogEvent] = require("../../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../../utils/logger/enums");
 
-async function get_philips_cv_data(run_id) {
+async function get_philips_cv_data(run_log) {
+  await addLogEvent(I, run_log, "get_philips_cv_data", cal, null, null);
+  const child_processes = [];
   try {
-    await log("info", run_id, "Philips_CV", "get_philips_cv_data", "FN CALL");
     const manufacturer = "Philips";
     const modality = "CV/IR";
     const systems = await getGeCtHhm([manufacturer, modality]);
-    const credentials = await getHhmCreds([manufacturer, "CV"]); // Change modality in hhm_credentials table to CV/IR
-
-    console.log(systems);
+    const credentials = await getHhmCreds([manufacturer, modality]);
 
     for (const system of systems) {
-      run_phil_cv(system, credentials, manufacturer);
+      child_processes.push(
+        async () => await run_phil_cv(run_log, system, credentials)
+      );
     }
   } catch (error) {
     console.log(error);
-    await log("error", run_id, "Philips_CV", "get_philips_cv_data", "FN CALL", {
-      error,
-    });
+  }
+  try {
+    // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
+    const promises = child_processes.map((child_process) => child_process());
+
+    // AWAIT PROMISIS
+    await Promise.all(promises);
+  } catch (error) {
+    console.log(error);
+    addLogEvent(E, run_log, "get_ge_cv_data", cat, null, error);
   }
 }
 
-async function run_phil_cv(system, credentials, manufacturer) {
+async function run_phil_cv(run_log, system, credentials) {
   if (system.data_acquisition && system.ip_address) {
+    await addLogEvent(I, run_log, "run_phil_cv", cal, null, null);
     const cv_path = `./read/sh/Philips/${system.data_acquisition.script}`;
 
     const system_creds = credentials.find((credential) => {
@@ -42,6 +55,7 @@ async function run_phil_cv(system, credentials, manufacturer) {
 
     // Pass last_aquired_dir to list new files post last_aquired_dir
     const new_files = await list_new_files(
+      run_log,
       system.id,
       system.ip_address,
       last_aquired_dir,
@@ -60,16 +74,13 @@ async function run_phil_cv(system, credentials, manufacturer) {
       return;
     }
 
-    for (const file of new_files) {
-      exec_phil_cv_data_grab(
-        "JOBID",
-        system.id,
-        cv_path,
-        manufacturer,
-        "CV",
-        system,
-        [system.ip_address, user, pass, file]
-      );
+    for await (const file of new_files) {
+      await exec_phil_cv_data_grab(run_log, system.id, cv_path, system, [
+        system.ip_address,
+        user,
+        pass,
+        file,
+      ]);
     }
   }
 }
