@@ -10,7 +10,7 @@ async function get_siemens_ct_data(run_log) {
   await addLogEvent(I, run_log, "get_siemens_ct_data", cal, null, null);
 
   const manufacturer = "Siemens";
-  const modality = "CT";
+  const modality = "%CT";
   const systems = await getGeCtHhm([manufacturer, modality]);
 
   const child_processes = [];
@@ -21,7 +21,7 @@ async function get_siemens_ct_data(run_log) {
 
     await addLogEvent(I, run_log, "get_siemens_ct_data", det, note, null);
     if (system.data_acquisition && system.ip_address) {
-      const ct_path = `./read/sh/siemens/${system.data_acquisition.script}`;
+      const ct_path = `./read/sh/Siemens/${system.data_acquisition.script}`;
 
       child_processes.push(
         async () =>

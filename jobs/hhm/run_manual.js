@@ -32,7 +32,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         }
       }
 
-      if ((man_mod[0] !== "Siemens" && user === "") || pass === "") {
+      if (man_mod[0] !== "Siemens" && (user === "" || pass === "")) {
         throw new Error("NO CREDENTIALS FOUND");
       }
 
@@ -86,8 +86,6 @@ async function run_system_manual(run_log, systemArray, man_mod) {
       }
       await exec_hhm_data_grab(run_log, system[0].id, path, system, [
         system[0].ip_address,
-        user,
-        pass,
       ]);
     }
   } catch (error) {

@@ -21,7 +21,7 @@ async function get_siemens_mri_data(run_log) {
     try {
       await addLogEvent(I, run_log, "get_siemens_mri_data", det, note, null);
       if (system.data_acquisition && system.ip_address) {
-        const mri_path = `./read/sh/siemens/${system.data_acquisition.script}`;
+        const mri_path = `./read/sh/Siemens/${system.data_acquisition.script}`;
 
         child_processes.push(
           async () =>
