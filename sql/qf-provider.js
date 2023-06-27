@@ -8,7 +8,7 @@ const {
   get_mod_man,
   get_ge_ct_hhm,
   get_hhm_creds,
-  get_all_system_data,
+  one_system_data,
 } = require("./sql");
 
 // GENERIC LOGGER FOR ANY QF CALL
@@ -67,9 +67,9 @@ const getHhmCreds = async (argsArray) => {
   }
 };
 
-const getAllSystem = async (argsArray) => {
+const getOneSystem = async (argsArray) => {
   try {
-    return db.any(get_all_system_data.system, argsArray);
+    return db.any(one_system_data.system, argsArray);
   } catch (error) {
     console.log(error);
   }
@@ -83,5 +83,5 @@ module.exports = {
   getModMan,
   getGeCtHhm,
   getHhmCreds,
-  getAllSystem,
+  getOneSystem,
 };

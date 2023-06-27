@@ -5,4 +5,4 @@ SELECT
 FROM
     systems
 WHERE
-    id IN ($1);
+    id = $1;

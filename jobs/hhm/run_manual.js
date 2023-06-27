@@ -1,33 +1,32 @@
-const { error } = require("winston");
-const { log } = require("../../logger");
 const exec_hhm_data_grab = require("../../read/exec-hhm_data_grab");
 const exec_phil_cv_data_grab = require("../../read/exec-phil_cv_data_grab");
-const exec_child_process = require("../../read/exec-list_dirs");
-const { getHhmCreds, getAllSystem } = require("../../sql/qf-provider");
-const {
-  decryptString,
-  phil_ct_file_date_formatter,
-  list_new_files,
-} = require("../../util");
+const { getHhmCreds, getOneSystem } = require("../../sql/qf-provider");
+const { decryptString, list_new_files } = require("../../util");
 const { get_last_dir_date } = require("../../redis/redis_helpers");
+const [addLogEvent] = require("../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../utils/logger/enums");
 
-async function run_system_manual(systemArray, man_mod) {
+async function run_system_manual(run_log, systemArray, man_mod) {
   try {
     const credentials = await getHhmCreds(man_mod);
 
+    // Can accept multiple system args in array
     for (const sys of systemArray) {
-      const system = await getAllSystem(sys);
-      if (!system[0].hhm_config) {
+      const system = await getOneSystem(sys);
+      console.log(system);
+      if (!system[0].data_acquisition) {
         console.log("NO CONFIG!! " + system[0].id);
-        return;
+        continue;
       }
 
+      // START Credential Acquisition
       let user = "";
       let pass = "";
       for (const cred of credentials) {
-        if (
-          system[0].hhm_config.data_acquisition.hhm_credentials_group == cred.id
-        ) {
+        if (system[0].data_acquisition.hhm_credentials_group == cred.id) {
           user = decryptString(cred.user_enc);
           pass = decryptString(cred.password_enc);
         }
@@ -36,47 +35,60 @@ async function run_system_manual(systemArray, man_mod) {
       if ((man_mod[0] !== "Siemens" && user === "") || pass === "") {
         throw new Error("NO CREDENTIALS FOUND");
       }
-      const path = `./read/sh/${man_mod[0]}/${system[0].hhm_config.data_acquisition.script}`;
+
+      // END Credential Acquisition
+
+      const path = `./read/sh/${man_mod[0]}/${system[0].data_acquisition.script}`;
 
       // { START: Philips CV Specific Code
 
-      // Get last dir from Redis
-      const last_aquired_dir = await get_last_dir_date(system[0].id);
-      console.log("last_aquired_dir");
-      console.log(last_aquired_dir);
-      // Example: daily_2023_06_19 or daily_20230619
+      if (man_mod[0] === "Philips" && man_mod[1] === "CV/IR") {
+        // Get last dir from Redis
+        const last_aquired_dir = await get_last_dir_date(system[0].id);
+        console.log("\n last_aquired_dir");
+        console.log(last_aquired_dir);
+        // Example: daily_2023_06_19 or daily_20230619
 
-      // Pass last_aquired_dir to list new files post last_aquired_dir
-      const new_files = await list_new_files(
-        system[0].id,
-        system[0].ip_address,
-        last_aquired_dir,
-        user,
-        pass
-      );
-
-      if (new_files === null) {
-        //LOG
-        console.log("No new files for: " + system[0].id);
-        return;
-      }
-      if (new_files === false) {
-        console.log("System needs tunnel reset: " + system[0].id);
-        return;
-      }
-      // { END: Philips CV Specific Code
-
-      // Remove last (file) arg if not running Philips CV
-      for (let file of new_files) {
-        exec_phil_cv_data_grab(
-          "JOBID",
+        // Pass last_aquired_dir to list new files post last_aquired_dir
+        const new_files = await list_new_files(
+          run_log,
           system[0].id,
-          path,
-          man_mod[0],
-          man_mod[1],
-          [system[0].ip_address, user, pass, file]
+          system[0].ip_address,
+          last_aquired_dir,
+          user,
+          pass
         );
+
+        console.log("\n new_files");
+        console.log(new_files);
+
+        if (new_files === null) {
+          //LOG
+          console.log("No new files for: " + system[0].id);
+          return;
+        }
+        if (new_files === false) {
+          console.log("System needs tunnel reset: " + system[0].id);
+          return;
+        }
+        // { END: Philips CV Specific Code
+
+        // Remove last (file) arg if not running Philips CV
+        for await (let file of new_files) {
+          await exec_phil_cv_data_grab(run_log, system[0].id, path, system, [
+            system[0].ip_address,
+            user,
+            pass,
+            file,
+          ]);
+        }
+        return;
       }
+      await exec_hhm_data_grab(run_log, system[0].id, path, system, [
+        system[0].ip_address,
+        user,
+        pass,
+      ]);
     }
   } catch (error) {
     console.log("ERROR IN MANUAL CATCH");

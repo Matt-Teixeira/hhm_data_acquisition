@@ -29,7 +29,7 @@ module.exports = {
   get_hhm_creds: {
     hhm_credentials: sql("system/hhm_credentials.sql"),
   },
-  get_all_system_data: {
-    system: sql("system/system_all.sql"),
+  one_system_data: {
+    system: sql("system/one_system.sql"),
   },
 };

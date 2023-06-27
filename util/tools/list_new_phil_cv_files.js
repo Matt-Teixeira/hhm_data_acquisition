@@ -12,9 +12,6 @@ async function list_new_files(run_log, sme, ip_address, last_file, user, pass, s
 
   if (files_list === false) return false;
 
-  console.log("\n*** files_list");
-  console.log(files_list);
-
   const dirs = files_list.split(" ");
   if (!dirs) return null;
 

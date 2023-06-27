@@ -15,7 +15,6 @@ const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("./utils/logger/enums");
-const { setTimeout } = require("timers/promises");
 
 async function runJob(run_log, run_group, schedule, manufacturer, modality) {
   let note = {
@@ -70,7 +69,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(["SME00445"], ["Philips", "CV"]);
+      run_system_manual(run_log, ["SME02471"], ["Philips", "CT"]);
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
