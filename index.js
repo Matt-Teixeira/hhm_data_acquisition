@@ -32,8 +32,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
       onBootMMB(parseInt(schedule));
       break;
     case "philips":
-      console.log(run_log);
-      rsync_philips_mri(run_log);
+      await rsync_philips_mri(run_log);
       break;
     case "hhm":
       await get_hhm_data(run_log, manufacturer, modality);

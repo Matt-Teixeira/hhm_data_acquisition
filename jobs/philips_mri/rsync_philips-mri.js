@@ -1,4 +1,3 @@
-const { log } = require("../../logger");
 const exec_remote_rsync = require("../../read/exec-remote_rsync");
 const rsync_local = require("../../relocate_files/rsync_local");
 const { get_phil_mri_systems } = require("../../sql/qf-provider");
@@ -9,53 +8,38 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../utils/logger/enums");
 
-const rsync_philips_mri = async (run_id) => {
+const rsync_philips_mri = async (run_log) => {
+  const system_data = await get_phil_mri_systems();
+  console.log(system_data);
 
-  try {
-    const system_data = await get_phil_mri_systems(run_id);
+  const child_processes = [];
+  for (const system of system_data) {
+    child_processes.push(async () => await group_processes(run_log, system));
 
-    for (const system of system_data) {
-      const job_id = short.uuid();
-      console.log(system);
-      console.log([
-        system.user_id,
-        system.ip_address,
-        system.hhm_config.file_path,
-      ]);
-       exec_remote_rsync(run_id, system.id, "./read/sh/rsync_mmb.sh", [
-        system.user_id,
-        system.ip_address,
-        system.hhm_config.file_path,
-      ]);
-       rsync_local(
-        run_id,
-        `${system.hhm_config.file_path}/host_logfiles`,
-        system
-      );
+    try {
+    } catch (error) {
+      addLogEvent(E, run_log, "rsync_philips_mri", cat, {system}, error);
     }
-  } catch (error) {
-    console.log(error);
-    await log("error", run_id, "NA", "redisClient", `ON ERROR`, {
-      error: error,
-    });
+    try {
+      // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
+      const promises = child_processes.map((child_process) => child_process());
+  
+      // AWAIT PROMISIS
+      await Promise.all(promises);
+    } catch (error) {
+      addLogEvent(E, run_log, "rsync_philips_mri", cat, null, error);
+    }
   }
 };
 
-module.exports = rsync_philips_mri;
-/*
-system in for loop
-
-{
-  id: 'SME15805',
-  hhm_config: {
-    modality: 'MRI',
-    data_acqu: 'mmb',
-    file_path: '/opt/files/SME15805/hhm',
-    run_group: 1
-  },
-  hhm_file_config: [ { logcurrent: [Object] }, { monitoring: [Array] } ],
-  ip_address: '172.31.3.51',
-  user_id: 'avante'
+async function group_processes(run_log, system) {
+  addLogEvent(I, run_log, "rsync_philips_mri", cal, {system}, null);
+  await exec_remote_rsync(run_log, system.id, "./read/sh/rsync_mmb.sh", [
+    system.user_id,
+    system.ip_address,
+    system.hhm_config.file_path,
+  ]);
+  await rsync_local(run_log, `${system.hhm_config.file_path}/host_logfiles`, system);
 }
 
-*/
+module.exports = rsync_philips_mri;

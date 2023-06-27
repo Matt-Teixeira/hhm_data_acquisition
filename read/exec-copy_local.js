@@ -1,27 +1,26 @@
-const { log } = require("../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
+const [addLogEvent] = require("../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../utils/logger/enums");
 
-const exec_local_rsync = async (jobId, sme, rsyncShPath, rsyncShArgs) => {
-  // THIS FUNCTION SYNCS A REMOTE FILE TO A LOCAL MIRROR AND RETURNS THE NEWLY SYNCED FILE SIZE
-  await log("info", jobId, sme, "exec_local_rsync", "FN CALL", {
-    rsyncShPath: rsyncShPath,
-    rsyncShArgs: rsyncShArgs,
-  });
+const exec_local_rsync = async (run_log, sme, rsyncShPath, rsyncShArgs) => {
+  let note = {
+    system_id: sme,
+    rsync_path: rsyncShPath,
+    args: rsyncShArgs,
+  };
+  addLogEvent(I, run_log, "exec_local_rsync", cal, note, null);
 
   try {
     const { stdout } = await execFile(rsyncShPath, rsyncShArgs);
 
-    //const fileSizeAfterRsync = parseInt(stdout);
-    await log("info", jobId, sme, "exec_local_rsync", "FN DETAILS", {
-      //fileSizeAfterRsync: fileSizeAfterRsync,
-    });
-    return; //fileSizeAfterRsync;
-  } catch (err) {
-    console.log(err)
-    await log("error", jobId, sme, "exec_local_rsync", "FN CATCH", {
-      error: err,
-    });
+    return;
+  } catch (error) {
+    console.log(error);
+    addLogEvent(E, run_log, "exec_local_rsync", cat, note, error);
     return null;
   }
 };
