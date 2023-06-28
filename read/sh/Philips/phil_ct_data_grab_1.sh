@@ -1,10 +1,7 @@
 # set -ue
 [ ! -d "$4" ] && mkdir $4
 
-# ssh philips_service@172.16.144.244 -oKexAlgorithms=diffie-hellman-group14-sha1
-
-#lftp -c "set net:timeout 20; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
-lftp -c "set net:timeout 20; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; set sftp:connect-program ssh -a '-oKexAlgorithms=diffie-hellman-group14-sha1'; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
+lftp -c "set net:timeout 20; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; set sftp:connect-program 'ssh -oKexAlgorithms=diffie-hellman-group14-sha1'; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger/; mget -e Output.mdb -O $4; exit"
 if [ $? -ne 0 ]; then
     echo "Connection timed out" >&2
     exit
@@ -43,6 +40,3 @@ echo "DTime,Controller,DataType,LogNumber,TmStamp,ERR_TYPE,ErrNum,vxwErrNo,File,
 mdb-export $4/Output.mdb $EALINFO_TABLEVAR | tail -n +2 | sort | awk 'NF > 2' >>$4/EALInfo.output
 
 exit
-
-# mget: Access failed: No such file (Output.mdb)
-## set net:timeout 10;
