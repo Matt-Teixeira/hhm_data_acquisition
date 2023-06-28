@@ -32,7 +32,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         }
       }
 
-      if (man_mod[0] !== "Siemens" && (user === "" || pass === "")) {
+      if ((man_mod[0] !== "Siemens" && user === "") || pass === "") {
         throw new Error("NO CREDENTIALS FOUND");
       }
 
@@ -47,6 +47,8 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         const last_aquired_dir = await get_last_dir_date(system[0].id);
         console.log("\n last_aquired_dir");
         console.log(last_aquired_dir);
+        console.log(user);
+        console.log(pass);
         // Example: daily_2023_06_19 or daily_20230619
 
         // Pass last_aquired_dir to list new files post last_aquired_dir
@@ -86,6 +88,8 @@ async function run_system_manual(run_log, systemArray, man_mod) {
       }
       await exec_hhm_data_grab(run_log, system[0].id, path, system, [
         system[0].ip_address,
+        user,
+        pass,
       ]);
     }
   } catch (error) {
