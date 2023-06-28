@@ -77,7 +77,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
 
         // Remove last (file) arg if not running Philips CV
         for await (let file of new_files) {
-          await exec_phil_cv_data_grab(run_log, system[0].id, path, system, [
+          await exec_phil_cv_data_grab(run_log, system[0].id, path, system[0], [
             system[0].ip_address,
             user,
             pass,
@@ -86,7 +86,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         }
         return;
       }
-      await exec_hhm_data_grab(run_log, system[0].id, path, system, [
+      await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
         system[0].ip_address,
         user,
         pass,

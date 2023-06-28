@@ -45,12 +45,12 @@ async function reset_tunnel(run_log) {
     // Reset tunnels
     await resetTunnels(run_log, tunnels_by_ip);
 
+    // Clear tunnel reset queue
+    await clear_redis_ip_queue();
+
     console.log("Start of 10 second timer");
     await setTimeout(10_000);
     console.log("End of timer");
-
-    // Clear tunnel reset queue
-    await clear_redis_ip_queue();
 
     // Run data acquisition
 
@@ -87,6 +87,8 @@ async function reset_tunnel(run_log) {
       // AWAIT PROMISIS
       await Promise.all(promises);
 
+      await setTimeout(30_000);
+      
       // Check queue and log systems that were added again. (Tunnel resets did not resolve connection issue)
       const ip_queue_post_reset = await get_redis_ip_queue();
       if (!ip_queue_post_reset.length) {
