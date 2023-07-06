@@ -68,7 +68,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(run_log, ["SME12631"], ["GE", "MRI"]);
+      run_system_manual(run_log, ["SME08285"], ["Philips", "MRI"]);
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
@@ -77,6 +77,7 @@ const onBoot = async () => {
     await writeLogEvents(run_log);
   } catch (error) {
     console.log(error);
+    await addLogEvent(E, run_log, "onBoot", cat, null, error);
   }
 };
 

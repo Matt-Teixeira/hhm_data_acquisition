@@ -9,6 +9,7 @@ const {
   get_ge_ct_hhm,
   get_hhm_creds,
   one_system_data,
+  phil_mri_host
 } = require("./sql");
 
 // GENERIC LOGGER FOR ANY QF CALL
@@ -75,6 +76,15 @@ const getOneSystem = async (argsArray) => {
   }
 };
 
+const get_phil_mri_host = async (argsArray) => {
+  try {
+    return db.any(phil_mri_host.systems, argsArray);
+  } catch (error) {
+    console.log(error);
+    await log("error", "uuid", "sme", "getGeCtHhm", `FN CALL`);
+  }
+};
+
 module.exports = {
   getSystemIpAddress,
   get_phil_mri_systems,
@@ -84,4 +94,5 @@ module.exports = {
   getGeCtHhm,
   getHhmCreds,
   getOneSystem,
+  get_phil_mri_host
 };

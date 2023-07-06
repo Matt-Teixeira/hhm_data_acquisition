@@ -17,12 +17,14 @@ async function run_system_manual(run_log, systemArray, man_mod) {
     for (const sys of systemArray) {
       const system = await getOneSystem(sys);
       console.log(system);
+
       if (!system[0].data_acquisition) {
         console.log("NO CONFIG!! " + system[0].id);
         continue;
       }
 
       // START Credential Acquisition
+
       let user = "";
       let pass = "";
       for (const cred of credentials) {
@@ -86,6 +88,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         }
         return;
       }
+      
       await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
         system[0].ip_address,
         user,

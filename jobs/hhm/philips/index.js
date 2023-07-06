@@ -3,7 +3,7 @@ const get_philips_cv_data = require("./philips_cv");
 const get_philips_ct_data = require("./philips_ct");
 const get_philips_mri_data = require("./philips_mri");
 
-async function get_philips_data(run_id, modality) {
+async function get_philips_data(run_log, modality) {
   log("info", "NA", "NA", "get_ge_data", `FN CALL`, {
     modality,
   });
@@ -11,13 +11,13 @@ async function get_philips_data(run_id, modality) {
   try {
     switch (modality) {
       case "CT":
-        await get_philips_ct_data(run_id);
+        await get_philips_ct_data(run_log);
         break;
       case "CV":
-        await get_philips_cv_data(run_id);
+        await get_philips_cv_data(run_log);
         break;
       case "MRI":
-        await get_philips_mri_data(run_id);
+        await get_philips_mri_data(run_log);
         break;
       default:
         break;

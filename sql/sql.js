@@ -32,4 +32,7 @@ module.exports = {
   one_system_data: {
     system: sql("system/one_system.sql"),
   },
+  phil_mri_host: {
+    systems: sql("system/get_phil_mri_host.sql"),
+  },
 };
