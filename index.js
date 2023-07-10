@@ -68,7 +68,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(run_log, ["SME08285"], ["Philips", "MRI"]);
+      run_system_manual(run_log, ["SME01406"], ["Philips", "MRI"]);
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
