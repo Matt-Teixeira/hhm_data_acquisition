@@ -60,7 +60,8 @@ async function run_system_manual(run_log, systemArray, man_mod) {
           system[0].ip_address,
           last_aquired_dir,
           user,
-          pass
+          pass,
+          system[0]
         );
 
         console.log("\n new_files");
@@ -88,7 +89,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         }
         return;
       }
-      
+
       await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
         system[0].ip_address,
         user,
