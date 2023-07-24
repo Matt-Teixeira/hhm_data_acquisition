@@ -15,7 +15,15 @@
       "philips_mri": "node index.js hhm null Philips MRI",
       "siemens_ct": "node index.js hhm null Siemens CT",
       "siemens_mri": "node index.js hhm null Siemens MRI",
-      "ip": "node index.js ip_reset"
+      "ip": "node index.js ip_reset",
+      "schedule_0": "node index.js mmb 0",
+      "schedule_1": "node index.js mmb 1",
+      "schedule_2": "node index.js mmb 2",
+      "schedule_3": "node index.js mmb 3",
+      "schedule_4": "node index.js mmb 4",
+      "schedule_5": "node index.js mmb 5",
+      "schedule_6": "node index.js mmb 6",
+      "schedule_7": "node index.js mmb 7"
    },
    "keywords": [],
    "author": "",

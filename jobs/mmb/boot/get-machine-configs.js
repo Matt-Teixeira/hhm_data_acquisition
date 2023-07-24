@@ -7,8 +7,9 @@ const getMachineConfigs = async (rows) => {
     const machine_configs = [];
     const missing_config = [];
     for (const row of rows) {
+      console.log(row);
       // QA - SKIP SYSTEMS MISSING REQUIRED CONFIG
-      if (!row.mmb_config) {
+      if (!row.mmb_config || !row.mmb_config.rpp_configs) {
         missing_config.push(row.id);
         continue;
       }

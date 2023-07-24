@@ -1,7 +1,7 @@
 ("use strict");
 //require("dotenv").config();
 const { log } = require("../../logger");
-const { getOnBootData } = require("./sql/qf-provider");
+const { getOnBootData, get_systems_by_schedule } = require("./sql/qf-provider");
 // BOOT
 const getMachineConfigs = require("./boot/get-machine-configs");
 // READ
@@ -76,7 +76,9 @@ const onBootMMB = async (process_argv) => {
 
   try {
     // ON BOOT GET DATA AND CONFIGS
-    const [systems_configs] = await getOnBootData("onBoot");
+    const systems_configs = await get_systems_by_schedule(
+      process_argv.toString()
+    );
 
     await log("info", "NA", "onBoot", "FN DETAILS", {
       systems_configs: systems_configs,
@@ -99,7 +101,15 @@ const onBootMMB = async (process_argv) => {
         }
         break;
       case "staging":
-        filter_schedules(runJob, machineConfigs, process_argv)
+        //filter_schedules(runJob, machineConfigs, process_argv);
+        const stagingConfigs = machineConfigs.filter(
+          ({ schedule }) => schedule === process_argv
+        );
+        for (const config of stagingConfigs) {
+          const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
+            config;
+          runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
+        }
         break;
       case "dev_hhm":
         const devConfigs = machineConfigs.filter(
