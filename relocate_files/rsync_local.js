@@ -8,13 +8,18 @@ const {
 
 async function rsync_local(run_log, rsync_path, system) {
   let note = {
-    system_id: system.id
-  }
+    system_id: system.id,
+  };
   try {
     await addLogEvent(I, run_log, "rsync_local", cal, note, null);
 
+    console.log(system.hhm_file_config);
+    console.log("\n *** *** *** ***\n");
     for (const file of system.hhm_file_config) {
+      console.log(file);
       let key = Object.keys(file);
+
+      console.log(key);
 
       if (key[0] === "monitoring") {
         for (const monitor_file of file.monitoring) {
@@ -56,7 +61,17 @@ async function rsync_local(run_log, rsync_path, system) {
             ]
           );
         }
-      }
+      } else if (key[0] === "stt_magnet") {
+        await exec_local_rsync(
+          run_log,
+          system.id,
+          "./read/sh/rsync_logcurrent_local.sh",
+          [
+            `${system.hhm_config.file_path}/host_logfiles/${file["stt_magnet"].file_name}`,
+            `${system.hhm_config.file_path}`,
+          ]
+        );
+      } 
     }
   } catch (error) {
     console.log(error);

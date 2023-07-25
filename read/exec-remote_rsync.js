@@ -12,6 +12,7 @@ const exec_remote_rsync = async (run_log, sme, rsyncShPath, rsyncShArgs) => {
     rsync_path: rsyncShPath,
     args: rsyncShArgs,
   };
+  
   try {
     addLogEvent(I, run_log, "exec_remote_rsync", cal, note, null);
     const { stdout } = await execFile(rsyncShPath, rsyncShArgs);

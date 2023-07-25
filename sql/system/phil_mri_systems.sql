@@ -7,4 +7,4 @@ SELECT
 from
     systems
 WHERE
-    hhm_config ->> 'data_acqu' = 'mmb';
+    hhm_config ->> 'data_acqu' = 'mmb' AND id = 'SME15809';
