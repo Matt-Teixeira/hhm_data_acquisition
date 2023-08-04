@@ -1,14 +1,7 @@
-("use strict");
-//require("dotenv").config();
-const { log } = require("../../logger");
-const { getOnBootData, get_systems_by_schedule } = require("./sql/qf-provider");
-// BOOT
+const { get_systems_by_schedule } = require("./sql/qf-provider");
 const getMachineConfigs = require("./boot/get-machine-configs");
-// READ
 const execRsync = require("./read/exec-rsync");
-const { filter_schedules } = require("./helpers");
 const { v4: uuidv4 } = require("uuid");
-
 const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -62,8 +55,10 @@ const runJob = async (run_log, config) => {
       rsyncShPath,
       rsyncShArgs
     );
-    console.log("\nfileSizeAfterRsync");
+
+    console.log("\nFile Size After Rsync");
     console.log(fileSizeAfterRsync);
+
     // HALT JOB DUE TO BAD fileSizeAfterRsync
     if (fileSizeAfterRsync === null) {
       let note = {
@@ -110,171 +105,34 @@ const onBootMMB = async (run_log, process_argv) => {
     // BUILD CONFIGS FOR runJob
     const machineConfigs = await getMachineConfigs(systems_configs);
 
-    // BUILD JOB SCHEDULES
-    let schedules = [];
-    switch (process.env.PG_DB) {
-      case "prod":
-        const prodConfigs = machineConfigs.filter(
-          ({ schedule }) => schedule === process_argv
-        );
-        const prod_jobs = [];
-        for (const config of prodConfigs) {
-          const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
-            config;
+    const prodConfigs = machineConfigs.filter(
+      ({ schedule }) => schedule === process_argv
+    );
+    const jobs = [];
+    for (const config of prodConfigs) {
+      const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
+        config;
 
-          prod_jobs.push(
-            async () =>
-              await runJob(run_log, [
-                sme,
-                mmbScript,
-                pgTable,
-                regexModels,
-                ip_address,
-                user_id,
-              ])
-          );
-        }
-        // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
-        const job_promises = prod_jobs.map((job) => job());
-
-        // AWAIT JOBS
-        await Promise.all(job_promises);
-        break;
-      case "staging":
-        //filter_schedules(runJob, machineConfigs, process_argv);
-        const stagingConfigs = machineConfigs.filter(
-          ({ schedule }) => schedule === process_argv
-        );
-        const staging_jobs = [];
-        for (const config of stagingConfigs) {
-          const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
-            config;
-
-          staging_jobs.push(
-            async () =>
-              await runJob(run_log, [
-                sme,
-                mmbScript,
-                pgTable,
-                regexModels,
-                ip_address,
-                user_id,
-              ])
-          );
-        }
-        // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
-        const job_promises_staging = staging_jobs.map((job) => job());
-
-        // AWAIT JOBS
-        await Promise.all(job_promises_staging);
-        break;
-      case "dev_hhm":
-        const devConfigs = machineConfigs.filter(
-          ({ schedule }) => schedule === process_argv
-        );
-        const dev_jobs = [];
-        for (const config of devConfigs) {
-          const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
-            config;
-
-          dev_jobs.push(
-            async () =>
-              await runJob(run_log, [
-                sme,
-                mmbScript,
-                pgTable,
-                regexModels,
-                ip_address,
-                user_id,
-              ])
-          );
-        }
-        // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
-        const job_promises_dev = dev_jobs.map((job) => job());
-
-        // AWAIT JOBS
-        await Promise.all(job_promises_dev);
-        break;
-      case "mig_profiles_units_prod":
-        await log(
-          "info",
-          "NA",
-          "onBoot",
-          "FN DETAILS -> DEV ENV, NO SCHEDULES",
-          null
-        );
-        break;
-      default:
-        throw new Error("onBoot FN CATCH -> NON-CONFORMANT process.env.PG_DB");
-    }
-
-    if (
-      process.env.PG_DB === "prod" ||
-      process.env.PG_DB === "staging" ||
-      process.env.PG_DB === "dev_hhm"
-    ) {
-      // || process.env.PG_DB === "dev_hhm"
-      // START SCHEDULES
-      for (const schedule of schedules) {
-        schedule.start();
-      }
-      await log(
-        "info",
-        "NA",
-        "onBoot",
-        "FN DETAILS -> SCHEDULES STARTED",
-        null
+      jobs.push(
+        async () =>
+          await runJob(run_log, [
+            sme,
+            mmbScript,
+            pgTable,
+            regexModels,
+            ip_address,
+            user_id,
+          ])
       );
-    } else {
-      // const dev_id = 'SME15799';
-      // const dev_table = 'mmb_ge_mm3';
-      // const dev_id = 'SME08722';
-      // const dev_table = 'mmb_ge_mm4';
-      // const dev_id = 'SME01111';
-      // const dev_table = 'mmb_siemens';
-      const dev_id = "SME10257";
-      // const dev_table = 'mmb_siemens_non_tim';
-      const dev_table = "mmb_siemens";
-      // THERE SHOULD ONLY BE 1 MATCH SO DESTRUCTOR STRAIGHT TO OBJECT AT IDX 0
-      const [dev_system] = systems_configs.filter(({ id }) => id === dev_id);
-      // AGAIN, IDX 0 ONLY
-      const [dev_config] = dev_system.mmb_config.rpp_configs.filter(
-        ({ pgTable }) => pgTable === dev_table
-      );
-      dev_config.ip_address = dev_system.ip_address;
-      dev_config.user_id = dev_system.user_id;
-      const { mmbScript, regexModels, ip_address, user_id } = dev_config;
-      const dev_job_config = [
-        dev_id,
-        mmbScript,
-        dev_table,
-        regexModels,
-        ip_address,
-        user_id,
-      ];
-
-      await log("info", "NA", "onBoot", "FN DETAILS", {
-        dev_job_config: dev_job_config,
-      });
-
-      // THIS PREVENTS UNHANDLED EXCEPTION, BUT await runJob() NOT GOOD
-      // try {
-      //    await runJob(0, dev_job_config, redisClient);
-      // } catch (error) {
-      //    throw new Error(`IDFKGD FN CATCH -> ${error.message}`, {
-      //       cause: error,
-      //    });
-      // }
-
-      // MAYBE DON'T CONVERT runJob FN TO ERROR THROW TO
-      // PARENT PATTERN UNTIL WE REMOVE INTERNAL SCHEDULES
-      runJob(dev_job_config);
     }
+    // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
+    const job_promises = jobs.map((job) => job());
+
+    // AWAIT JOBS
+    await Promise.all(job_promises);
   } catch (error) {
     console.log(error);
-    await log("error", "NA", "onBoot", "FN CATCH", {
-      error: error,
-    });
+    await addLogEvent(E, run_log, "onBootMMB", cat, null, error);
   }
 };
 
