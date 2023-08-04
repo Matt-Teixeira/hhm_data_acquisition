@@ -5,30 +5,39 @@ const { getOnBootData, get_systems_by_schedule } = require("./sql/qf-provider");
 // BOOT
 const getMachineConfigs = require("./boot/get-machine-configs");
 // READ
-const short = require("short-uuid");
 const execRsync = require("./read/exec-rsync");
 const { filter_schedules } = require("./helpers");
+const { v4: uuidv4 } = require("uuid");
 
-const runJob = async (config) => {
+const [addLogEvent] = require("../../utils/logger/log");
+const {
+  type: { I, W, E },
+  tag: { cal, det, cat, seq, qaf },
+} = require("../../utils/logger/enums");
+
+const runJob = async (run_log, config) => {
   // UUID FOR EACH JOB
-  const jobId = short.uuid();
+  const job_id = uuidv4();
 
   try {
     // THIS IS THE PRIMARY JOB FUNCTION
-    await log("info", jobId, "runJob", "FN CALL", { config: config });
+    let note = {
+      job_id,
+      config,
+    };
+    await addLogEvent(I, run_log, "runJob", cal, note, null);
 
     // ["SME01096","v2_edu2","mmb_ge_mm3",["RE_GE_MM3_A"]]
     // TODO: RENAME machineRegexTags TO regexModels
     const [sme, mmbScript, pgTable, machineRegexTags, ip_address, user_id] =
       config;
     if (!(sme && mmbScript && pgTable && machineRegexTags)) {
-      await log(
-        "info",
-        jobId,
-        "runJob",
-        "JOB HALTED -> NON-CONFORMANT config",
-        { config: config }
-      );
+      let note = {
+        job_id,
+        config,
+        message: "JOB HALTED -> NON-CONFORMANT config",
+      };
+      await addLogEvent(W, run_log, "runJob", det, note, null);
       return;
     }
 
@@ -47,32 +56,45 @@ const runJob = async (config) => {
     ];
 
     const fileSizeAfterRsync = await execRsync(
-      jobId,
+      run_log,
+      job_id,
       sme,
       rsyncShPath,
       rsyncShArgs
     );
+    console.log("\nfileSizeAfterRsync");
     console.log(fileSizeAfterRsync);
     // HALT JOB DUE TO BAD fileSizeAfterRsync
     if (fileSizeAfterRsync === null) {
-      await log("info", jobId, "runJob", "JOB HALTED", {
-        fileSizeAfterRsync: fileSizeAfterRsync,
-      });
+      let note = {
+        job_id,
+        config,
+        fileSizeAfterRsync,
+        message: "JOB HALTED",
+      };
+      await addLogEvent(W, run_log, "runJob", det, note, null);
       return;
     }
   } catch (error) {
     console.log(error);
-    await log("error", jobId, "runJob", "FN CATCH", { error: error });
+    let note = {
+      job_id,
+      config,
+      error,
+    };
+    await addLogEvent(E, run_log, "runJob", cat, note, error);
   }
 };
 
-const onBootMMB = async (process_argv) => {
-  await log("info", "NA", "onBoot", "FN CALL", {
+const onBootMMB = async (run_log, process_argv) => {
+  let note = {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
     PG_USER: process.env.PG_USER,
     PG_DB: process.env.PG_DB,
-  });
+  };
+
+  await addLogEvent(I, run_log, "onBootMMB", cal, note, null);
 
   try {
     // ON BOOT GET DATA AND CONFIGS
@@ -80,9 +102,10 @@ const onBootMMB = async (process_argv) => {
       process_argv.toString()
     );
 
-    await log("info", "NA", "onBoot", "FN DETAILS", {
+    let note = {
       systems_configs: systems_configs,
-    });
+    };
+    await addLogEvent(I, run_log, "onBootMMB", det, note, null);
 
     // BUILD CONFIGS FOR runJob
     const machineConfigs = await getMachineConfigs(systems_configs);
@@ -94,32 +117,83 @@ const onBootMMB = async (process_argv) => {
         const prodConfigs = machineConfigs.filter(
           ({ schedule }) => schedule === process_argv
         );
+        const prod_jobs = [];
         for (const config of prodConfigs) {
           const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
             config;
-          runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
+
+          prod_jobs.push(
+            async () =>
+              await runJob(run_log, [
+                sme,
+                mmbScript,
+                pgTable,
+                regexModels,
+                ip_address,
+                user_id,
+              ])
+          );
         }
+        // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
+        const job_promises = prod_jobs.map((job) => job());
+
+        // AWAIT JOBS
+        await Promise.all(job_promises);
         break;
       case "staging":
         //filter_schedules(runJob, machineConfigs, process_argv);
         const stagingConfigs = machineConfigs.filter(
           ({ schedule }) => schedule === process_argv
         );
+        const staging_jobs = [];
         for (const config of stagingConfigs) {
           const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
             config;
-          runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
+
+          staging_jobs.push(
+            async () =>
+              await runJob(run_log, [
+                sme,
+                mmbScript,
+                pgTable,
+                regexModels,
+                ip_address,
+                user_id,
+              ])
+          );
         }
+        // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
+        const job_promises_staging = staging_jobs.map((job) => job());
+
+        // AWAIT JOBS
+        await Promise.all(job_promises_staging);
         break;
       case "dev_hhm":
         const devConfigs = machineConfigs.filter(
           ({ schedule }) => schedule === process_argv
         );
+        const dev_jobs = [];
         for (const config of devConfigs) {
           const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
             config;
-          runJob([sme, mmbScript, pgTable, regexModels, ip_address, user_id]);
+
+          dev_jobs.push(
+            async () =>
+              await runJob(run_log, [
+                sme,
+                mmbScript,
+                pgTable,
+                regexModels,
+                ip_address,
+                user_id,
+              ])
+          );
         }
+        // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
+        const job_promises_dev = dev_jobs.map((job) => job());
+
+        // AWAIT JOBS
+        await Promise.all(job_promises_dev);
         break;
       case "mig_profiles_units_prod":
         await log(

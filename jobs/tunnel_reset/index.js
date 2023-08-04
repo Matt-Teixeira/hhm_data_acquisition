@@ -5,14 +5,17 @@ const { group_queue_keys } = require("../../util");
 const get_philips_data = require("./philips");
 const get_ge_data = require("./ge");
 const get_siemens_data = require("./siemens");
+const execRsync = require("../mmb/read/exec-rsync");
 const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("../../utils/logger/enums");
 const { setTimeout } = require("timers/promises");
+const { v4: uuidv4 } = require("uuid");
 
 async function reset_tunnel(run_log) {
+  const job_id = uuidv4();
   try {
     // Get Redis systems that need tunnel resets
     const ip_queue = await get_redis_ip_queue();
@@ -42,6 +45,14 @@ async function reset_tunnel(run_log) {
     );
 
     console.log(tunnels_by_ip);
+    if (!tunnels_by_ip.length) {
+      let note = {
+        message: "No tunnels assocciated with systems",
+        systems: parsed_data.id,
+      };
+      addLogEvent(W, run_log, "reset_tunnel", det, note, null);
+      return;
+    }
     // Reset tunnels
     await resetTunnels(run_log, tunnels_by_ip);
 
@@ -63,6 +74,19 @@ async function reset_tunnel(run_log) {
       // Check for possible duplicates in queue and prevent double runs
       let is_duplicate = ran_systems.indexOf(system.id);
       if (is_duplicate !== -1) continue;
+
+      if (system.data_source === "mmb") {
+        jobs.push(
+          async () =>
+            await execRsync(
+              run_log,
+              job_id,
+              system.id,
+              `./jobs/mmb/read/sh/rsync_mmb.sh`,
+              system.rsyncShArgs
+            )
+        );
+      }
 
       switch (system.manufacturer) {
         case "GE":
@@ -88,7 +112,7 @@ async function reset_tunnel(run_log) {
       await Promise.all(promises);
 
       await setTimeout(30_000);
-      
+
       // Check queue and log systems that were added again. (Tunnel resets did not resolve connection issue)
       const ip_queue_post_reset = await get_redis_ip_queue();
       if (!ip_queue_post_reset.length) {

@@ -16,22 +16,4 @@ function decryptString(encryptedText) {
   return decrypted;
 }
 
-// Example usage
-
-/* 
-philips_mr_user_1: 'remote'
-philips_mr_pass_1: 'manager'
-philips_mr_user_2: 'remote'
-philips_mr_pass_2: 'Manager'
-philips_mr_user_3: 'remote'
-philips_mr_pass_3: 'MANAGER'
-*/
-/*  
-const plainText = 'MANAGER';
-const encryptedText = encryptString(plainText);
-console.log('Encrypted:', encryptedText);
-const decryptedText = decryptString(encryptedText);
-console.log('Decrypted:', decryptedText);  
- */
-
 module.exports = { encryptString, decryptString };

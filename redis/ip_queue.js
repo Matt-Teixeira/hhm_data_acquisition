@@ -8,9 +8,6 @@ const {
 async function add_to_redis_queue(run_log, system) {
   //const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
-  console.log("\n ********** system");
-  console.log(system);
-
   let note = {
     system_id: system.id,
   };

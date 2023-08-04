@@ -29,7 +29,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
 
   switch (run_group) {
     case "mmb":
-      onBootMMB(parseInt(schedule));
+      await onBootMMB(run_log, parseInt(schedule));
       break;
     case "philips":
       await rsync_philips_mri(run_log);
@@ -68,7 +68,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      run_system_manual(run_log, ["SME01139"], ["Philips", "MRI"]);
+      run_system_manual(run_log, ["SME15822"], ["Philips", "MRI"]);
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
