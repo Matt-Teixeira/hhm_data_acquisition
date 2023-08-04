@@ -1,5 +1,5 @@
 const exec_phil_cv_data_grab = require("../../../read/exec-phil_cv_data_grab");
-const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
+const { get_hhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString, list_new_files } = require("../../../util");
 const { get_last_dir_date } = require("../../../redis/redis_helpers");
 const [addLogEvent] = require("../../../utils/logger/log");
@@ -14,7 +14,7 @@ async function get_philips_cv_data(run_log) {
   try {
     const manufacturer = "Philips";
     const modality = "CV/IR";
-    const systems = await getGeCtHhm([manufacturer, modality]);
+    const systems = await get_hhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
 
     for (const system of systems) {

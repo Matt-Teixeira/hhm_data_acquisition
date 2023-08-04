@@ -1,5 +1,5 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
-const { getGeCtHhm } = require("../../../sql/qf-provider");
+const { get_hhm } = require("../../../sql/qf-provider");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -11,7 +11,7 @@ async function get_siemens_mri_data(run_log) {
 
   const manufacturer = "Siemens";
   const modality = "MRI";
-  const systems = await getGeCtHhm([manufacturer, modality]);
+  const systems = await get_hhm([manufacturer, modality]);
 
   const child_processes = [];
   for await (const system of systems) {

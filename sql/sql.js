@@ -23,8 +23,8 @@ module.exports = {
   get_mod_man: {
     smeNumber: sql("system/get_mod_man.sql"),
   },
-  get_ge_ct_hhm: {
-    systems: sql("system/get_ge_ct_hhm.sql"),
+  get_hhm_data: {
+    systems: sql("system/get_hhm_data.sql"),
   },
   get_hhm_creds: {
     hhm_credentials: sql("system/hhm_credentials.sql"),

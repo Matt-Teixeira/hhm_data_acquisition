@@ -6,10 +6,10 @@ const {
   pg_table,
   update_date_time,
   get_mod_man,
-  get_ge_ct_hhm,
+  get_hhm_data,
   get_hhm_creds,
   one_system_data,
-  phil_mri_host
+  phil_mri_host,
 } = require("./sql");
 
 // GENERIC LOGGER FOR ANY QF CALL
@@ -50,12 +50,12 @@ const getModMan = async (sme) => {
   }
 };
 
-const getGeCtHhm = async (argsArray) => {
+const get_hhm = async (argsArray) => {
   try {
-    return db.any(get_ge_ct_hhm.systems, argsArray);
+    return db.any(get_hhm_data.systems, argsArray);
   } catch (error) {
     console.log(error);
-    await log("error", "uuid", "sme", "getGeCtHhm", `FN CALL`);
+    await log("error", "uuid", "sme", "get_hhm_data", `FN CALL`);
   }
 };
 
@@ -81,7 +81,7 @@ const get_phil_mri_host = async (argsArray) => {
     return db.any(phil_mri_host.systems, argsArray);
   } catch (error) {
     console.log(error);
-    await log("error", "uuid", "sme", "getGeCtHhm", `FN CALL`);
+    await log("error", "uuid", "sme", "get_phil_mri_host", `FN CALL`);
   }
 };
 
@@ -91,8 +91,8 @@ module.exports = {
   getPgTable,
   updateDateTime,
   getModMan,
-  getGeCtHhm,
+  get_hhm,
   getHhmCreds,
   getOneSystem,
-  get_phil_mri_host
+  get_phil_mri_host,
 };

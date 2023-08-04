@@ -1,5 +1,5 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
-const { getGeCtHhm, getHhmCreds } = require("../../../sql/qf-provider");
+const {  get_hhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
@@ -12,7 +12,7 @@ async function get_ge_ct_data(run_log) {
 
   const manufacturer = "GE";
   const modality = "CT";
-  const systems = await getGeCtHhm([manufacturer, modality]);
+  const systems = await get_hhm([manufacturer, modality]);
   const credentials = await getHhmCreds([manufacturer, modality]);
 
   const child_processes = [];

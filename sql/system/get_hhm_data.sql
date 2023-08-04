@@ -9,4 +9,5 @@ FROM
 WHERE
     hhm_config IS NOT NULL
     AND manufacturer = $1
-    AND modality LIKE $2;
+    AND modality LIKE $2
+    AND process_log = true;
