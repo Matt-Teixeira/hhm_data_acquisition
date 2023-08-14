@@ -40,7 +40,6 @@ async function insertAlertTable(ip_queue, capture_datetime) {
   for (const system of ip_queue) {
     // Check for possible duplicates in queue and prevent double runs
     let is_duplicate = dup_systems.indexOf(system.id);
-    console.log(`${system.id}: ${is_duplicate}`);
     if (is_duplicate !== -1) continue;
 
     insert_array.push({
@@ -50,7 +49,6 @@ async function insertAlertTable(ip_queue, capture_datetime) {
     dup_systems.push(system.id);
   }
 
-  console.log(insert_array);
   const query = pgp.helpers.insert(insert_array, pg_cs.alert.ip.offline);
 
   await db.any(query);

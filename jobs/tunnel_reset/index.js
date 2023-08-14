@@ -119,7 +119,6 @@ async function reset_tunnel(run_log) {
 
       // Check queue for systems in which tunnel resets did not resolve connection issue
       const ip_queue_post_reset = await get_redis_ip_queue();
-      console.log(ip_queue_post_reset);
 
       // Clear Redis queue
       await clear_redis_ip_queue();
@@ -127,6 +126,7 @@ async function reset_tunnel(run_log) {
       // No systems in queue. All resets effective
       if (!ip_queue_post_reset.length) return;
 
+      // Else: log and insert into db, systems that timeout after tunnel reset
       let note = {
         message: "Data not acquired post tunnel reset",
         ip_queue_post_reset,
@@ -135,10 +135,11 @@ async function reset_tunnel(run_log) {
 
       await insertOfflineAlerts(ip_queue_post_reset, captur_datetime);
     } catch (error) {
-      addLogEvent(E, run_log, "get_ge_ct_data", cat, null, error);
+      addLogEvent(E, run_log, "reset_tunnel", cat, null, error);
     }
   } catch (error) {
     console.log(error);
+    addLogEvent(E, run_log, "reset_tunnel", cat, null, error);
   }
 }
 
@@ -148,6 +149,11 @@ async function insertOfflineAlerts(ip_queue, captur_datetime) {
   try {
     await insertAlertTable(ip_queue, captur_datetime);
   } catch (error) {
+    let note = {
+      ip_queue,
+      captur_datetime,
+    };
     console.log(error);
+    addLogEvent(E, run_log, "insertOfflineAlerts", cat, note, error);
   }
 }
