@@ -7,13 +7,13 @@ async function get_ge_data(run_log, system) {
     switch (system.modality) {
       case "CT":
         console.log("RUNNING GE MODALITY");
-        get_ge_ct_data(run_log, system);
+        await get_ge_ct_data(run_log, system);
         break;
       case "CV/IR":
-        get_ge_cv_data(run_log, system);
+        await get_ge_cv_data(run_log, system);
         break;
       case "MRI":
-        get_ge_mri_data(run_log, system);
+        await get_ge_mri_data(run_log, system);
         break;
       default:
         break;

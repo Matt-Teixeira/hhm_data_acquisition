@@ -47,6 +47,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
 }
 
 const onBoot = async () => {
+  console.time("App Run Time");
   const run_log = await makeAppRunLog();
 
   let note = {
@@ -75,6 +76,8 @@ const onBoot = async () => {
 
     //await setTimeout(60_000);
     await writeLogEvents(run_log);
+    console.log("\n********** END **********")
+    console.timeEnd("App Run Time");
   } catch (error) {
     console.log(error);
     await addLogEvent(E, run_log, "onBoot", cat, null, error);

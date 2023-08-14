@@ -1,7 +1,7 @@
 const getTunnelsByIP = require("../../utils/vpn/get-tunnels-by-ip");
 const resetTunnels = require("../../utils/vpn/reset-tunnels");
 const { get_redis_ip_queue, clear_redis_ip_queue } = require("../../redis");
-const { group_queue_keys } = require("../../util");
+const { extract_ip, captureDatetime, insertAlertTable } = require("../../util");
 const get_philips_data = require("./philips");
 const get_ge_data = require("./ge");
 const get_siemens_data = require("./siemens");
@@ -15,26 +15,29 @@ const { setTimeout } = require("timers/promises");
 const { v4: uuidv4 } = require("uuid");
 
 async function reset_tunnel(run_log) {
+  const captur_datetime = captureDatetime();
   const job_id = uuidv4();
   try {
     // Get Redis systems that need tunnel resets
     const ip_queue = await get_redis_ip_queue();
+
+    // End if no systems in redis queue
     if (!ip_queue.length) {
       let note = { message: "No IP addresses in queue" };
       addLogEvent(I, run_log, "reset_tunnel", det, note, null);
       return;
     }
-    console.log(ip_queue);
-    addLogEvent(I, run_log, "reset_tunnel", det, { ip_queue }, null);
 
-    // Parse system data to get array of ip addresses
-    const parsed_data = group_queue_keys(ip_queue);
+    addLogEvent(I, run_log, "reset_tunnel", cal, { ip_queue }, null);
 
-    console.log("\nparsed_data");
-    console.log(parsed_data);
+    // Parse system data to get array of ip addresses and ids
+    const parsed_data = extract_ip(ip_queue);
 
     // Group IP by tunnel id
-    const tunnels_by_ip = await getTunnelsByIP(run_log, parsed_data.ip_address);
+    const tunnels_by_ip = await getTunnelsByIP(
+      run_log,
+      parsed_data.ip_addresses
+    );
     addLogEvent(
       I,
       run_log,
@@ -44,7 +47,6 @@ async function reset_tunnel(run_log) {
       null
     );
 
-    console.log(tunnels_by_ip);
     if (!tunnels_by_ip.length) {
       let note = {
         message: "No tunnels assocciated with systems",
@@ -56,14 +58,15 @@ async function reset_tunnel(run_log) {
     // Reset tunnels
     await resetTunnels(run_log, tunnels_by_ip);
 
-    // Clear tunnel reset queue
+    // Clear Redis queue
     await clear_redis_ip_queue();
 
+    // Timer set to allow tunnel resets to complete
     console.log("Start of 10 second timer");
     await setTimeout(10_000);
     console.log("End of timer");
 
-    // Run data acquisition
+    /* Rerun Data Acquisition */
 
     // Store and prevent run of duplicate systems
     const ran_systems = [];
@@ -75,6 +78,7 @@ async function reset_tunnel(run_log) {
       let is_duplicate = ran_systems.indexOf(system.id);
       if (is_duplicate !== -1) continue;
 
+      // Check for and run mmb systems
       if (system.data_source === "mmb") {
         jobs.push(
           async () =>
@@ -86,8 +90,10 @@ async function reset_tunnel(run_log) {
               system.rsyncShArgs
             )
         );
+        continue;
       }
 
+      // Check for and run hhm systems
       switch (system.manufacturer) {
         case "GE":
           jobs.push(async () => await get_ge_data(run_log, system));
@@ -111,23 +117,23 @@ async function reset_tunnel(run_log) {
       // AWAIT PROMISIS
       await Promise.all(promises);
 
-      await setTimeout(30_000);
-
-      // Check queue and log systems that were added again. (Tunnel resets did not resolve connection issue)
+      // Check queue for systems in which tunnel resets did not resolve connection issue
       const ip_queue_post_reset = await get_redis_ip_queue();
-      if (!ip_queue_post_reset.length) {
-        let note = {
-          message: "No IP addresses in queue after tunnel resets",
-          ip_queue_post_reset,
-        };
-        addLogEvent(I, run_log, "reset_tunnel", det, note, null);
-        return;
-      }
+      console.log(ip_queue_post_reset);
+
+      // Clear Redis queue
+      await clear_redis_ip_queue();
+
+      // No systems in queue. All resets effective
+      if (!ip_queue_post_reset.length) return;
+
       let note = {
         message: "Data not acquired post tunnel reset",
         ip_queue_post_reset,
       };
       addLogEvent(I, run_log, "reset_tunnel", det, note, null);
+
+      await insertOfflineAlerts(ip_queue_post_reset, captur_datetime);
     } catch (error) {
       addLogEvent(E, run_log, "get_ge_ct_data", cat, null, error);
     }
@@ -138,21 +144,10 @@ async function reset_tunnel(run_log) {
 
 module.exports = reset_tunnel;
 
-/* 
-[
-  {
-    id: 'SME02552',
-    ip_address: '172.16.112.240',
-    data_acquisition: { script: 'phil_cv_21.sh', hhm_credentials_group: '12' },
-    manufacturer: 'Philips',
-    modality: 'CV/IR'
-  },
-  {
-    id: 'SME01394',
-    ip_address: '172.18.21.229',
-    data_acquisition: { script: 'phil_cv_21.sh', hhm_credentials_group: '12' },
-    manufacturer: 'Philips',
-    modality: 'CV/IR'
-  },
-]
-*/
+async function insertOfflineAlerts(ip_queue, captur_datetime) {
+  try {
+    await insertAlertTable(ip_queue, captur_datetime);
+  } catch (error) {
+    console.log(error);
+  }
+}

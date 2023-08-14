@@ -8,8 +8,8 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_ge_ct_data(run_log, system) {
+  let note = { system: system };
   try {
-    let note = { system: system };
     addLogEvent(I, run_log, "get_ge_ct_data", cal, note, null);
 
     const manufacturer = "GE";

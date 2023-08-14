@@ -8,8 +8,8 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_ge_cv_data(run_log, system) {
+  let note = { system: system };
   try {
-    let note = { system: system };
     addLogEvent(I, run_log, "get_ge_ct_data", cal, note, null);
     const manufacturer = "GE";
     const modality = "CV/IR";
@@ -25,13 +25,11 @@ async function get_ge_cv_data(run_log, system) {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      await exec_hhm_data_grab(
-        run_log,
-        system.id,
-        cv_path,
-        system,
-        [system.ip_address, user, pass]
-      );
+      await exec_hhm_data_grab(run_log, system.id, cv_path, system, [
+        system.ip_address,
+        user,
+        pass,
+      ]);
     }
   } catch (error) {
     console.log(error);

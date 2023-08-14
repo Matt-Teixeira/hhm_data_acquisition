@@ -3,6 +3,7 @@ node_modules/
 test/
 test*/
 files/
+logs/
 system_enrollment/
 NOTES/
 logger.js

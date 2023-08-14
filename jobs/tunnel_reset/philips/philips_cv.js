@@ -9,8 +9,8 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_philips_cv_data(run_log, system) {
+  let note = { system: system };
   try {
-    let note = { system: system };
     addLogEvent(I, run_log, "get_philips_cv_data", cal, note, null);
     const manufacturer = "Philips";
     const modality = "CV/IR";
@@ -66,6 +66,7 @@ async function get_philips_cv_data(run_log, system) {
     }
   } catch (error) {
     console.log(error);
+    addLogEvent(E, run_log, "get_philips_cv_data", cat, note, error);
   }
 }
 
