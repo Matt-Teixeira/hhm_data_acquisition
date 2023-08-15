@@ -3,11 +3,6 @@ const exec_phil_cv_data_grab = require("../../read/exec-phil_cv_data_grab");
 const { getHhmCreds, getOneSystem } = require("../../sql/qf-provider");
 const { decryptString, list_new_files } = require("../../util");
 const { get_last_dir_date } = require("../../redis/redis_helpers");
-const [addLogEvent] = require("../../utils/logger/log");
-const {
-  type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
-} = require("../../utils/logger/enums");
 
 async function run_system_manual(run_log, systemArray, man_mod) {
   try {
