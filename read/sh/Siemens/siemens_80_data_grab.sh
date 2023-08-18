@@ -7,4 +7,4 @@
 ### "--tlsv1.[1-3]"
 ### "--tls-max 1.[1-3]"
 [ ! -d "$2" ] && mkdir $2
-curl -m 10 $(echo -n "$POS_ARGS") "http://$1/service/autoreport/hold/EvtApplication_Today.txt" >"$2/Application.log"
+curl -m 20 $(echo -n "$POS_ARGS") "http://$1/service/autoreport/hold/EvtApplication_Today.txt" >"$2/Application.log"

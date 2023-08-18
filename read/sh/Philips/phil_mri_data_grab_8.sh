@@ -13,6 +13,7 @@ cd /cygdrive/g/Site;
 mget rmmu_short_cryogenic$current_year_month* -O $4/rmmu_short; 
 mget rmmu_magnet$current_year_month* -O $4/rmmu_magnet; 
 mget rmmu$current_year_month* -O $4/rmmu;
+cd /cygdrive/g/monitoring/; 
 mget monitor_System* -O $4/monitoring;
 mget monitor_cryocompressor* -O $4/monitoring;
 mget monitor_magnet* -O $4/monitoring;
@@ -27,6 +28,6 @@ mget STT_MAGNET.txt -O $4"
 ## rmmu_short      /cygdrive/g/Site/
 ## rmmu_magnet     /cygdrive/g/Site/
 
-## monitoring.dat /cygdrive/g/Site /
+## monitoring.dat /cygdrive/g/monitoring/
 
 ## STT_MAGNET.txt /cygdrive/g/stt/

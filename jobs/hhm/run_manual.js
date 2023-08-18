@@ -22,15 +22,16 @@ async function run_system_manual(run_log, systemArray, man_mod) {
 
       let user = "";
       let pass = "";
-      for (const cred of credentials) {
-        if (system[0].data_acquisition.hhm_credentials_group == cred.id) {
-          user = decryptString(cred.user_enc);
-          pass = decryptString(cred.password_enc);
+      if (credentials.length) {
+        for (const cred of credentials) {
+          if (system[0].data_acquisition.hhm_credentials_group == cred.id) {
+            user = decryptString(cred.user_enc);
+            pass = decryptString(cred.password_enc);
+          }
         }
-      }
-
-      if ((man_mod[0] !== "Siemens" && user === "") || pass === "") {
-        throw new Error("NO CREDENTIALS FOUND");
+        if ((man_mod[0] !== "Siemens" && user === "") || pass === "") {
+          throw new Error("NO CREDENTIALS FOUND");
+        }
       }
 
       // END Credential Acquisition
@@ -85,11 +86,17 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         return;
       }
 
-      await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
-        system[0].ip_address,
-        user,
-        pass,
-      ]);
+      if (man_mod[0] === "Siemens") {
+        await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
+          system[0].ip_address,
+        ]);
+      } else {
+        await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
+          system[0].ip_address,
+          user,
+          pass,
+        ]);
+      }
     }
   } catch (error) {
     console.log("ERROR IN MANUAL CATCH");
