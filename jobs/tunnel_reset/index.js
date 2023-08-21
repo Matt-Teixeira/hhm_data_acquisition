@@ -75,8 +75,8 @@ async function reset_tunnel(run_log) {
 
     for (const system of ip_queue) {
       // Check for possible duplicates in queue and prevent double runs
-      let is_duplicate = ran_systems.indexOf(system.id);
-      if (is_duplicate !== -1) continue;
+      // let is_duplicate = ran_systems.indexOf(system.id);
+      // if (is_duplicate !== -1) continue;
 
       // Check for and run mmb systems
       if (system.data_source === "mmb") {
@@ -108,7 +108,7 @@ async function reset_tunnel(run_log) {
         default:
           break;
       }
-      ran_systems.push(system.id);
+      // ran_systems.push(system.id);
     }
 
     try {

@@ -1,7 +1,3 @@
-const db = require("../../utils/db/pg-pool");
-const pgp = require("pg-promise")();
-const { pg_column_sets: pg_cs } = require("../../utils/db/sql/pg-helpers_hhm");
-
 function group_queue_keys(ip_queue) {
   const parsed_queue = {};
   // Set keys in parsed_queue
