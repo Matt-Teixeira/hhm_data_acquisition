@@ -6,7 +6,7 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_siemens_cv_data(run_log) {
+async function get_siemens_cv_data(run_log, capture_datetime) {
   try {
     const manufacturer = "Siemens";
     const modality = "CV/IR";
@@ -20,9 +20,14 @@ async function get_siemens_cv_data(run_log) {
         if (system.data_acquisition && system.ip_address) {
           const cv_path = `./read/sh/Siemens/${system.data_acquisition.script}`;
 
-          exec_hhm_data_grab(run_log, system.id, cv_path, system, [
-            system.ip_address,
-          ]);
+          exec_hhm_data_grab(
+            run_log,
+            system.id,
+            cv_path,
+            system,
+            [system.ip_address],
+            capture_datetime
+          );
         }
       } catch (error) {
         await addLogEvent(E, run_log, "get_siemens_ct_data", cat, note, error);

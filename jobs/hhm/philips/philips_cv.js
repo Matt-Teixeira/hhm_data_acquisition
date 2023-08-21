@@ -8,7 +8,7 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_philips_cv_data(run_log) {
+async function get_philips_cv_data(run_log, capture_datetime) {
   await addLogEvent(I, run_log, "get_philips_cv_data", cal, null, null);
   const child_processes = [];
   try {
@@ -19,7 +19,8 @@ async function get_philips_cv_data(run_log) {
 
     for (const system of systems) {
       child_processes.push(
-        async () => await run_phil_cv(run_log, system, credentials)
+        async () =>
+          await run_phil_cv(run_log, system, credentials, capture_datetime)
       );
     }
   } catch (error) {
@@ -37,7 +38,7 @@ async function get_philips_cv_data(run_log) {
   }
 }
 
-async function run_phil_cv(run_log, system, credentials) {
+async function run_phil_cv(run_log, system, credentials, capture_datetime) {
   if (system.data_acquisition && system.ip_address) {
     await addLogEvent(I, run_log, "run_phil_cv", cal, null, null);
     const cv_path = `./read/sh/Philips/${system.data_acquisition.script}`;
@@ -75,12 +76,14 @@ async function run_phil_cv(run_log, system, credentials) {
     }
 
     for await (const file of new_files) {
-      await exec_phil_cv_data_grab(run_log, system.id, cv_path, system, [
-        system.ip_address,
-        user,
-        pass,
-        file,
-      ]);
+      await exec_phil_cv_data_grab(
+        run_log,
+        system.id,
+        cv_path,
+        system,
+        [system.ip_address, user, pass, file],
+        capture_datetime
+      );
     }
   }
 }

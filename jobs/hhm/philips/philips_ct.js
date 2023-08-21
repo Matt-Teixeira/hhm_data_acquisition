@@ -7,7 +7,7 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_philips_ct_data(run_log) {
+async function get_philips_ct_data(run_log, capture_datetime) {
   await addLogEvent(I, run_log, "get_philips_ct_data", cal, null, null);
 
   const manufacturer = "Philips";
@@ -33,12 +33,16 @@ async function get_philips_ct_data(run_log) {
         const user = decryptString(system_creds.user_enc);
         const pass = decryptString(system_creds.password_enc);
 
-        child_processes.push(async () =>
-        await exec_hhm_data_grab(run_log, system.id, ct_path, system, [
-            system.ip_address,
-            user,
-            pass,
-          ])
+        child_processes.push(
+          async () =>
+            await exec_hhm_data_grab(
+              run_log,
+              system.id,
+              ct_path,
+              system,
+              [system.ip_address, user, pass],
+              capture_datetime
+            )
         );
       }
     } catch (error) {

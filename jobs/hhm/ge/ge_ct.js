@@ -1,5 +1,5 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
-const {  get_hhm, getHhmCreds } = require("../../../sql/qf-provider");
+const { get_hhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
@@ -7,7 +7,7 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_ge_ct_data(run_log) {
+async function get_ge_ct_data(run_log, capture_datetime) {
   await addLogEvent(I, run_log, "get_ge_ct_data", cal, null, null);
 
   const manufacturer = "GE";
@@ -35,11 +35,14 @@ async function get_ge_ct_data(run_log) {
 
         child_processes.push(
           async () =>
-            await exec_hhm_data_grab(run_log, system.id, ct_path, system, [
-              system.ip_address,
-              user,
-              pass,
-            ])
+            await exec_hhm_data_grab(
+              run_log,
+              system.id,
+              ct_path,
+              system,
+              [system.ip_address, user, pass],
+              capture_datetime
+            )
         );
       }
     } catch (error) {

@@ -26,8 +26,6 @@ async function list_new_files(run_log, sme, ip_address, last_file, user, pass, s
         break;
       }
     }
-    console.log("Last Dir");
-    console.log(last_file);
     return [last_file];
   }
 

@@ -1,7 +1,7 @@
 const getTunnelsByIP = require("../../utils/vpn/get-tunnels-by-ip");
 const resetTunnels = require("../../utils/vpn/reset-tunnels");
 const { get_redis_ip_queue, clear_redis_ip_queue } = require("../../redis");
-const { extract_ip, captureDatetime, insertAlertTable } = require("../../util");
+const { extract_ip, captureDatetime } = require("../../util");
 const get_philips_data = require("./philips");
 const get_ge_data = require("./ge");
 const get_siemens_data = require("./siemens");
@@ -15,7 +15,7 @@ const { setTimeout } = require("timers/promises");
 const { v4: uuidv4 } = require("uuid");
 
 async function reset_tunnel(run_log) {
-  const captur_datetime = captureDatetime();
+  const capture_datetime = captureDatetime();
   const job_id = uuidv4();
   try {
     // Get Redis systems that need tunnel resets
@@ -87,7 +87,8 @@ async function reset_tunnel(run_log) {
               job_id,
               system.id,
               `./jobs/mmb/read/sh/rsync_mmb.sh`,
-              system.rsyncShArgs
+              system.rsyncShArgs,
+              "ip_reset"
             )
         );
         continue;
@@ -133,7 +134,7 @@ async function reset_tunnel(run_log) {
       };
       addLogEvent(I, run_log, "reset_tunnel", det, note, null);
 
-      await insertOfflineAlerts(ip_queue_post_reset, captur_datetime);
+      //await insertOfflineAlerts(ip_queue_post_reset, capture_datetime);
     } catch (error) {
       addLogEvent(E, run_log, "reset_tunnel", cat, null, error);
     }
@@ -145,13 +146,13 @@ async function reset_tunnel(run_log) {
 
 module.exports = reset_tunnel;
 
-async function insertOfflineAlerts(ip_queue, captur_datetime) {
+async function insertOfflineAlerts(ip_queue, capture_datetime) {
   try {
-    await insertAlertTable(ip_queue, captur_datetime);
+    //await insertAlertTable(ip_queue, capture_datetime);
   } catch (error) {
     let note = {
       ip_queue,
-      captur_datetime,
+      capture_datetime,
     };
     console.log(error);
     addLogEvent(E, run_log, "insertOfflineAlerts", cat, note, error);

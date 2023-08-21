@@ -5,6 +5,9 @@ const onBootMMB = require("./jobs/mmb");
 const get_hhm_data = require("./jobs/hhm");
 const run_system_manual = require("./jobs/hhm/run_manual");
 const reset_tunnel = require("./jobs/tunnel_reset");
+const build_config = require("./jobs/build_config");
+const { captureDatetime } = require("./util");
+const { insertOfflineTable } = require("./util");
 const [
   addLogEvent,
   writeLogEvents,
@@ -17,6 +20,7 @@ const {
 } = require("./utils/logger/enums");
 
 async function runJob(run_log, run_group, schedule, manufacturer, modality) {
+  const capture_datetime = captureDatetime();
   let note = {
     run_group: run_group,
     schedule: schedule,
@@ -29,18 +33,20 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
 
   switch (run_group) {
     case "mmb":
-      await onBootMMB(run_log, parseInt(schedule));
+      await onBootMMB(run_log, parseInt(schedule), capture_datetime);
       break;
     case "philips":
-      await rsync_philips_mri(run_log);
+      await rsync_philips_mri(run_log, capture_datetime);
       break;
     case "hhm":
-      await get_hhm_data(run_log, manufacturer, modality);
+      await get_hhm_data(run_log, manufacturer, modality, capture_datetime);
       break;
     case "ip_reset":
-      await reset_tunnel(run_log);
+      await reset_tunnel(run_log, capture_datetime);
       break;
-
+    case "offline_alert":
+      await insertOfflineTable();
+      break;
     default:
       break;
   }
@@ -71,12 +77,15 @@ const onBoot = async () => {
     if (run_group === "manual") {
       await run_system_manual(run_log, ["SME02583"], ["GE", "MRI"]);
     }
+    if (run_group === "config") {
+      await build_config(system);
+    }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
 
     //await setTimeout(60_000);
     await writeLogEvents(run_log);
-    console.log("\n********** END **********")
+    console.log("\n********** END **********");
     console.timeEnd("App Run Time");
   } catch (error) {
     console.log(error);

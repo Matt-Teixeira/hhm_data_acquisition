@@ -8,7 +8,7 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../utils/logger/enums");
 
-const runJob = async (run_log, config) => {
+const runJob = async (run_log, config, capture_datetime) => {
   // UUID FOR EACH JOB
   const job_id = uuidv4();
 
@@ -53,7 +53,8 @@ const runJob = async (run_log, config) => {
       job_id,
       sme,
       rsyncShPath,
-      rsyncShArgs
+      rsyncShArgs,
+      capture_datetime
     );
 
     console.log("\nFile Size After Rsync");
@@ -81,7 +82,7 @@ const runJob = async (run_log, config) => {
   }
 };
 
-const onBootMMB = async (run_log, process_argv) => {
+const onBootMMB = async (run_log, process_argv, capture_datetime) => {
   let note = {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
@@ -115,14 +116,11 @@ const onBootMMB = async (run_log, process_argv) => {
 
       jobs.push(
         async () =>
-          await runJob(run_log, [
-            sme,
-            mmbScript,
-            pgTable,
-            regexModels,
-            ip_address,
-            user_id,
-          ])
+          await runJob(
+            run_log,
+            [sme, mmbScript, pgTable, regexModels, ip_address, user_id],
+            capture_datetime
+          )
       );
     }
     // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION

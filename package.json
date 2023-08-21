@@ -16,6 +16,7 @@
       "siemens_ct": "node index.js hhm null Siemens CT",
       "siemens_mri": "node index.js hhm null Siemens MRI",
       "ip": "node index.js ip_reset",
+      "offline_alert": "node index.js offline_alert",
       "schedule_0": "node index.js mmb 0",
       "schedule_1": "node index.js mmb 1",
       "schedule_2": "node index.js mmb 2",

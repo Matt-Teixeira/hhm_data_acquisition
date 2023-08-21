@@ -1,7 +1,7 @@
 const { log } = require("../../../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
-const { add_to_redis_queue } = require("../../../redis");
+const { add_to_redis_queue, add_to_online_queue } = require("../../../redis");
 
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
@@ -9,7 +9,14 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-const execRsync = async (run_log, job_id, sme, rsyncShPath, rsyncShArgs) => {
+const execRsync = async (
+  run_log,
+  job_id,
+  sme,
+  rsyncShPath,
+  rsyncShArgs,
+  capture_datetime
+) => {
   //  console.log(rsyncShArgs);
   // THIS FUNCTION SYNCS A REMOTE FILE TO A LOCAL MIRROR AND RETURNS THE NEWLY SYNCED FILE SIZE
   let note = {
@@ -35,6 +42,13 @@ const execRsync = async (run_log, job_id, sme, rsyncShPath, rsyncShArgs) => {
 
     await addLogEvent(I, run_log, "execRsync", det, note, null);
 
+    if(capture_datetime !== "ip_reset") {
+      await add_to_online_queue(run_log, {
+        id: sme,
+        capture_datetime,
+      });
+    }
+
     return fileSizeAfterRsync;
   } catch (error) {
     let note = {
@@ -51,7 +65,7 @@ const execRsync = async (run_log, job_id, sme, rsyncShPath, rsyncShArgs) => {
         ip_address: rsyncShArgs[3],
         data_source: "mmb",
         rsyncShArgs,
-        rsyncShPath
+        rsyncShPath,
       };
 
       await add_to_redis_queue(run_log, system);

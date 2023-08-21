@@ -1,29 +1,19 @@
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
-const { add_to_redis_queue, add_to_online_queue } = require("../redis");
-const [addLogEvent] = require("../utils/logger/log");
+const { add_to_redis_queue, add_to_online_queue } = require("../../redis");
+const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
-} = require("../utils/logger/enums");
+} = require("../../utils/logger/enums");
 
-const exec_hhm_data_grab = async (
-  run_log,
-  sme,
-  execPath,
-  system,
-  args,
-  capture_datetime
-) => {
+const exec_hhm_data_grab = async (run_log, sme, execPath, system, args) => {
   let note = {
     system_id: system.id,
     execute_path: execPath,
     args,
   };
   await addLogEvent(I, run_log, "exec_hhm_data_grab", cal, note, null);
-
-  const connection_test_1 = /Connection timed out/;
-  const connection_test_2 = /error: max-retries exceeded/;
 
   let data_store_path = "";
   switch (process.env.RUN_ENV) {
@@ -63,42 +53,10 @@ const exec_hhm_data_grab = async (
 
     await addLogEvent(I, run_log, "exec_hhm_data_grab", det, note, null);
 
-    // If connection is closed, return false. Any other error, return null.
-    if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
-      let note = {
-        system_id: system.id,
-        stdout,
-        stderr,
-      };
-
-      await addLogEvent(W, run_log, "exec_hhm_data_grab", det, note, null);
-      await add_to_redis_queue(run_log, system);
-
-      return false;
-    }
-
-    await add_to_online_queue(run_log, {
-      id: system.id,
-      capture_datetime,
-    });
-
     return stdout;
   } catch (error) {
     console.log(error);
 
-    if (
-      connection_test_1.test(error.message) ||
-      connection_test_2.test(error.message)
-    ) {
-      let note = {
-        system_id: system.id,
-      };
-
-      await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
-      await add_to_redis_queue(run_log, system);
-
-      return false;
-    }
     await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
     return null;
   }
