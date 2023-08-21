@@ -8,7 +8,12 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_philips_cv_data(run_log, system) {
+async function get_philips_cv_data(
+  run_log,
+  system,
+  capture_datetime,
+  ip_reset
+) {
   let note = { system: system };
   try {
     addLogEvent(I, run_log, "get_philips_cv_data", cal, note, null);
@@ -56,12 +61,15 @@ async function get_philips_cv_data(run_log, system) {
       }
 
       for (const file of new_files) {
-        await exec_phil_cv_data_grab(run_log, system.id, cv_path, system, [
-          system.ip_address,
-          user,
-          pass,
-          file,
-        ]);
+        await exec_phil_cv_data_grab(
+          run_log,
+          system.id,
+          cv_path,
+          system,
+          [system.ip_address, user, pass, file],
+          capture_datetime,
+          ip_reset
+        );
       }
     }
   } catch (error) {

@@ -1,13 +1,25 @@
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
-const { add_to_redis_queue, add_to_online_queue, update_last_dir_date } = require("../redis");
+const {
+  add_to_redis_queue,
+  add_to_online_queue,
+  update_last_dir_date,
+} = require("../redis");
 const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
   tag: { cal, det, cat, seq, qaf },
 } = require("../utils/logger/enums");
 
-const exec_phil_cv_data_grab = async (run_log, sme, execPath, system, args, capture_datetime) => {
+const exec_phil_cv_data_grab = async (
+  run_log,
+  sme,
+  execPath,
+  system,
+  args,
+  capture_datetime,
+  ip_reset = false
+) => {
   let note = {
     system_id: system.id,
     execute_path: execPath,
@@ -60,12 +72,30 @@ const exec_phil_cv_data_grab = async (run_log, sme, execPath, system, args, capt
       };
 
       await addLogEvent(E, run_log, "exec_phil_cv_data_grab", det, note, null);
+
+      // Only runs for ip reset instance
+      // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
+      // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
+      if (ip_reset) {
+        await add_to_online_queue(run_log, {
+          id: system.id,
+          capture_datetime,
+          successful_acquisition: false,
+        });
+
+        return false;
+      }
+
       await add_to_redis_queue(run_log, system);
       return false;
     }
 
     await update_last_dir_date(sme, args[3]);
-    await add_to_online_queue(run_log, {id: system.id, capture_datetime})
+    await add_to_online_queue(run_log, {
+      id: system.id,
+      capture_datetime,
+      successful_acquisition: true,
+    });
 
     return stdout;
   } catch (error) {
@@ -80,6 +110,17 @@ const exec_phil_cv_data_grab = async (run_log, sme, execPath, system, args, capt
       };
 
       await addLogEvent(E, run_log, "exec_phil_cv_data_grab", cat, note, error);
+
+      if (ip_reset) {
+        await add_to_online_queue(run_log, {
+          id: system.id,
+          capture_datetime,
+          successful_acquisition: false,
+        });
+
+        return false;
+      }
+
       await add_to_redis_queue(run_log, system);
 
       return false;

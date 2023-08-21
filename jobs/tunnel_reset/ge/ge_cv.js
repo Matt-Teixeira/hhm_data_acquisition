@@ -1,4 +1,4 @@
-const exec_hhm_data_grab = require("../../../read/post_tunnel_reset/exec-hhm_data_grab");
+const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
 const [addLogEvent] = require("../../../utils/logger/log");
@@ -7,7 +7,7 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_ge_cv_data(run_log, system) {
+async function get_ge_cv_data(run_log, system, capture_datetime, ip_reset) {
   let note = { system: system };
   try {
     addLogEvent(I, run_log, "get_ge_ct_data", cal, note, null);
@@ -25,11 +25,15 @@ async function get_ge_cv_data(run_log, system) {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      await exec_hhm_data_grab(run_log, system.id, cv_path, system, [
-        system.ip_address,
-        user,
-        pass,
-      ]);
+      await exec_hhm_data_grab(
+        run_log,
+        system.id,
+        cv_path,
+        system,
+        [system.ip_address, user, pass],
+        capture_datetime,
+        ip_reset
+      );
     }
   } catch (error) {
     console.log(error);

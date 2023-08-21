@@ -7,7 +7,12 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../../../utils/logger/enums");
 
-async function get_philips_mri_data(run_log, system) {
+async function get_philips_mri_data(
+  run_log,
+  system,
+  capture_datetime,
+  ip_reset
+) {
   let note = { system: system };
   try {
     addLogEvent(I, run_log, "get_philips_mri_data", cal, note, null);
@@ -27,11 +32,15 @@ async function get_philips_mri_data(run_log, system) {
       const user = decryptString(system_creds.user_enc);
       const pass = decryptString(system_creds.password_enc);
 
-      await exec_hhm_data_grab(run_log, system.id, mri_path, system, [
-        system.ip_address,
-        user,
-        pass,
-      ]);
+      await exec_hhm_data_grab(
+        run_log,
+        system.id,
+        mri_path,
+        system,
+        [system.ip_address, user, pass],
+        capture_datetime,
+        ip_reset
+      );
     }
   } catch (error) {
     console.log(error);

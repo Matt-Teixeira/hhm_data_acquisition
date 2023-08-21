@@ -6,8 +6,7 @@ const get_hhm_data = require("./jobs/hhm");
 const run_system_manual = require("./jobs/hhm/run_manual");
 const reset_tunnel = require("./jobs/tunnel_reset");
 const build_config = require("./jobs/build_config");
-const { captureDatetime } = require("./util");
-const { insertOfflineTable } = require("./util");
+const { captureDatetime, insertHeartbeat } = require("./util");
 const [
   addLogEvent,
   writeLogEvents,
@@ -45,7 +44,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
       await reset_tunnel(run_log, capture_datetime);
       break;
     case "offline_alert":
-      await insertOfflineTable();
+      await insertHeartbeat();
       break;
     default:
       break;

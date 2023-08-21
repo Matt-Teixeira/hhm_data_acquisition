@@ -15,7 +15,9 @@ const execRsync = async (
   sme,
   rsyncShPath,
   rsyncShArgs,
-  capture_datetime
+  capture_datetime,
+  ip_reset = false
+
 ) => {
   //  console.log(rsyncShArgs);
   // THIS FUNCTION SYNCS A REMOTE FILE TO A LOCAL MIRROR AND RETURNS THE NEWLY SYNCED FILE SIZE
@@ -42,10 +44,11 @@ const execRsync = async (
 
     await addLogEvent(I, run_log, "execRsync", det, note, null);
 
-    if(capture_datetime !== "ip_reset") {
+    if (capture_datetime !== "ip_reset") {
       await add_to_online_queue(run_log, {
         id: sme,
         capture_datetime,
+        successful_acquisition: true,
       });
     }
 
@@ -67,6 +70,19 @@ const execRsync = async (
         rsyncShArgs,
         rsyncShPath,
       };
+
+      // Only runs for ip reset instance
+      // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
+      // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
+      if (ip_reset) {
+        await add_to_online_queue(run_log, {
+          id: system.id,
+          capture_datetime,
+          successful_acquisition: false,
+        });
+
+        return null;
+      }
 
       await add_to_redis_queue(run_log, system);
 

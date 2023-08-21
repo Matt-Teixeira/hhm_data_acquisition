@@ -13,13 +13,17 @@ const exec_hhm_data_grab = async (
   execPath,
   system,
   args,
-  capture_datetime
+  capture_datetime,
+  ip_reset = false
 ) => {
   let note = {
     system_id: system.id,
     execute_path: execPath,
     args,
   };
+
+  console.log(note);
+  console.log(capture_datetime, ip_reset);
   await addLogEvent(I, run_log, "exec_hhm_data_grab", cal, note, null);
 
   const connection_test_1 = /Connection timed out/;
@@ -72,6 +76,20 @@ const exec_hhm_data_grab = async (
       };
 
       await addLogEvent(W, run_log, "exec_hhm_data_grab", det, note, null);
+
+      // Only runs for ip reset instance
+      // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
+      // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
+      if (ip_reset) {
+        await add_to_online_queue(run_log, {
+          id: system.id,
+          capture_datetime,
+          successful_acquisition: false,
+        });
+
+        return false;
+      }
+
       await add_to_redis_queue(run_log, system);
 
       return false;
@@ -80,12 +98,14 @@ const exec_hhm_data_grab = async (
     await add_to_online_queue(run_log, {
       id: system.id,
       capture_datetime,
+      successful_acquisition: true,
     });
 
     return stdout;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
 
+    console.log("In Error");
     if (
       connection_test_1.test(error.message) ||
       connection_test_2.test(error.message)
@@ -95,6 +115,18 @@ const exec_hhm_data_grab = async (
       };
 
       await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
+
+      if (ip_reset) {
+        console.log("In ip_reset");
+        await add_to_online_queue(run_log, {
+          id: system.id,
+          capture_datetime,
+          successful_acquisition: false,
+        });
+
+        return false;
+      }
+
       await add_to_redis_queue(run_log, system);
 
       return false;

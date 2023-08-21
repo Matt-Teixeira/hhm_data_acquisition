@@ -88,7 +88,8 @@ async function reset_tunnel(run_log) {
               system.id,
               `./jobs/mmb/read/sh/rsync_mmb.sh`,
               system.rsyncShArgs,
-              "ip_reset"
+              capture_datetime,
+              true
             )
         );
         continue;
@@ -97,13 +98,16 @@ async function reset_tunnel(run_log) {
       // Check for and run hhm systems
       switch (system.manufacturer) {
         case "GE":
-          jobs.push(async () => await get_ge_data(run_log, system));
+          jobs.push(
+            async () =>
+              await get_ge_data(run_log, system, capture_datetime, true)
+          );
           break;
         case "Philips":
-          jobs.push(async () => await get_philips_data(run_log, system));
+          jobs.push(async () => await get_philips_data(run_log, system, capture_datetime, true));
           break;
         case "Siemens":
-          jobs.push(async () => await get_siemens_data(run_log, system));
+          jobs.push(async () => await get_siemens_data(run_log, system, capture_datetime, true));
           break;
         default:
           break;
