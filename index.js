@@ -74,7 +74,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      await run_system_manual(run_log, ["SME02583"], ["GE", "MRI"]);
+      await run_system_manual(run_log, ["SME12753"], ["Siemens", "MRI"]);
     }
     if (run_group === "config") {
       await build_config(system);

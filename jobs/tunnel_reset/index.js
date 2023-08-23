@@ -138,7 +138,6 @@ async function reset_tunnel(run_log) {
       };
       addLogEvent(I, run_log, "reset_tunnel", det, note, null);
 
-      //await insertOfflineAlerts(ip_queue_post_reset, capture_datetime);
     } catch (error) {
       addLogEvent(E, run_log, "reset_tunnel", cat, null, error);
     }
