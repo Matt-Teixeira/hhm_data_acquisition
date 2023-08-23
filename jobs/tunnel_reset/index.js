@@ -47,7 +47,7 @@ async function reset_tunnel(run_log) {
       null
     );
 
-    if (!tunnels_by_ip.length) {
+    if (!tunnels_by_ip) {
       let note = {
         message: "No tunnels assocciated with systems",
         systems: parsed_data.id,
