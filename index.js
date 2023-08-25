@@ -74,7 +74,7 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      await run_system_manual(run_log, ["SME12753"], ["Siemens", "MRI"]);
+      await run_system_manual(run_log, ["SME16891"], ["Siemens", "CT"]);
     }
     if (run_group === "config") {
       await build_config(system);
@@ -93,3 +93,18 @@ const onBoot = async () => {
 };
 
 onBoot();
+
+/*
+SME16434		172.16.19.67
+ssh remote@172.16.19.67 -oKexAlgorithms=diffie-hellman-group14-sha1
+
+SME16412		172.16.147.58
+ssh remote@172.16.147.58 -oKexAlgorithms=diffie-hellman-group14-sha1
+
+SME16420		172.16.14.249
+ssh remote@172.16.14.249 -oKexAlgorithms=diffie-hellman-group14-sha1
+
+SME16432		172.16.21.165
+ssh remote@172.16.21.165 -oKexAlgorithms=diffie-hellman-group-exchange-sha256
+diffie-hellman-group-exchange-sha256
+*/

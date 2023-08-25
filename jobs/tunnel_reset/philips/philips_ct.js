@@ -1,4 +1,4 @@
-const exec_hhm_data_grab = require("../../../read/post_tunnel_reset/exec-hhm_data_grab");
+const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
 const [addLogEvent] = require("../../../utils/logger/log");

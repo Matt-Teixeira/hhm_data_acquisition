@@ -1,5 +1,5 @@
 const { log } = require("../../../logger");
-const exec_hhm_data_grab = require("../../../read/post_tunnel_reset/exec-hhm_data_grab");
+const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
