@@ -3,7 +3,9 @@
 [ ! -d "$4" ] && mkdir $4
 
 cd $4 
-lftp -c "set net:timeout 10; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; set sftp:connect-program 'ssh -oKexAlgorithms=diffie-hellman-group14-sha1'; open sftp://$2:$3@$1; cd /cygdrive/d/Data_Logger; mget -e Logger.mdb;" # mget -e Logger.mdb -O $4; exit
+lftp -c "set net:timeout 10; set ftp:ssl-allow off; set net:reconnect-interval-base 5; set net:max-retries 2; set sftp:connect-program 'ssh -oKexAlgorithms=diffie-hellman-group14-sha1'; set xfer:clobber true; open sftp://$2:$3@$1; 
+cd /cygdrive/d/Data_Logger; 
+mget Logger.mdb;"
 
 if [ $? -ne 0 ]; then
     echo "Connection timed out" >&2
