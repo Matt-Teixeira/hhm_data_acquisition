@@ -86,6 +86,7 @@ const exec_phil_cv_data_grab = async (
         return false;
       }
 
+      system.data_source = "hhm";
       await add_to_redis_queue(run_log, system);
       return false;
     }
@@ -121,6 +122,7 @@ const exec_phil_cv_data_grab = async (
         return false;
       }
 
+      system.data_source = "hhm";
       await add_to_redis_queue(run_log, system);
 
       return false;

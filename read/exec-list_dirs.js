@@ -35,6 +35,7 @@ const exec_list_dirs = async (run_log, sme, path, system, args) => {
         stderr,
       };
       await addLogEvent(W, run_log, "exec_list_dirs", det, note, null);
+      system.data_source = "hhm";
       await add_to_redis_queue(run_log, system);
       return false;
     }
@@ -51,6 +52,7 @@ const exec_list_dirs = async (run_log, sme, path, system, args) => {
         system_id: sme,
       };
       await addLogEvent(E, run_log, "exec_list_dirs", cat, note, error);
+      system.data_source = "hhm";
       await add_to_redis_queue(run_log, system);
       return false;
     }

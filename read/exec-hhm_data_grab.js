@@ -90,6 +90,7 @@ const exec_hhm_data_grab = async (
         return false;
       }
 
+      system.data_source = "hhm";
       await add_to_redis_queue(run_log, system);
 
       return false;
@@ -103,7 +104,7 @@ const exec_hhm_data_grab = async (
 
     return stdout;
   } catch (error) {
-    //console.log(error);
+    console.log(error);
 
     console.log("In Error");
     if (
@@ -127,6 +128,7 @@ const exec_hhm_data_grab = async (
         return false;
       }
 
+      system.data_source = "hhm";
       await add_to_redis_queue(run_log, system);
 
       return false;

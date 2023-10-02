@@ -3,48 +3,44 @@ const exec_local_rsync = require("../read/exec-copy_local");
 const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../utils/logger/enums");
 
 async function rsync_local(run_log, rsync_path, system) {
   let note = {
-    system_id: system.id,
+    system_id: system.id
   };
   try {
     await addLogEvent(I, run_log, "rsync_local", cal, note, null);
 
-    console.log(system.hhm_file_config);
-    console.log("\n *** *** *** ***\n");
-    for (const file of system.hhm_file_config) {
+    if (system.log_config) {
+      await exec_local_rsync(
+        run_log,
+        system.id,
+        "./read/sh/rsync_monitoring_local.sh",
+        [
+          `${system.debian_server_path}/host_logfiles/${system.log_config.file_name}`,
+          `${system.debian_server_path}/`
+        ]
+      );
+    }
+
+    for await (const file of system.mag_data) {
       console.log(file);
-      let key = Object.keys(file);
+      let key = file.dir_name;
 
-      console.log(key);
-
-      if (key[0] === "monitoring") {
-        for (const monitor_file of file.monitoring) {
-          await exec_local_rsync(
-            run_log,
-            system.id,
-            "./read/sh/rsync_monitoring_local.sh",
-            [
-              `${system.hhm_config.file_path}/host_logfiles/${monitor_file.file_name}`,
-              `${system.hhm_config.file_path}/monitoring`,
-            ]
-          );
-        }
-      } else if (key[0] === "logcurrent") {
+      if (key === "monitoring") {
         await exec_local_rsync(
           run_log,
           system.id,
-          "./read/sh/rsync_logcurrent_local.sh",
+          "./read/sh/rsync_monitoring_local.sh",
           [
-            `${system.hhm_config.file_path}/host_logfiles/${file.logcurrent.file_name}`,
-            `${system.hhm_config.file_path}`,
+            `${system.debian_server_path}/host_logfiles/${file.file_name}`,
+            `${system.debian_server_path}/monitoring`
           ]
         );
-      } else if (key[0] === "rmmu") {
-        const files = await fsp.readdir(rsync_path);
+      } else if (key === "rmmu") {
+        const files = await fsp.readdir(rsync_path); // `${system.debian_server_path}/host_logfiles`
         const rmmu_re_test = /rmmu\d+\.log/;
 
         // Gather only rmmu files. Example rmmu20140107030318.log
@@ -56,22 +52,76 @@ async function rsync_local(run_log, rsync_path, system) {
             system.id,
             "./read/sh/rsync_monitoring_local.sh",
             [
-              `${system.hhm_config.file_path}/host_logfiles/${rmmu_file}`,
-              `${system.hhm_config.file_path}/rmmu`,
+              `${system.debian_server_path}/host_logfiles/${rmmu_file}`,
+              `${system.debian_server_path}/rmmu`
             ]
           );
         }
-      } else if (key[0] === "stt_magnet") {
+      } else if (key === "rmmu_magnet") {
+        const files = await fsp.readdir(rsync_path); // `${system.debian_server_path}/host_logfiles`
+        const rmmu_re_test = /rmmu_magnet\d+\.log/;
+
+        // Gather only rmmu files. Example rmmu20140107030318.log
+        const rmmu_files = files.filter((f) => rmmu_re_test.test(f) === true);
+
+        for (const rmmu_file of rmmu_files) {
+          await exec_local_rsync(
+            run_log,
+            system.id,
+            "./read/sh/rsync_monitoring_local.sh",
+            [
+              `${system.debian_server_path}/host_logfiles/${rmmu_file}`,
+              `${system.debian_server_path}/rmmu_magnet`
+            ]
+          );
+        }
+      } else if (key === "rmmu_long") {
+        const files = await fsp.readdir(rsync_path); // `${system.debian_server_path}/host_logfiles`
+        const rmmu_re_test = /rmmu_long_cryogenic\d+\.log/;
+
+        // Gather only rmmu files. Example rmmu20140107030318.log
+        const rmmu_files = files.filter((f) => rmmu_re_test.test(f) === true);
+
+        for (const rmmu_file of rmmu_files) {
+          await exec_local_rsync(
+            run_log,
+            system.id,
+            "./read/sh/rsync_monitoring_local.sh",
+            [
+              `${system.debian_server_path}/host_logfiles/${rmmu_file}`,
+              `${system.debian_server_path}/rmmu_long`
+            ]
+          );
+        }
+      } else if (key === "rmmu_short") {
+        const files = await fsp.readdir(rsync_path); // `${system.debian_server_path}/host_logfiles`
+        const rmmu_re_test = /rmmu_short_cryogenic\d+\.log/;
+
+        // Gather only rmmu files. Example rmmu20140107030318.log
+        const rmmu_files = files.filter((f) => rmmu_re_test.test(f) === true);
+
+        for (const rmmu_file of rmmu_files) {
+          await exec_local_rsync(
+            run_log,
+            system.id,
+            "./read/sh/rsync_monitoring_local.sh",
+            [
+              `${system.debian_server_path}/host_logfiles/${rmmu_file}`,
+              `${system.debian_server_path}/rmmu_short`
+            ]
+          );
+        }
+      } else if (key === "stt_magnet") {
         await exec_local_rsync(
           run_log,
           system.id,
           "./read/sh/rsync_logcurrent_local.sh",
           [
-            `${system.hhm_config.file_path}/host_logfiles/${file["stt_magnet"].file_name}`,
-            `${system.hhm_config.file_path}`,
+            `${system.debian_server_path}/host_logfiles/${file.file_name}`,
+            `${system.debian_server_path}`
           ]
         );
-      } 
+      }
     }
   } catch (error) {
     console.log(error);

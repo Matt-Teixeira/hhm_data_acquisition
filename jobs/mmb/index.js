@@ -1,11 +1,15 @@
-const { get_systems_by_schedule } = require("./sql/qf-provider");
+const {
+  get_systems_by_schedule,
+  get_systems_by_mag_schedule,
+  get_systems_by_edu_schedule
+} = require("./sql/qf-provider");
 const getMachineConfigs = require("./boot/get-machine-configs");
 const execRsync = require("./read/exec-rsync");
 const { v4: uuidv4 } = require("uuid");
 const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../utils/logger/enums");
 
 const runJob = async (run_log, config, capture_datetime) => {
@@ -16,7 +20,7 @@ const runJob = async (run_log, config, capture_datetime) => {
     // THIS IS THE PRIMARY JOB FUNCTION
     let note = {
       job_id,
-      config,
+      config
     };
     await addLogEvent(I, run_log, "runJob", cal, note, null);
 
@@ -28,7 +32,7 @@ const runJob = async (run_log, config, capture_datetime) => {
       let note = {
         job_id,
         config,
-        message: "JOB HALTED -> NON-CONFORMANT config",
+        message: "JOB HALTED -> NON-CONFORMANT config"
       };
       await addLogEvent(W, run_log, "runJob", det, note, null);
       return;
@@ -45,7 +49,7 @@ const runJob = async (run_log, config, capture_datetime) => {
       rsyncRemotePath,
       rsyncLocalPath,
       ip_address,
-      user_id,
+      user_id
     ];
 
     const fileSizeAfterRsync = await execRsync(
@@ -66,7 +70,7 @@ const runJob = async (run_log, config, capture_datetime) => {
         job_id,
         config,
         fileSizeAfterRsync,
-        message: "JOB HALTED",
+        message: "JOB HALTED"
       };
       await addLogEvent(W, run_log, "runJob", det, note, null);
       return;
@@ -76,7 +80,7 @@ const runJob = async (run_log, config, capture_datetime) => {
     let note = {
       job_id,
       config,
-      error,
+      error
     };
     await addLogEvent(E, run_log, "runJob", cat, note, error);
   }
@@ -87,30 +91,33 @@ const onBootMMB = async (run_log, process_argv, capture_datetime) => {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
     PG_USER: process.env.PG_USER,
-    PG_DB: process.env.PG_DB,
+    PG_DB: process.env.PG_DB
   };
 
   await addLogEvent(I, run_log, "onBootMMB", cal, note, null);
 
   try {
     // ON BOOT GET DATA AND CONFIGS
-    const systems_configs = await get_systems_by_schedule(
+    const systems_mag_configs = await get_systems_by_mag_schedule(
+      process_argv.toString()
+    );
+    const systems_edu_configs = await get_systems_by_edu_schedule(
       process_argv.toString()
     );
 
+    const systems_configs = [...systems_mag_configs, ...systems_edu_configs];
+
     let note = {
-      systems_configs: systems_configs,
+      systems_configs: systems_configs
     };
     await addLogEvent(I, run_log, "onBootMMB", det, note, null);
 
     // BUILD CONFIGS FOR runJob
     const machineConfigs = await getMachineConfigs(systems_configs);
 
-    const prodConfigs = machineConfigs.filter(
-      ({ schedule }) => schedule === process_argv
-    );
+    //console.log(machineConfigs);
     const jobs = [];
-    for (const config of prodConfigs) {
+    for (const config of machineConfigs) {
       const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
         config;
 

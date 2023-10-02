@@ -3,7 +3,7 @@ const { get_hhm } = require("../../../sql/qf-provider");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../../utils/logger/enums");
 
 async function get_siemens_ct_data(run_log, capture_datetime) {
@@ -16,12 +16,12 @@ async function get_siemens_ct_data(run_log, capture_datetime) {
   const child_processes = [];
   for (const system of systems) {
     let note = {
-      system,
+      system
     };
 
     await addLogEvent(I, run_log, "get_siemens_ct_data", det, note, null);
-    if (system.data_acquisition && system.ip_address) {
-      const ct_path = `./read/sh/Siemens/${system.data_acquisition.script}`;
+    if (system.acquisition_script && system.host_ip) {
+      const ct_path = `./read/sh/Siemens/${system.acquisition_script}`;
 
       child_processes.push(
         async () =>
@@ -30,7 +30,7 @@ async function get_siemens_ct_data(run_log, capture_datetime) {
             system.id,
             ct_path,
             system,
-            [system.ip_address],
+            [system.host_ip],
             capture_datetime
           )
       );

@@ -4,7 +4,7 @@ const { decryptString } = require("../../../util");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../../utils/logger/enums");
 
 async function get_philips_mri_data(run_log, capture_datetime) {
@@ -18,15 +18,16 @@ async function get_philips_mri_data(run_log, capture_datetime) {
   const child_processes = [];
   for (const system of systems) {
     let note = {
-      system,
+      system
     };
 
     try {
       await addLogEvent(I, run_log, "get_philips_mri_data", det, note, null);
-      if (system.data_acquisition && system.ip_address) {
-        const mri_path = `./read/sh/Philips/${system.data_acquisition.script}`;
+      if (system.host_ip && system.credentials_group) {
+        const mri_path = `./read/sh/Philips/${system.acquisition_script}`;
+
         const system_creds = credentials.find((credential) => {
-          if (credential.id == system.data_acquisition.hhm_credentials_group)
+          if (credential.id == system.credentials_group)
             return true;
         });
 
@@ -40,7 +41,7 @@ async function get_philips_mri_data(run_log, capture_datetime) {
               system.id,
               mri_path,
               system,
-              [system.ip_address, user, pass],
+              [system.host_ip, user, pass],
               capture_datetime
             )
         );

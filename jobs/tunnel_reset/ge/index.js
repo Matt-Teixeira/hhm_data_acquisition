@@ -6,7 +6,6 @@ async function get_ge_data(run_log, system, capture_datetime, ip_reset) {
   try {
     switch (system.modality) {
       case "CT":
-        console.log("RUNNING GE MODALITY");
         await get_ge_ct_data(run_log, system, capture_datetime, ip_reset);
         break;
       case "CV/IR":

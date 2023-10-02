@@ -2,7 +2,7 @@ const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../../utils/logger/enums");
 
 async function get_siemens_mri_data(
@@ -15,19 +15,17 @@ async function get_siemens_mri_data(
   try {
     addLogEvent(I, run_log, "get_siemens_mri_data", cal, note, null);
 
-    if (system.data_acquisition && system.ip_address) {
-      const mri_path = `./read/sh/Siemens/${system.data_acquisition.script}`;
+    const mri_path = `./read/sh/Siemens/${system.acquisition_script}`;
 
-      await exec_hhm_data_grab(
-        run_log,
-        system.id,
-        mri_path,
-        system,
-        [system.ip_address],
-        capture_datetime,
-        ip_reset
-      );
-    }
+    await exec_hhm_data_grab(
+      run_log,
+      system.id,
+      mri_path,
+      system,
+      [system.host_ip],
+      capture_datetime,
+      ip_reset
+    );
   } catch (error) {
     console.log(error);
     addLogEvent(E, run_log, "get_siemens_mri_data", cat, note, error);

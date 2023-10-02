@@ -9,7 +9,7 @@ const execRsync = require("../mmb/read/exec-rsync");
 const [addLogEvent] = require("../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../utils/logger/enums");
 const { setTimeout } = require("timers/promises");
 const { v4: uuidv4 } = require("uuid");
@@ -20,7 +20,7 @@ async function reset_tunnel(run_log) {
   try {
     // Get Redis systems that need tunnel resets
     const ip_queue = await get_redis_ip_queue();
-
+    console.log(ip_queue);
     // End if no systems in redis queue
     if (!ip_queue.length) {
       let note = { message: "No IP addresses in queue" };
@@ -32,6 +32,7 @@ async function reset_tunnel(run_log) {
 
     // Parse system data to get array of ip addresses and ids
     const parsed_data = extract_ip(ip_queue);
+    console.log(parsed_data);
 
     // Group IP by tunnel id
     const tunnels_by_ip = await getTunnelsByIP(
@@ -50,7 +51,7 @@ async function reset_tunnel(run_log) {
     if (!tunnels_by_ip) {
       let note = {
         message: "No tunnels assocciated with systems",
-        systems: parsed_data.id,
+        systems: parsed_data.id
       };
       addLogEvent(W, run_log, "reset_tunnel", det, note, null);
       return;
@@ -104,10 +105,16 @@ async function reset_tunnel(run_log) {
           );
           break;
         case "Philips":
-          jobs.push(async () => await get_philips_data(run_log, system, capture_datetime, true));
+          jobs.push(
+            async () =>
+              await get_philips_data(run_log, system, capture_datetime, true)
+          );
           break;
         case "Siemens":
-          jobs.push(async () => await get_siemens_data(run_log, system, capture_datetime, true));
+          jobs.push(
+            async () =>
+              await get_siemens_data(run_log, system, capture_datetime, true)
+          );
           break;
         default:
           break;
@@ -134,10 +141,9 @@ async function reset_tunnel(run_log) {
       // Else: log and insert into db, systems that timeout after tunnel reset
       let note = {
         message: "Data not acquired post tunnel reset",
-        ip_queue_post_reset,
+        ip_queue_post_reset
       };
       addLogEvent(I, run_log, "reset_tunnel", det, note, null);
-
     } catch (error) {
       addLogEvent(E, run_log, "reset_tunnel", cat, null, error);
     }
@@ -155,7 +161,7 @@ async function insertOfflineAlerts(ip_queue, capture_datetime) {
   } catch (error) {
     let note = {
       ip_queue,
-      capture_datetime,
+      capture_datetime
     };
     console.log(error);
     addLogEvent(E, run_log, "insertOfflineAlerts", cat, note, error);

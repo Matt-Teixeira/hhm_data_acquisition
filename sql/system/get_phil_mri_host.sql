@@ -1,13 +1,16 @@
 SELECT
-    id,
-    ip_address,
-    hhm_config -> 'data_acquisition' AS data_acquisition,
-    manufacturer,
-    modality
+    sys.id,
+    sys.manufacturer,
+    sys.modality,
+    ac.host_ip,
+    ac.acqu_point,
+    ac.debian_server_path,
+    ac.credentials_group,
+    ac.acquisition_script
 FROM
-    systems
+    systems sys
+    JOIN config.acquisition ac ON sys.id = ac.system_id
 WHERE
-    hhm_config IS NOT NULL
-    AND manufacturer = $1
-    AND modality LIKE $2
-    AND hhm_config ->> 'data_acqu' = 'host';
+    sys.manufacturer = 'Philips'
+    AND sys.modality LIKE 'MRI'
+   AND ac.acqu_point = 'host';

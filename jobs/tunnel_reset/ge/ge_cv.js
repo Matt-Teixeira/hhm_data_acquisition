@@ -4,7 +4,7 @@ const { decryptString } = require("../../../util");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../../utils/logger/enums");
 
 async function get_ge_cv_data(run_log, system, capture_datetime, ip_reset) {
@@ -15,26 +15,25 @@ async function get_ge_cv_data(run_log, system, capture_datetime, ip_reset) {
     const modality = "CV/IR";
     const credentials = await getHhmCreds([manufacturer, modality]);
 
-    if (system.data_acquisition && system.ip_address) {
-      const cv_path = `./read/sh/GE/${system.data_acquisition.script}`;
-      const system_creds = credentials.find((credential) => {
-        if (credential.id == system.data_acquisition.hhm_credentials_group)
-          return true;
-      });
+    const cv_path = `./read/sh/GE/${system.acquisition_script}`;
+    
+    const system_creds = credentials.find((credential) => {
+      if (credential.id == system.credentials_group)
+        return true;
+    });
 
-      const user = decryptString(system_creds.user_enc);
-      const pass = decryptString(system_creds.password_enc);
+    const user = decryptString(system_creds.user_enc);
+    const pass = decryptString(system_creds.password_enc);
 
-      await exec_hhm_data_grab(
-        run_log,
-        system.id,
-        cv_path,
-        system,
-        [system.ip_address, user, pass],
-        capture_datetime,
-        ip_reset
-      );
-    }
+    await exec_hhm_data_grab(
+      run_log,
+      system.id,
+      cv_path,
+      system,
+      [system.host_ip, user, pass],
+      capture_datetime,
+      ip_reset
+    );
   } catch (error) {
     console.log(error);
     note["txt"] = "Error";

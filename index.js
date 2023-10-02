@@ -26,8 +26,6 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
     modality: modality,
   };
 
-  console.log(note);
-
   await addLogEvent(I, run_log, "onBoot", det, note, null);
 
   switch (run_group) {

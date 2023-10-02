@@ -20,11 +20,15 @@ function group_queue_keys(ip_queue) {
 function extract_ip(ip_queue) {
   const parsed_queue = {
     id: [],
-    ip_addresses: [],
+    ip_addresses: []
   };
   for (let entry of ip_queue) {
     parsed_queue.id.push(entry.id);
-    parsed_queue.ip_addresses.push(entry.ip_address);
+    if (entry.data_source === "hhm") {
+      parsed_queue.ip_addresses.push(entry.host_ip);
+    } else if (entry.data_source === "hhm") {
+      parsed_queue.ip_addresses.push(entry.mmb_ip);
+    }
   }
   return parsed_queue;
 }

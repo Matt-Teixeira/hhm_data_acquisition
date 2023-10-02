@@ -1,13 +1,17 @@
 SELECT
-    id,
-    ip_address,
-    hhm_config -> 'data_acquisition' AS data_acquisition,
-    manufacturer,
-    modality
+    pc.id,
+    pc.manufacturer,
+    pc.modality,
+    ac.host_ip,
+    ac.mmb_ip,
+    ac.acqu_point,
+    ac.debian_server_path,
+    ac.credentials_group,
+    ac.acquisition_script
 FROM
-    systems
+    systems pc
+    JOIN config.acquisition ac ON pc.id = ac.system_id
 WHERE
-    hhm_config IS NOT NULL
-    AND manufacturer = $1
+    manufacturer = $1
     AND modality LIKE $2
-    AND process_log = true;
+   	AND process_log = true;

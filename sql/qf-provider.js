@@ -3,6 +3,7 @@ const { log } = require("../logger");
 const {
   system_ip,
   system_data,
+  system_data_logs,
   pg_table,
   update_date_time,
   get_mod_man,
@@ -27,6 +28,11 @@ const getSystemIpAddress = async (uuid, sme) => {
 const get_phil_mri_systems = async () => {
   await logQf("ID", "get_phil_mri_systems", "n/a");
   return await db.any(system_data.smeNumber);
+};
+
+const get_phil_mri_systems_log = async () => {
+  await logQf("ID", "get_phil_mri_systems", "n/a");
+  return await db.any(system_data_logs.systems);
 };
 
 const getPgTable = async (uuid, sme) => {
@@ -88,6 +94,7 @@ const get_phil_mri_host = async (argsArray) => {
 module.exports = {
   getSystemIpAddress,
   get_phil_mri_systems,
+  get_phil_mri_systems_log,
   getPgTable,
   updateDateTime,
   getModMan,

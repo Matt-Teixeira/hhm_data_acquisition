@@ -14,6 +14,9 @@ module.exports = {
   system_data: {
     smeNumber: sql("system/phil_mri_systems.sql"),
   },
+  system_data_logs: {
+    systems: sql("system/phil_mri_systems_log.sql"),
+  },
   pg_table: {
     smeNumber: sql("system/getPgTable.sql"),
   },

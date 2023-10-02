@@ -5,7 +5,7 @@ const { get_last_dir_date } = require("../../../redis/redis_helpers");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../../../utils/logger/enums");
 
 async function get_philips_cv_data(run_log, capture_datetime) {
@@ -39,12 +39,12 @@ async function get_philips_cv_data(run_log, capture_datetime) {
 }
 
 async function run_phil_cv(run_log, system, credentials, capture_datetime) {
-  if (system.data_acquisition && system.ip_address) {
+  if (system.host_ip && system.credentials_group) {
     await addLogEvent(I, run_log, "run_phil_cv", cal, null, null);
-    const cv_path = `./read/sh/Philips/${system.data_acquisition.script}`;
+    const cv_path = `./read/sh/Philips/${system.acquisition_script}`;
 
     const system_creds = credentials.find((credential) => {
-      if (credential.id == system.data_acquisition.hhm_credentials_group)
+      if (credential.id == system.credentials_group)
         return true;
     });
 
@@ -58,7 +58,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
     const new_files = await list_new_files(
       run_log,
       system.id,
-      system.ip_address,
+      system.host_ip,
       last_aquired_dir,
       user,
       pass,
@@ -81,7 +81,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
         system.id,
         cv_path,
         system,
-        [system.ip_address, user, pass, file],
+        [system.host_ip, user, pass, file],
         capture_datetime
       );
     }

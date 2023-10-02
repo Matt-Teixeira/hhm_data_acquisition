@@ -16,11 +16,11 @@ async function get_ge_ct_data(run_log, system, capture_datetime, ip_reset) {
     const modality = "CT";
     const credentials = await getHhmCreds([manufacturer, modality]);
 
-    if (system.data_acquisition && system.ip_address) {
-      const ct_path = `./read/sh/GE/${system.data_acquisition.script}`;
+    if (system.host_ip && system.credentials_group) {
+      const ct_path = `./read/sh/GE/${system.acquisition_script}`;
 
       const system_creds = credentials.find((credential) => {
-        if (credential.id == system.data_acquisition.hhm_credentials_group)
+        if (credential.id == system.credentials_group)
           return true;
       });
 
@@ -32,7 +32,7 @@ async function get_ge_ct_data(run_log, system, capture_datetime, ip_reset) {
         system.id,
         ct_path,
         system,
-        [system.ip_address, user, pass],
+        [system.host_ip, user, pass],
         capture_datetime,
         ip_reset
       );
