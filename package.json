@@ -14,6 +14,7 @@
       "philips_mri": "node index.js hhm null Philips MRI",
       "philips_mri_mmb": "node index.js philips",
       "siemens_ct": "node index.js hhm null Siemens CT",
+      "siemens_cv": "node index.js hhm null Siemens CV",
       "siemens_mri": "node index.js hhm null Siemens MRI",
       "ip": "node index.js ip_reset",
       "offline_alert": "node index.js offline_alert",

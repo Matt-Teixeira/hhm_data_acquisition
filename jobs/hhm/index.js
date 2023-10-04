@@ -3,7 +3,7 @@ const get_philips_data = require("./philips");
 const get_siemens_data = require("./siemens");
 
 const get_hhm_data = async (run_log, manufacturer, modality, capture_datetime) => {
-  console.log(run_log, manufacturer, modality, capture_datetime);
+
   switch (manufacturer) {
     case "GE":
       await get_ge_data(run_log, modality, capture_datetime);

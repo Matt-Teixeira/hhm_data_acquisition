@@ -10,10 +10,11 @@ async function run_system_manual(run_log, systemArray, man_mod) {
 
     // Can accept multiple system args in array
     for (const sys of systemArray) {
+      console.log(sys);
       const system = await getOneSystem(sys);
       console.log(system);
 
-      if (!system[0].data_acquisition) {
+      if (!system) {
         console.log("NO CONFIG!! " + system[0].id);
         continue;
       }
@@ -24,7 +25,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
       let pass = "";
       if (credentials.length) {
         for (const cred of credentials) {
-          if (system[0].data_acquisition.hhm_credentials_group == cred.id) {
+          if (system[0].credentials_group == cred.id) {
             user = decryptString(cred.user_enc);
             pass = decryptString(cred.password_enc);
           }
@@ -36,7 +37,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
 
       // END Credential Acquisition
 
-      const path = `./read/sh/${man_mod[0]}/${system[0].data_acquisition.script}`;
+      const path = `./read/sh/${man_mod[0]}/${system[0].acquisition_script}`;
 
       // { START: Philips CV Specific Code
 
@@ -77,7 +78,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
         // Remove last (file) arg if not running Philips CV
         for await (let file of new_files) {
           await exec_phil_cv_data_grab(run_log, system[0].id, path, system[0], [
-            system[0].ip_address,
+            system[0].host_ip,
             user,
             pass,
             file,
@@ -88,11 +89,11 @@ async function run_system_manual(run_log, systemArray, man_mod) {
 
       if (man_mod[0] === "Siemens") {
         await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
-          system[0].ip_address,
+          system[0].host_ip,
         ]);
       } else {
         await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
-          system[0].ip_address,
+          system[0].host_ip,
           user,
           pass,
         ]);
