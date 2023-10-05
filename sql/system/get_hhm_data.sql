@@ -8,7 +8,8 @@ SELECT
     ac.debian_server_path,
     ac.credentials_group,
     ac.acquisition_script,
-    ac.host_path
+    ac.host_path,
+    ac.cerb_file
 FROM
     systems pc
     JOIN config.acquisition ac ON pc.id = ac.system_id
