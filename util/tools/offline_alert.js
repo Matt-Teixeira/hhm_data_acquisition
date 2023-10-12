@@ -29,12 +29,12 @@ const upsert_query_builder = async (queue) => {
   const insert_str = `INSERT INTO alert.offline (system_id, capture_datetime, successful_acquisition, source) VALUES `;
   let values = [];
   const on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
-  const set_str = `capture_datetime = EXCLUDED.capture_datetime, successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at;`;
+  const set_str = `capture_datetime = EXCLUDED.capture_datetime, successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at, source = EXCLUDED.source;`;
 
   const failed_insert_str = `INSERT INTO alert.offline (system_id, successful_acquisition, source) VALUES `;
   let failed_values = [];
   const failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
-  const failed_set_str = `successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at;`;
+  const failed_set_str = `successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at, source = EXCLUDED.source;`;
 
   // Insert Successful Acquisition Systems
   for (const system of success_queue) {
