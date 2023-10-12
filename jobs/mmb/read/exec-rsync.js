@@ -49,6 +49,7 @@ const execRsync = async (
         id: sme,
         capture_datetime,
         successful_acquisition: true,
+        data_source: "mmb"
       });
     }
 
@@ -79,6 +80,7 @@ const execRsync = async (
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
+          data_source: "mmb"
         });
 
         return null;

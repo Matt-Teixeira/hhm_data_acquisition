@@ -4,7 +4,7 @@ const { add_to_redis_queue, add_to_online_queue } = require("../redis");
 const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../utils/logger/enums");
 
 const exec_hhm_data_grab = async (
@@ -19,7 +19,7 @@ const exec_hhm_data_grab = async (
   let note = {
     system_id: system.id,
     execute_path: execPath,
-    args,
+    args
   };
 
   console.log(note);
@@ -62,7 +62,7 @@ const exec_hhm_data_grab = async (
     let note = {
       system_id: system.id,
       stdout,
-      stderr,
+      stderr
     };
 
     await addLogEvent(I, run_log, "exec_hhm_data_grab", det, note, null);
@@ -72,7 +72,7 @@ const exec_hhm_data_grab = async (
       let note = {
         system_id: system.id,
         stdout,
-        stderr,
+        stderr
       };
 
       await addLogEvent(W, run_log, "exec_hhm_data_grab", det, note, null);
@@ -85,6 +85,7 @@ const exec_hhm_data_grab = async (
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
+          data_source: "hhm"
         });
 
         return false;
@@ -100,6 +101,7 @@ const exec_hhm_data_grab = async (
       id: system.id,
       capture_datetime,
       successful_acquisition: true,
+      data_source: "hhm"
     });
 
     return stdout;
@@ -112,7 +114,7 @@ const exec_hhm_data_grab = async (
       connection_test_2.test(error.message)
     ) {
       let note = {
-        system_id: system.id,
+        system_id: system.id
       };
 
       await addLogEvent(E, run_log, "exec_hhm_data_grab", cat, note, error);
@@ -123,6 +125,7 @@ const exec_hhm_data_grab = async (
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
+          data_source: "hhm"
         });
 
         return false;

@@ -7,7 +7,7 @@ const {
 async function insertHeartbeat() {
   const queue = await get_redis_online_queue();
 
-  //await clear_redis_online_queue();
+  await clear_redis_online_queue();
   await upsert_query_builder(queue);
 }
 
@@ -18,16 +18,20 @@ const upsert_query_builder = async (queue) => {
   const failed_queue = [];
 
   for (let system of queue) {
-    if (system.successful_acquisition) success_queue.push(system);
-    if (!system.successful_acquisition) failed_queue.push(system);
+    if (system.successful_acquisition && system.data_source !== "hhm") {
+      success_queue.push(system);
+    }
+    if (!system.successful_acquisition && system.data_source !== "hhm") {
+      failed_queue.push(system);
+    }
   }
 
-  const insert_str = `INSERT INTO alert.offline (system_id, capture_datetime, successful_acquisition) VALUES `;
+  const insert_str = `INSERT INTO alert.offline (system_id, capture_datetime, successful_acquisition, source) VALUES `;
   let values = [];
   const on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
   const set_str = `capture_datetime = EXCLUDED.capture_datetime, successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at;`;
 
-  const failed_insert_str = `INSERT INTO alert.offline (system_id, successful_acquisition) VALUES `;
+  const failed_insert_str = `INSERT INTO alert.offline (system_id, successful_acquisition, source) VALUES `;
   let failed_values = [];
   const failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
   const failed_set_str = `successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at;`;
@@ -39,7 +43,7 @@ const upsert_query_builder = async (queue) => {
     if (is_duplicate !== -1) continue;
 
     values.push(
-      `('${system.id}', '${system.capture_datetime}', ${system.successful_acquisition})`
+      `('${system.id}', '${system.capture_datetime}', ${system.successful_acquisition}, '${system.data_source}')`
     );
 
     dup_systems.push(system.id);
@@ -67,7 +71,7 @@ const upsert_query_builder = async (queue) => {
     if (is_duplicate !== -1) continue;
 
     failed_values.push(
-      `('${system.id}', ${system.successful_acquisition})`
+      `('${system.id}', ${system.successful_acquisition}, '${system.data_source}')`
     );
 
     dup_systems.push(system.id);

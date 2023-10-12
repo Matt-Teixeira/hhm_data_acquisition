@@ -81,6 +81,7 @@ const exec_phil_cv_data_grab = async (
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
+          data_source: "hhm"
         });
 
         return false;
@@ -96,6 +97,7 @@ const exec_phil_cv_data_grab = async (
       id: system.id,
       capture_datetime,
       successful_acquisition: true,
+      data_source: "hhm"
     });
 
     return stdout;
@@ -117,6 +119,7 @@ const exec_phil_cv_data_grab = async (
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
+          data_source: "hhm"
         });
 
         return false;

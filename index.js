@@ -7,6 +7,7 @@ const run_system_manual = require("./jobs/hhm/run_manual");
 const reset_tunnel = require("./jobs/tunnel_reset");
 const build_config = require("./jobs/build_config");
 const { captureDatetime, insertHeartbeat } = require("./util");
+const mmb_configs = require("./build_mmb_config")
 const [
   addLogEvent,
   writeLogEvents,
@@ -75,7 +76,7 @@ const onBoot = async () => {
       await run_system_manual(run_log, ["SME01446"], ["Philips", "CT"]);
     }
     if (run_group === "config") {
-      await build_config(system);
+      await mmb_configs();
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
