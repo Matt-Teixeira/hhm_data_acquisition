@@ -21,6 +21,8 @@ FROM
     JOIN config.edu edu ON sys.id = edu.system_id
 WHERE
 	edu.schedule = $1
+    AND
+    sys.process_edu IS TRUE
 GROUP BY
     sys.id,
     ac.system_id,

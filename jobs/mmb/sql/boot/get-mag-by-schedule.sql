@@ -21,6 +21,8 @@ FROM
     JOIN config.mag mag ON sys.id = mag.system_id
 WHERE
     mag.schedule = $1
+    AND
+    sys.process_mag IS TRUE
 GROUP BY
     sys.id,
     ac.system_id,
