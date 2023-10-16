@@ -18,6 +18,8 @@ async function get_siemens_cv_data(run_log, capture_datetime) {
 
   const child_processes = [];
 
+  console.log(systems);
+
   for (const system of systems) {
     let note = {
       system

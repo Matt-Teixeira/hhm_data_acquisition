@@ -17,37 +17,37 @@ const upsert_query_builder = async (queue) => {
   const success_queue = [];
   const failed_queue = [];
 
-  // Prevent inserts of hhm data 10/13/2023
+  // Prevent inserts of hhm data 10/13/2023  && system.data_source !== "hhm"
   for (let system of queue) {
-    if (system.successful_acquisition && system.data_source !== "hhm") {
+    if (system.successful_acquisition) {
       success_queue.push(system);
     }
-    if (!system.successful_acquisition && system.data_source !== "hhm") {
+    if (!system.successful_acquisition) {
       failed_queue.push(system);
     }
   }
 
   const insert_str = `INSERT INTO alert.offline (system_id, capture_datetime, successful_acquisition, source) VALUES `;
   let values = [];
-  const on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
+  const on_conflict = `ON CONFLICT (system_id, source) DO UPDATE SET `;
   const set_str = `capture_datetime = EXCLUDED.capture_datetime, successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at, source = EXCLUDED.source;`;
 
   const failed_insert_str = `INSERT INTO alert.offline (system_id, successful_acquisition, source) VALUES `;
   let failed_values = [];
-  const failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
+  const failed_on_conflict = `ON CONFLICT (system_id, source) DO UPDATE SET `;
   const failed_set_str = `successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at, source = EXCLUDED.source;`;
 
   // Insert Successful Acquisition Systems
   for (const system of success_queue) {
     // Check for possible duplicates in queue and prevent double runs
-    let is_duplicate = dup_systems.indexOf(system.id);
-    if (is_duplicate !== -1) continue;
+    //let is_duplicate = dup_systems.indexOf(system.id);
+    //if (is_duplicate !== -1) continue;
 
     values.push(
       `('${system.id}', '${system.capture_datetime}', ${system.successful_acquisition}, '${system.data_source}')`
     );
 
-    dup_systems.push(system.id);
+    //dup_systems.push(system.id);
   }
 
   let values_str = "";
@@ -68,14 +68,14 @@ const upsert_query_builder = async (queue) => {
   // Insert FAILED Acquisition Systems
   for (const system of failed_queue) {
     // Check for possible duplicates in queue and prevent double runs
-    let is_duplicate = dup_systems.indexOf(system.id);
-    if (is_duplicate !== -1) continue;
+    //let is_duplicate = dup_systems.indexOf(system.id);
+    //if (is_duplicate !== -1) continue;
 
     failed_values.push(
       `('${system.id}', ${system.successful_acquisition}, '${system.data_source}')`
     );
 
-    dup_systems.push(system.id);
+    //dup_systems.push(system.id);
   }
 
   let failed_values_str = "";
