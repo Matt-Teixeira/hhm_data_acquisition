@@ -13,4 +13,8 @@ FROM
 WHERE
     sys.manufacturer = 'Philips'
     AND sys.modality LIKE 'MRI'
-   AND ac.acqu_point = 'host';
+    AND ac.acqu_point = 'host'
+    AND (
+        sys.process_mag IS TRUE
+        OR sys.process_log IS TRUE
+    );
