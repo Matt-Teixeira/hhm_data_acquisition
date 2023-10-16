@@ -12,7 +12,10 @@ async function insertHeartbeat() {
 }
 
 const upsert_query_builder = async (queue) => {
-  const dup_systems = [];
+  const dup_systems = {
+    mmb: [],
+    hhm: []
+  };
 
   const success_queue = [];
   const failed_queue = [];
@@ -39,15 +42,29 @@ const upsert_query_builder = async (queue) => {
 
   // Insert Successful Acquisition Systems
   for (const system of success_queue) {
-    // Check for possible duplicates in queue and prevent double runs
-    //let is_duplicate = dup_systems.indexOf(system.id);
-    //if (is_duplicate !== -1) continue;
+    if (system.data_source === "hhm") {
+      // Check for possible duplicates in queue and prevent double runs
+      let is_duplicate = dup_systems.hhm.indexOf(system.id);
+      if (is_duplicate !== -1) continue;
+    }
+
+    if (system.data_source === "mmb") {
+      // Check for possible duplicates in queue and prevent double runs
+      let is_duplicate = dup_systems.mmb.indexOf(system.id);
+      if (is_duplicate !== -1) continue;
+    }
 
     values.push(
       `('${system.id}', '${system.capture_datetime}', ${system.successful_acquisition}, '${system.data_source}')`
     );
 
-    //dup_systems.push(system.id);
+    if (system.data_source === "hhm") {
+      dup_systems.hhm.push(system.id);
+    }
+
+    if (system.data_source === "mmb") {
+      dup_systems.mmb.push(system.id);
+    }
   }
 
   let values_str = "";
@@ -67,15 +84,29 @@ const upsert_query_builder = async (queue) => {
 
   // Insert FAILED Acquisition Systems
   for (const system of failed_queue) {
-    // Check for possible duplicates in queue and prevent double runs
-    //let is_duplicate = dup_systems.indexOf(system.id);
-    //if (is_duplicate !== -1) continue;
+    if (system.data_source === "hhm") {
+      // Check for possible duplicates in queue and prevent double runs
+      let is_duplicate = dup_systems.hhm.indexOf(system.id);
+      if (is_duplicate !== -1) continue;
+    }
+
+    if (system.data_source === "mmb") {
+      // Check for possible duplicates in queue and prevent double runs
+      let is_duplicate = dup_systems.mmb.indexOf(system.id);
+      if (is_duplicate !== -1) continue;
+    }
 
     failed_values.push(
       `('${system.id}', ${system.successful_acquisition}, '${system.data_source}')`
     );
 
-    //dup_systems.push(system.id);
+    if (system.data_source === "hhm") {
+      dup_systems.hhm.push(system.id);
+    }
+
+    if (system.data_source === "mmb") {
+      dup_systems.mmb.push(system.id);
+    }
   }
 
   let failed_values_str = "";
