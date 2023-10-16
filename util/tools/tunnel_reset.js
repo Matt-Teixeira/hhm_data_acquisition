@@ -26,7 +26,7 @@ function extract_ip(ip_queue) {
     parsed_queue.id.push(entry.id);
     if (entry.data_source === "hhm") {
       parsed_queue.ip_addresses.push(entry.host_ip);
-    } else if (entry.data_source === "hhm") {
+    } else if (entry.data_source === "mmb") {
       parsed_queue.ip_addresses.push(entry.mmb_ip);
     }
   }

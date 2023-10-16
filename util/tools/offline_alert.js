@@ -17,6 +17,7 @@ const upsert_query_builder = async (queue) => {
   const success_queue = [];
   const failed_queue = [];
 
+  // Prevent inserts of hhm data 10/13/2023
   for (let system of queue) {
     if (system.successful_acquisition && system.data_source !== "hhm") {
       success_queue.push(system);
