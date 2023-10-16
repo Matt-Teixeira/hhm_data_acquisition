@@ -74,7 +74,7 @@ const execRsync = async (
 
       // Only runs for ip reset instance
       // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
-      // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
+      // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in alert.offline table
       if (ip_reset) {
         await add_to_online_queue(run_log, {
           id: system.id,
@@ -95,23 +95,3 @@ const execRsync = async (
 };
 
 module.exports = execRsync;
-
-/* 
-EXAMPLE: rsyncShArgs
-[
-  "SME10257",
-  "v2_rdu_9600.log",
-  "./files/SME10257.v2_rdu_9600.log",
-  "25.63.233.139",
-  "jdis",
-];
-
-EXAMPLE: What is currently sent to ip:queue
-{
-  id: 'SME12452',
-  ip_address: '10.184.10.205',
-  data_acquisition: { script: 'ge_mri_22.sh', hhm_credentials_group: '6' },
-  manufacturer: 'GE',
-  modality: 'MRI'
-}
- */

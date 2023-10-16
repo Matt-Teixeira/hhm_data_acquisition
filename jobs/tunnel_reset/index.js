@@ -32,7 +32,6 @@ async function reset_tunnel(run_log) {
 
     // Parse system data to get array of ip addresses and ids
     const parsed_data = extract_ip(ip_queue);
-    console.log(parsed_data);
 
     // Group IP by tunnel id
     const tunnels_by_ip = await getTunnelsByIP(
@@ -68,10 +67,6 @@ async function reset_tunnel(run_log) {
     console.log("End of timer");
 
     /* Rerun Data Acquisition */
-
-    // Store and prevent run of duplicate systems
-    const ran_systems = [];
-
     const jobs = [];
 
     for (const system of ip_queue) {
