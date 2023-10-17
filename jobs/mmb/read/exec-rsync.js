@@ -66,7 +66,7 @@ const execRsync = async (
     if (connection_test_1.test(error)) {
       let system = {
         id: rsyncShArgs[0],
-        ip_address: rsyncShArgs[3],
+        mmb_ip: rsyncShArgs[3],
         data_source: "mmb",
         rsyncShArgs,
         rsyncShPath,
