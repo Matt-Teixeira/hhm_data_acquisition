@@ -1,0 +1,1 @@
+scp -i ~/.ssh/id_rsa root@10.75.9.244:/usr/g/service/log/gesys*.log  /home/prod/hhm_data_acquisition/files/SME16340
