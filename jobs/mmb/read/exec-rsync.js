@@ -16,6 +16,7 @@ const execRsync = async (
   rsyncShPath,
   rsyncShArgs,
   capture_datetime,
+  vpn,
   ip_reset = false
 
 ) => {
@@ -66,6 +67,7 @@ const execRsync = async (
     if (connection_test_1.test(error)) {
       let system = {
         id: rsyncShArgs[0],
+        vpn: vpn,
         mmb_ip: rsyncShArgs[3],
         data_source: "mmb",
         rsyncShArgs,

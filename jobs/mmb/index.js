@@ -58,6 +58,7 @@ const runJob = async (run_log, config, capture_datetime) => {
       sme,
       rsyncShPath,
       rsyncShArgs,
+      config.vpn,
       capture_datetime
     );
 

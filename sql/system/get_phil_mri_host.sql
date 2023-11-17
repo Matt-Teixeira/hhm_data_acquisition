@@ -3,6 +3,7 @@ SELECT
     sys.manufacturer,
     sys.modality,
     ac.host_ip,
+    ac.vpn,
     ac.acqu_point,
     ac.debian_server_path,
     ac.credentials_group,

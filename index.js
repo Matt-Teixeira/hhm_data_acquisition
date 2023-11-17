@@ -5,18 +5,18 @@ const onBootMMB = require("./jobs/mmb");
 const get_hhm_data = require("./jobs/hhm");
 const run_system_manual = require("./jobs/hhm/run_manual");
 const reset_tunnel = require("./jobs/tunnel_reset");
-const build_config = require("./jobs/build_config");
+const get_ip_sec_table = require("./jobs/tools/ip_sec");
 const { captureDatetime, insertHeartbeat } = require("./util");
-const mmb_configs = require("./build_mmb_config")
+const mmb_configs = require("./jobs/tools/build_mmb_config");
 const [
   addLogEvent,
   writeLogEvents,
   dbInsertLogEvents,
-  makeAppRunLog,
+  makeAppRunLog
 ] = require("./utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("./utils/logger/enums");
 
 async function runJob(run_log, run_group, schedule, manufacturer, modality) {
@@ -24,7 +24,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
   let note = {
     run_group: run_group,
     schedule: schedule,
-    modality: modality,
+    modality: modality
   };
 
   await addLogEvent(I, run_log, "onBoot", det, note, null);
@@ -58,7 +58,7 @@ const onBoot = async () => {
     LOGGER: process.env.LOGGER,
     REDIS_IP: process.env.REDIS_IP,
     PG_USER: process.env.PG_USER,
-    PG_DB: process.env.PG_DB,
+    PG_DB: process.env.PG_DB
   };
 
   await addLogEvent(I, run_log, "onBoot", cal, note, null);
@@ -75,8 +75,8 @@ const onBoot = async () => {
     if (run_group === "manual") {
       await run_system_manual(run_log, ["SME01446"], ["Philips", "CT"]);
     }
-    if (run_group === "config") {
-      await mmb_configs();
+    if (run_group === "ip_sec") {
+      await get_ip_sec_table();
     }
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
@@ -92,4 +92,3 @@ const onBoot = async () => {
 };
 
 onBoot();
-

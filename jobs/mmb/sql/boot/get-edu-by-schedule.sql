@@ -3,6 +3,7 @@ SELECT
     ac.mmb_ip,
     ac.host,
     ac.user_id,
+    ac.vpn,
     json_build_object(
         'system_id',
         edu.system_id,

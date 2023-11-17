@@ -15,8 +15,6 @@ async function get_ge_ct_data(run_log, capture_datetime) {
   const systems = await get_hhm([manufacturer, modality]);
   const credentials = await getHhmCreds([manufacturer, modality]);
 
-  console.log(systems);
-
   const child_processes = [];
   for (const system of systems) {
     let note = {

@@ -5,7 +5,7 @@ const {
   insert_mmb_edu_config,
   update_mag_config_array,
   insert_mmb_mag_config
-} = require("./sql/qf-provider");
+} = require("../../sql/qf-provider");
 
 async function mmb_configs() {
   const systems = await get_mmb_configs();

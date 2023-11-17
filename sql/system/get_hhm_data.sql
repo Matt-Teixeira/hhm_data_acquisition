@@ -3,7 +3,7 @@ SELECT
     pc.manufacturer,
     pc.modality,
     ac.host_ip,
-    ac.mmb_ip,
+    ac.vpn,
     ac.acqu_point,
     ac.debian_server_path,
     ac.credentials_group,
