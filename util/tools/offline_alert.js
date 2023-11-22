@@ -11,7 +11,7 @@ async function insertHeartbeat() {
   await upsert_query_builder(queue);
 }
 
-const upsert_query_builder = async (queue) => {
+const upsert_query_builder = async queue => {
   const dup_systems = {
     mmb: [],
     hhm: []
@@ -20,7 +20,7 @@ const upsert_query_builder = async (queue) => {
   const success_queue = [];
   const failed_queue = [];
 
-  // Prevent inserts of hhm data 10/13/2023  && system.data_source !== "hhm"
+  // Seperate queued systems based on successful acquisition
   for (let system of queue) {
     if (system.successful_acquisition) {
       success_queue.push(system);
@@ -30,99 +30,130 @@ const upsert_query_builder = async (queue) => {
     }
   }
 
-  const insert_str = `INSERT INTO alert.offline (system_id, capture_datetime, successful_acquisition, source) VALUES `;
-  let values = [];
-  const on_conflict = `ON CONFLICT (system_id, source) DO UPDATE SET `;
-  const set_str = `capture_datetime = EXCLUDED.capture_datetime, successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at, source = EXCLUDED.source;`;
+  // alert.offline_mmb
+  // alert.offline_hhm
 
-  const failed_insert_str = `INSERT INTO alert.offline (system_id, successful_acquisition, source) VALUES `;
-  let failed_values = [];
-  const failed_on_conflict = `ON CONFLICT (system_id, source) DO UPDATE SET `;
-  const failed_set_str = `successful_acquisition = EXCLUDED.successful_acquisition, inserted_at = EXCLUDED.inserted_at, source = EXCLUDED.source;`;
+  const hhm_success_values = [];
+  const hhm_insert_str = `INSERT INTO alert.offline_hhm (system_id, capture_datetime) VALUES `;
+  const hhm_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
+  const hhm_set_str = `capture_datetime = EXCLUDED.capture_datetime, inserted_at = EXCLUDED.inserted_at;`;
+
+  const hhm_failed_values = [];
+  const hhm_failed_insert_str = `INSERT INTO alert.offline_hhm (system_id) VALUES `;
+  const hhm_failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
+  const hhm_failed_set_str = `inserted_at = EXCLUDED.inserted_at;`;
+
+  const mmb_success_values = [];
+  const mmb_insert_str = `INSERT INTO alert.offline_mmb (system_id, capture_datetime) VALUES `;
+  const mmb_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
+  const mmb_set_str = `capture_datetime = EXCLUDED.capture_datetime, inserted_at = EXCLUDED.inserted_at;`;
+
+  const mmb_failed_values = [];
+  const mmb_failed_insert_str = `INSERT INTO alert.offline_mmb (system_id) VALUES `;
+  const mmb_failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
+  const mmb_failed_set_str = `inserted_at = EXCLUDED.inserted_at;`;
 
   // Insert Successful Acquisition Systems
+
+  // Seperate successful hhm and mmb. Filter duplicate entries.
   for (const system of success_queue) {
     if (system.data_source === "hhm") {
       // Check for possible duplicates in queue and prevent double runs
       let is_duplicate = dup_systems.hhm.indexOf(system.id);
       if (is_duplicate !== -1) continue;
+
+      hhm_success_values.push(`('${system.id}', '${system.capture_datetime}')`);
+
+      dup_systems.hhm.push(system.id);
     }
 
     if (system.data_source === "mmb") {
       // Check for possible duplicates in queue and prevent double runs
       let is_duplicate = dup_systems.mmb.indexOf(system.id);
       if (is_duplicate !== -1) continue;
-    }
 
-    values.push(
-      `('${system.id}', '${system.capture_datetime}', ${system.successful_acquisition}, '${system.data_source}')`
-    );
+      mmb_success_values.push(`('${system.id}', '${system.capture_datetime}')`);
 
-    if (system.data_source === "hhm") {
-      dup_systems.hhm.push(system.id);
-    }
-
-    if (system.data_source === "mmb") {
       dup_systems.mmb.push(system.id);
     }
   }
 
-  let values_str = "";
+  let hhm_values_str = "";
+  let mmb_values_str = "";
 
-  for (let i = 0; i < values.length; i++) {
+  // Loop through and build query for successful hhm
+  for (let i = 0; i < hhm_success_values.length; i++) {
     console.log(i);
-    if (i === values.length - 1) {
-      values_str += values[i] + " ";
+    if (i === hhm_success_values.length - 1) {
+      hhm_values_str += hhm_success_values[i] + " ";
       continue;
     }
-    values_str += values[i] + ", ";
+    hhm_values_str += hhm_success_values[i] + ", ";
   }
 
-  let query_string = `${insert_str}${values_str}${on_conflict}${set_str}`;
+  // Loop through and build query for successful mmb
+  for (let i = 0; i < mmb_success_values.length; i++) {
+    console.log("MMB SUCCESS: " + i);
+    if (i === mmb_success_values.length - 1) {
+      mmb_values_str += mmb_success_values[i] + " ";
+      continue;
+    }
+    mmb_values_str += mmb_success_values[i] + ", ";
+  }
 
-  await db.any(query_string);
+  let hhm_query_string = `${hhm_insert_str}${hhm_values_str}${hhm_on_conflict}${hhm_set_str}`;
+  let mmb_query_string = `${mmb_insert_str}${mmb_values_str}${mmb_on_conflict}${mmb_set_str}`;
 
-  // Insert FAILED Acquisition Systems
+  if (hhm_success_values.length) await db.any(hhm_query_string);
+  if (mmb_success_values.length) await db.any(mmb_query_string);
+
+  // Seperate failed hhm and mmb. Filter duplicate entries.
   for (const system of failed_queue) {
     if (system.data_source === "hhm") {
       // Check for possible duplicates in queue and prevent double runs
       let is_duplicate = dup_systems.hhm.indexOf(system.id);
       if (is_duplicate !== -1) continue;
+      dup_systems.hhm.push(system.id);
+
+      hhm_failed_values.push(`('${system.id}')`);
     }
 
     if (system.data_source === "mmb") {
       // Check for possible duplicates in queue and prevent double runs
       let is_duplicate = dup_systems.mmb.indexOf(system.id);
       if (is_duplicate !== -1) continue;
-    }
-
-    failed_values.push(
-      `('${system.id}', ${system.successful_acquisition}, '${system.data_source}')`
-    );
-
-    if (system.data_source === "hhm") {
-      dup_systems.hhm.push(system.id);
-    }
-
-    if (system.data_source === "mmb") {
       dup_systems.mmb.push(system.id);
+
+      mmb_failed_values.push(`('${system.id}')`);
     }
   }
 
-  let failed_values_str = "";
+  let hhm_failed_values_str = "";
+  let mmb_failed_values_str = "";
 
-  for (let i = 0; i < failed_values.length; i++) {
+  for (let i = 0; i < hhm_failed_values.length; i++) {
     console.log(i);
-    if (i === failed_values.length - 1) {
-      failed_values_str += failed_values[i] + " ";
+    if (i === hhm_failed_values.length - 1) {
+      hhm_failed_values_str += hhm_failed_values[i] + " ";
       continue;
     }
-    failed_values_str += failed_values[i] + ", ";
+    hhm_failed_values_str += hhm_failed_values[i] + ", ";
   }
 
-  let failed_query_string = `${failed_insert_str}${failed_values_str}${failed_on_conflict}${failed_set_str}`;
+  for (let i = 0; i < mmb_failed_values.length; i++) {
+    console.log(i);
+    if (i === mmb_failed_values.length - 1) {
+      mmb_failed_values_str += mmb_failed_values[i] + " ";
+      continue;
+    }
+    mmb_failed_values_str += mmb_failed_values[i] + ", ";
+  }
 
-  await db.any(failed_query_string);
+  let hhm_failed_query_string = `${hhm_failed_insert_str}${hhm_failed_values_str}${hhm_failed_on_conflict}${hhm_failed_set_str}`;
+  let mmb_failed_query_string = `${mmb_failed_insert_str}${mmb_failed_values_str}${mmb_failed_on_conflict}${mmb_failed_set_str}`;
+
+  if (hhm_failed_values.length) await db.any(hhm_failed_query_string);
+  if (mmb_failed_values.length) await db.any(mmb_failed_query_string);
 };
 
 module.exports = { insertHeartbeat };

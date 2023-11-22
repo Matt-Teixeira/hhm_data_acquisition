@@ -21,6 +21,7 @@ const {
 
 async function runJob(run_log, run_group, schedule, manufacturer, modality) {
   const capture_datetime = captureDatetime();
+
   let note = {
     run_group: run_group,
     schedule: schedule,

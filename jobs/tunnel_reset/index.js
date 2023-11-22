@@ -85,6 +85,7 @@ async function reset_tunnel(run_log) {
               `./jobs/mmb/read/sh/rsync_mmb.sh`,
               system.rsyncShArgs,
               capture_datetime,
+              true,
               true
             )
         );

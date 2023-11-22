@@ -26,8 +26,14 @@ const runJob = async (run_log, config, capture_datetime) => {
 
     // ["SME01096","v2_edu2","mmb_ge_mm3",["RE_GE_MM3_A"]]
     // TODO: RENAME machineRegexTags TO regexModels
-    const [sme, mmbScript, pgTable, machineRegexTags, ip_address, user_id] =
-      config;
+    const [
+      sme,
+      mmbScript,
+      pgTable,
+      machineRegexTags,
+      ip_address,
+      user_id
+    ] = config;
     if (!(sme && mmbScript && pgTable && machineRegexTags)) {
       let note = {
         job_id,
@@ -58,8 +64,8 @@ const runJob = async (run_log, config, capture_datetime) => {
       sme,
       rsyncShPath,
       rsyncShArgs,
-      config.vpn,
-      capture_datetime
+      capture_datetime,
+      config.vpn
     );
 
     console.log("\nFile Size After Rsync");
@@ -119,8 +125,14 @@ const onBootMMB = async (run_log, process_argv, capture_datetime) => {
     //console.log(machineConfigs);
     const jobs = [];
     for (const config of machineConfigs) {
-      const { sme, mmbScript, pgTable, regexModels, ip_address, user_id } =
-        config;
+      const {
+        sme,
+        mmbScript,
+        pgTable,
+        regexModels,
+        ip_address,
+        user_id
+      } = config;
 
       jobs.push(
         async () =>
@@ -132,7 +144,7 @@ const onBootMMB = async (run_log, process_argv, capture_datetime) => {
       );
     }
     // CREATE AN ARRAY OF PROMISES BY CALLING EACH FUNCTION
-    const job_promises = jobs.map((job) => job());
+    const job_promises = jobs.map(job => job());
 
     // AWAIT JOBS
     await Promise.all(job_promises);
