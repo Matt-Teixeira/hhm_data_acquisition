@@ -34,22 +34,22 @@ const upsert_query_builder = async queue => {
   // alert.offline_hhm
 
   const hhm_success_values = [];
-  const hhm_insert_str = `INSERT INTO alert.offline_hhm (system_id, capture_datetime) VALUES `;
+  const hhm_insert_str = `INSERT INTO alert.offline_hhm_conn (system_id, capture_datetime) VALUES `;
   const hhm_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
   const hhm_set_str = `capture_datetime = EXCLUDED.capture_datetime, inserted_at = EXCLUDED.inserted_at;`;
 
   const hhm_failed_values = [];
-  const hhm_failed_insert_str = `INSERT INTO alert.offline_hhm (system_id) VALUES `;
+  const hhm_failed_insert_str = `INSERT INTO alert.offline_hhm_conn (system_id) VALUES `;
   const hhm_failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
   const hhm_failed_set_str = `inserted_at = EXCLUDED.inserted_at;`;
 
   const mmb_success_values = [];
-  const mmb_insert_str = `INSERT INTO alert.offline_mmb (system_id, capture_datetime) VALUES `;
+  const mmb_insert_str = `INSERT INTO alert.offline_mmb_conn (system_id, capture_datetime) VALUES `;
   const mmb_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
   const mmb_set_str = `capture_datetime = EXCLUDED.capture_datetime, inserted_at = EXCLUDED.inserted_at;`;
 
   const mmb_failed_values = [];
-  const mmb_failed_insert_str = `INSERT INTO alert.offline_mmb (system_id) VALUES `;
+  const mmb_failed_insert_str = `INSERT INTO alert.offline_mmb_conn (system_id) VALUES `;
   const mmb_failed_on_conflict = `ON CONFLICT (system_id) DO UPDATE SET `;
   const mmb_failed_set_str = `inserted_at = EXCLUDED.inserted_at;`;
 
