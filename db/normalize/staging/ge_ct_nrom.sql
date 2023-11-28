@@ -1380,3 +1380,246 @@ VALUES
 		NULL,
 		NULL
 	);
+
+-- >
+-- >
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME17371',
+		'10.146.9.140',
+		NULL,
+		'lftp',
+		'/home/staging/hhm_data_acquisition/files/SME17371',
+		'1',
+		'ge_ct_22.sh',
+		1,
+		NULL,
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17371',
+		'gesys_NBCT1.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17371',
+		'gesys_nbls.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+-- >
+-- >
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME17373',
+		'10.146.184.43',
+		NULL,
+		'lftp',
+		'/home/staging/hhm_data_acquisition/files/SME17373',
+		'1',
+		'ge_ct_22.sh',
+		1,
+		NULL,
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17373',
+		'gesys_MIHCCT_INIH.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+-- >
+-- >
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME17379',
+		'10.146.9.138',
+		NULL,
+		'lftp',
+		'/home/staging/hhm_data_acquisition/files/SME17379',
+		'1',
+		'ge_ct_22.sh',
+		1,
+		NULL,
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17379',
+		'gesys_ct03.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17379',
+		'gesys_ct99.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17379',
+		'gesys_NBCT2.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17379',
+		'gesys_RE36A1700208YC.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);

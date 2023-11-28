@@ -555,3 +555,60 @@ VALUES
         NULL,
         NULL
     );
+
+-- >
+-- >
+
+INSERT INTO
+    config.acquisition(
+        system_id,
+        host_ip,
+        mmb_ip,
+        protocal,
+        debian_server_path,
+        credentials_group,
+        acquisition_script,
+        run_group,
+        host,
+        user_id,
+        acqu_point,
+        host_path,
+        cerb_file
+    )
+VALUES
+    (
+        'SME00884',
+        '10.10.10.3',
+        NULL,
+        'lftp',
+        '/home/staging/hhm_data_acquisition/files/SME00884',
+        '17',
+        'siemens_cerb.sh',
+        1,
+        NULL,
+        NULL,
+        NULL,
+        'C0137/SHIP005/SME00884',
+        'Error_log_A1_'
+    );
+
+INSERT INTO
+    config.log (
+        system_id,
+        file_name,
+        dir_name,
+        regex_models,
+        pg_tables,
+        column_name,
+        agg
+    )
+VALUES
+    (
+        'SME00884',
+        'Evtlog.txt',
+        'Evtlog',
+        ARRAY ['cv_bulk', 'cv_groups'],
+        ARRAY ['siemens_cv'],
+        NULL,
+        NULL
+    );
