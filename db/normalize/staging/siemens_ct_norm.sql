@@ -801,3 +801,34 @@ VALUES(
 	NULL,
 	NULL
 );
+
+-- >
+-- >
+
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME17148',
+	'129.109.254.95',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME17148',
+	NULL,
+	'siemens_443_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17148',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);

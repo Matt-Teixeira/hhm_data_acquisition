@@ -1778,6 +1778,7 @@ VALUES
 
 -- >
 -- >
+
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2518,11 +2519,32 @@ VALUES
 		'10.251.201.15',
 		NULL,
 		'lftp',
-		'/home/prod/hhm_data_acquisition/files/10.251.201.15',
+		'/home/prod/hhm_data_acquisition/files/SME16618',
 		'19',
 		'ge_ct_22.sh',
 		1,
 		NULL,
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME16618',
+		'gesys_svct.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
 		NULL,
 		NULL
 	);

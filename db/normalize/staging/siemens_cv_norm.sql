@@ -612,3 +612,117 @@ VALUES
         NULL,
         NULL
     );
+
+-->
+-->
+
+INSERT INTO
+    config.acquisition(
+        system_id,
+        host_ip,
+        mmb_ip,
+        protocal,
+        debian_server_path,
+        credentials_group,
+        acquisition_script,
+        run_group,
+        host,
+        user_id,
+        acqu_point,
+        host_path,
+        cerb_file
+    )
+VALUES
+    (
+        'SME01444',
+        '10.10.10.3',
+        NULL,
+        'lftp',
+        '/home/staging/hhm_data_acquisition/files/SME01444',
+        '17',
+        'siemens_cerb.sh',
+        1,
+        NULL,
+        NULL,
+        NULL,
+        'C027932/SHIP03/SME01444',
+        'PLACEHOLDER'
+    );
+
+INSERT INTO
+    config.log (
+        system_id,
+        file_name,
+        dir_name,
+        regex_models,
+        pg_tables,
+        column_name,
+        agg
+    )
+VALUES
+    (
+        'SME01444',
+        'Evtlog.txt',
+        'Evtlog',
+        ARRAY ['cv_bulk', 'cv_groups'],
+        ARRAY ['siemens_cv'],
+        NULL,
+        NULL
+    );
+
+-->
+-->
+
+INSERT INTO
+    config.acquisition(
+        system_id,
+        host_ip,
+        mmb_ip,
+        protocal,
+        debian_server_path,
+        credentials_group,
+        acquisition_script,
+        run_group,
+        host,
+        user_id,
+        acqu_point,
+        host_path,
+        cerb_file
+    )
+VALUES
+    (
+        'SME01440',
+        '10.10.10.3',
+        NULL,
+        'lftp',
+        '/home/staging/hhm_data_acquisition/files/SME01440',
+        '17',
+        'siemens_cerb.sh',
+        1,
+        NULL,
+        NULL,
+        NULL,
+        'C027932/SHIP04/SME01440',
+        'PLACEHOLDER'
+    );
+
+INSERT INTO
+    config.log (
+        system_id,
+        file_name,
+        dir_name,
+        regex_models,
+        pg_tables,
+        column_name,
+        agg
+    )
+VALUES
+    (
+        'SME01440',
+        'Evtlog.txt',
+        'Evtlog',
+        ARRAY ['cv_bulk', 'cv_groups'],
+        ARRAY ['siemens_cv'],
+        NULL,
+        NULL
+    );

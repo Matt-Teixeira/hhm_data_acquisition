@@ -476,3 +476,124 @@ VALUES(
 	NULL,
 	NULL
 );
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
+VALUES (
+	'SME17372',
+	'10.146.75.153',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME17372',
+	'13',
+	'phil_ct_data_grab_1.sh',
+	1,
+	NULL,
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17372',
+	'Events.output',
+	'events',
+	ARRAY['ct_events_v2'], -- regex
+	ARRAY['philips_ct_events'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17372',
+	'EALInfo.output',
+	'eal',
+	ARRAY['ct_eal_v_2'], -- regex
+	ARRAY['philips_ct_eal'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
+VALUES (
+	'SME17374',
+	'10.146.0.157',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME17374',
+	'13',
+	'phil_ct_data_grab_1.sh',
+	1,
+	NULL,
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17374',
+	'Events.output',
+	'events',
+	ARRAY['ct_events_v2'], -- regex
+	ARRAY['philips_ct_events'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17374',
+	'EALInfo.output',
+	'eal',
+	ARRAY['ct_eal_v_2'], -- regex
+	ARRAY['philips_ct_eal'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
+VALUES (
+	'SME17375',
+	'10.146.0.159',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME17375',
+	'13',
+	'phil_ct_data_grab_1.sh',
+	1,
+	NULL,
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17375',
+	'Events.output',
+	'events',
+	ARRAY['ct_events_v2'], -- regex
+	ARRAY['philips_ct_events'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17375',
+	'EALInfo.output',
+	'eal',
+	ARRAY['ct_eal_v_2'], -- regex
+	ARRAY['philips_ct_eal'], -- tables
+	NULL,
+	NULL
+);
