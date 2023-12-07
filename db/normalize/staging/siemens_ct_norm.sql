@@ -832,3 +832,153 @@ VALUES(
 	NULL,
 	NULL
 );
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME00835',
+	'10.102.1.43',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME00835',
+	NULL,
+	'siemens_80_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00835',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME00846',
+	'10.189.10.141',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME00846',
+	NULL,
+	'siemens_80_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00846',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME00874',
+	'10.60.63.146',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME00874',
+	NULL,
+	'siemens_80_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00874',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME01436',
+	'172.22.23.222',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME01436',
+	NULL,
+	'siemens_80_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01436',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME01439',
+	'172.27.22.63',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME01439',
+	NULL,
+	'siemens_80_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01439',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);
