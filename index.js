@@ -74,7 +74,8 @@ const onBoot = async () => {
 
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
-      await run_system_manual(run_log, ["SME01446"], ["Philips", "CT"]);
+      const capture_datetime = captureDatetime();
+      await run_system_manual(run_log, ["SME01392"], ["Philips", "CV/IR"], capture_datetime);
     }
     if (run_group === "ip_sec") {
       await get_ip_sec_table();

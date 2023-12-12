@@ -1,11 +1,11 @@
 const { log } = require("../../../logger");
-const get_philips_cv_data = require("./philips_cv");
+const { get_philips_cv_data } = require("./philips_cv");
 const get_philips_ct_data = require("./philips_ct");
 const get_philips_mri_data = require("./philips_mri");
 
 async function get_philips_data(run_log, modality, capture_datetime) {
   log("info", "NA", "NA", "get_ge_data", `FN CALL`, {
-    modality,
+    modality
   });
 
   try {
@@ -26,7 +26,7 @@ async function get_philips_data(run_log, modality, capture_datetime) {
     console.log(error);
     log("error", "NA", "NA", "get_ge_data", `FN CALL`, {
       error,
-      modality,
+      modality
     });
   }
 }

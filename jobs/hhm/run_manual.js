@@ -3,14 +3,19 @@ const exec_phil_cv_data_grab = require("../../read/exec-phil_cv_data_grab");
 const { getHhmCreds, getOneSystem } = require("../../sql/qf-provider");
 const { decryptString, list_new_files } = require("../../util");
 const { get_last_dir_date } = require("../../redis/redis_helpers");
+const { run_phil_cv } = require("./philips/philips_cv");
 
-async function run_system_manual(run_log, systemArray, man_mod) {
+async function run_system_manual(
+  run_log,
+  systemArray,
+  man_mod,
+  capture_datetime
+) {
   try {
     const credentials = await getHhmCreds(man_mod);
 
     // Can accept multiple system args in array
     for (const sys of systemArray) {
-      console.log(sys);
       const system = await getOneSystem(sys);
       console.log(system);
 
@@ -36,6 +41,14 @@ async function run_system_manual(run_log, systemArray, man_mod) {
       }
 
       // END Credential Acquisition
+
+      if (
+        system[0].manufacturer === "Philips" &&
+        system[0].modality === "CV/IR"
+      ) {
+        await run_phil_cv(run_log, system[0], credentials, capture_datetime);
+        return;
+      }
 
       const path = `./read/sh/${man_mod[0]}/${system[0].acquisition_script}`;
 
@@ -81,7 +94,7 @@ async function run_system_manual(run_log, systemArray, man_mod) {
             system[0].host_ip,
             user,
             pass,
-            file,
+            file
           ]);
         }
         return;
@@ -89,13 +102,13 @@ async function run_system_manual(run_log, systemArray, man_mod) {
 
       if (man_mod[0] === "Siemens") {
         await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
-          system[0].host_ip,
+          system[0].host_ip
         ]);
       } else {
         await exec_hhm_data_grab(run_log, system[0].id, path, system[0], [
           system[0].host_ip,
           user,
-          pass,
+          pass
         ]);
       }
     }

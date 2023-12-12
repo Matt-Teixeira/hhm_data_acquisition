@@ -17,6 +17,7 @@ const exec_phil_cv_data_grab = async (
   execPath,
   system,
   args,
+  type,
   capture_datetime,
   ip_reset = false
 ) => {
@@ -92,7 +93,7 @@ const exec_phil_cv_data_grab = async (
       return false;
     }
 
-    await update_last_dir_date(sme, args[3]);
+    await update_last_dir_date(sme, args[3], type);
     await add_to_online_queue(run_log, {
       id: system.id,
       capture_datetime,
