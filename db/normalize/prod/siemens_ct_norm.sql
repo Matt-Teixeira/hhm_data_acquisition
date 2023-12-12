@@ -814,7 +814,7 @@ VALUES (
 	'lftp',
 	'/home/prod/hhm_data_acquisition/files/SME17148',
 	NULL,
-	'siemens_443_data_grab.sh',
+	'siemens_80_data_grab.sh',
 	1,
 	NULL,
 	NULL,

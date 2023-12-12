@@ -38,7 +38,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME00896',
 		'gesys_RDMCOPCT.log',
 		'gesys',
@@ -90,7 +90,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01091',
 		'gesys_RDMCCT_2.log',
 		'gesys',
@@ -111,7 +111,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01091',
 		'gesys_RE36A1600120YC.log',
 		'gesys',
@@ -132,7 +132,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01091',
 		'gesys_ct99.log',
 		'gesys',
@@ -184,7 +184,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME00847',
 		'gesys_ct99.log',
 		'gesys',
@@ -205,7 +205,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME00847',
 		'gesys_mcvct.log',
 		'gesys',
@@ -257,7 +257,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01429',
 		'gesys_CRDCT01.log',
 		'gesys',
@@ -309,7 +309,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01431',
 		'gesys_LRDCT01.log',
 		'gesys',
@@ -361,7 +361,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01432',
 		'gesys_LRDCT02.log',
 		'gesys',
@@ -413,7 +413,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01433',
 		'gesys_HRDCT01.log',
 		'gesys',
@@ -465,7 +465,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01434',
 		'gesys_BRDCT01.log',
 		'gesys',
@@ -477,7 +477,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -518,7 +517,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01176',
 		'gesys__oc0.log',
 		'gesys',
@@ -570,7 +569,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME01435',
 		'gesys_BRDCT01.log',
 		'gesys',
@@ -622,7 +621,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME00897',
 		'gesys_BRDCT01.log',
 		'gesys',
@@ -674,7 +673,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME14521',
 		'gesys_ct07.log',
 		'gesys',
@@ -726,7 +725,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME14522',
 		'gesys_ct04.log',
 		'gesys',
@@ -778,7 +777,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12413',
 		'gesys_GEOPT660CT1.log',
 		'gesys',
@@ -830,7 +829,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12451',
 		'gesys_CTSEN.log',
 		'gesys',
@@ -851,7 +850,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12451',
 		'gesys_ct99.log',
 		'gesys',
@@ -903,7 +902,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12412',
 		'gesys_gect1.log',
 		'gesys',
@@ -955,7 +954,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12408',
 		'gesys_GEBSCT1.log',
 		'gesys',
@@ -1007,7 +1006,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12446',
 		'gesys_GE-OPTIMA64.log',
 		'gesys',
@@ -1059,7 +1058,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12411',
 		'gesys_phrgect4.log',
 		'gesys',
@@ -1111,7 +1110,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12450',
 		'gesys_ct_eso.log',
 		'gesys',
@@ -1163,7 +1162,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12445',
 		'gesys_GECT1.log',
 		'gesys',
@@ -1215,7 +1214,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12444',
 		'gesys_GECT1.log',
 		'gesys',
@@ -1267,7 +1266,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12443',
 		'gesys_CT_GE_BEH_2.log',
 		'gesys',
@@ -1319,7 +1318,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12409',
 		'gesys_QUORTUGECTIC.log',
 		'gesys',
@@ -1371,7 +1370,7 @@ INSERT INTO
 		agg
 	)
 VALUES
-(
+	(
 		'SME12449',
 		'gesys_QUORTUGECTIC.log',
 		'gesys',
@@ -1383,7 +1382,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1457,7 +1455,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1510,7 +1507,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1626,7 +1622,6 @@ VALUES
 
 -->
 -->
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1679,8 +1674,6 @@ VALUES
 
 -->
 -->
-
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1785,7 +1778,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1838,7 +1830,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1943,7 +1934,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2069,7 +2059,6 @@ VALUES
 
 -->
 -->
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2122,8 +2111,6 @@ VALUES
 
 -->
 -->
-
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2176,7 +2163,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2229,7 +2215,6 @@ VALUES
 
 -->
 -->
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2303,7 +2288,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2356,7 +2340,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2372,9 +2355,10 @@ INSERT INTO
 		acqu_point
 	)
 VALUES
+	--10.46.210.44
 	(
 		'SME17377',
-		'10.146.16.47',
+		'10.46.210.44',
 		NULL,
 		'lftp',
 		'/home/staging/hhm_data_acquisition/files/SME17377',
@@ -2399,7 +2383,7 @@ INSERT INTO
 VALUES
 	(
 		'SME17377',
-		'gesys_DVMR_SL.log',
+		'gesys_ct03.log',
 		'gesys',
 		ARRAY ['block', 'sub_block'],
 		ARRAY ['ge_ct_gesys'],
@@ -2409,7 +2393,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2525,7 +2508,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2578,7 +2560,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2631,7 +2612,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2684,7 +2664,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2737,7 +2716,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2790,7 +2768,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2843,7 +2820,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2896,7 +2872,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -2970,7 +2945,6 @@ VALUES
 
 -- >
 -- >
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -3038,6 +3012,38 @@ VALUES
 		'gesys',
 		ARRAY ['block', 'sub_block'],
 		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+-- >
+-- >
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME17153',
+		'129.109.253.137',
+		NULL,
+		'lftp',
+		'/home/staging/hhm_data_acquisition/files/SME17153',
+		'3',
+		'ge_ct_22.sh',
+		1,
+		NULL,
 		NULL,
 		NULL
 	);

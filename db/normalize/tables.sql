@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS config.acquisition(
 	file_version TEXT,
 	alt_data_source JSONB,
 	host_path TEXT,
-	cerb_file TEXT
+	cerb_file TEXT,
+	vpn BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS config.edu(

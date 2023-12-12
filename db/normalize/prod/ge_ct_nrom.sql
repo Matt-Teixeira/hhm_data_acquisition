@@ -1796,7 +1796,7 @@ INSERT INTO
 VALUES
 	(
 		'SME17377',
-		'10.146.16.47',
+		'10.46.210.44',
 		NULL,
 		'lftp',
 		'/home/prod/hhm_data_acquisition/files/SME17377',
@@ -1821,7 +1821,7 @@ INSERT INTO
 VALUES
 	(
 		'SME17377',
-		'gesys_DVMR_SL.log',
+		'gesys_ct03.log',
 		'gesys',
 		ARRAY ['block', 'sub_block'],
 		ARRAY ['ge_ct_gesys'],
@@ -1831,6 +1831,7 @@ VALUES
 
 -- >
 -- >
+
 INSERT INTO
 	config.acquisition(
 		system_id,

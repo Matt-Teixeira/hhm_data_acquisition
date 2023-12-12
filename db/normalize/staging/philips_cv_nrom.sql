@@ -1650,3 +1650,32 @@ VALUES(
 	NULL,
 	NULL
 );
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
+VALUES (
+	'SME16076',
+	'10.144.233.17',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME16076',
+	'12',
+	'phil_cv_21.sh',
+	1,
+	NULL,
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16076',
+	'EventLog.txe',
+	'EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
