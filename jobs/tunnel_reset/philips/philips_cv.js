@@ -1,7 +1,7 @@
 const exec_phil_cv_data_grab = require("../../../read/exec-phil_cv_data_grab");
 const { getHhmCreds } = require("../../../sql/qf-provider");
-const { decryptString, list_new_files } = require("../../../util");
-const { get_last_dir_date } = require("../../../redis/redis_helpers");
+const { decryptString, list_new_phil_cv_files } = require("../../../util");
+const { get_previous_dir } = require("../../../redis/redis_helpers");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -23,51 +23,67 @@ async function get_philips_cv_data(
 
     const cv_path = `./read/sh/Philips/${system.acquisition_script}`;
 
-    const system_creds = credentials.find((credential) => {
+    const system_creds = credentials.find(credential => {
       if (credential.id == system.credentials_group) return true;
     });
 
     const user = decryptString(system_creds.user_enc);
     const pass = decryptString(system_creds.password_enc);
 
-    const last_aquired_dir = await get_last_dir_date(system.id);
+    const last_aquired_dir = await get_previous_dir(
+      system.id,
+      "last_phil_cv_daily"
+    );
     // Example: daily_2023_06_19 or daily_20230619
 
+    const last_lod_file = await get_previous_dir(system.id, "last_phil_cv_lod");
+    // Example: lod_20231114_0953
+
     // Pass last_aquired_dir to list new files post last_aquired_dir
-    const new_files = await list_new_files(
+    const {
+      daily_files_to_pull,
+      lod_files_to_pull
+    } = await list_new_phil_cv_files(
       run_log,
       system.id,
       system.host_ip,
       last_aquired_dir,
+      last_lod_file,
       user,
       pass,
-      system
+      system,
+      capture_datetime,
+      true
     );
 
-    if (new_files === null) {
-      //LOG
-      let note = {
-        system_id: system.id,
-        message: "No new files"
-      };
-      addLogEvent(I, run_log, "get_philips_cv_data", cal, note, null);
-      return;
-    }
-    if (new_files === false) {
-      console.log("System needs tunnel reset: " + system.id);
-      return;
+    if (daily_files_to_pull !== null) {
+      for await (const file of daily_files_to_pull) {
+        await exec_phil_cv_data_grab(
+          run_log,
+          system.id,
+          daily_dir_acqu_script,
+          system,
+          [system.host_ip, user, pass, file],
+          "last_phil_cv_daily",
+          capture_datetime,
+          ip_reset
+        );
+      }
     }
 
-    for (const file of new_files) {
-      await exec_phil_cv_data_grab(
-        run_log,
-        system.id,
-        cv_path,
-        system,
-        [system.host_ip, user, pass, file],
-        capture_datetime,
-        ip_reset
-      );
+    if (lod_files_to_pull !== null) {
+      for await (const file of lod_files_to_pull) {
+        await exec_phil_cv_data_grab(
+          run_log,
+          system.id,
+          lod_dir_acqu_script,
+          system,
+          [system.host_ip, user, pass, file],
+          "last_phil_cv_lod",
+          capture_datetime,
+          ip_reset
+        );
+      }
     }
   } catch (error) {
     console.log(error);

@@ -83,7 +83,6 @@ const upsert_query_builder = async queue => {
 
   // Loop through and build query for successful hhm
   for (let i = 0; i < hhm_success_values.length; i++) {
-    console.log(i);
     if (i === hhm_success_values.length - 1) {
       hhm_values_str += hhm_success_values[i] + " ";
       continue;
@@ -93,7 +92,6 @@ const upsert_query_builder = async queue => {
 
   // Loop through and build query for successful mmb
   for (let i = 0; i < mmb_success_values.length; i++) {
-    console.log("MMB SUCCESS: " + i);
     if (i === mmb_success_values.length - 1) {
       mmb_values_str += mmb_success_values[i] + " ";
       continue;
@@ -132,7 +130,6 @@ const upsert_query_builder = async queue => {
   let mmb_failed_values_str = "";
 
   for (let i = 0; i < hhm_failed_values.length; i++) {
-    console.log(i);
     if (i === hhm_failed_values.length - 1) {
       hhm_failed_values_str += hhm_failed_values[i] + " ";
       continue;
@@ -141,7 +138,6 @@ const upsert_query_builder = async queue => {
   }
 
   for (let i = 0; i < mmb_failed_values.length; i++) {
-    console.log(i);
     if (i === mmb_failed_values.length - 1) {
       mmb_failed_values_str += mmb_failed_values[i] + " ";
       continue;

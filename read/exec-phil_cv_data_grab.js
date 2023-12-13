@@ -77,6 +77,9 @@ const exec_phil_cv_data_grab = async (
       // Only runs for ip reset instance
       // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
       // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
+      
+      console.log("\nip_reset");
+      console.log(ip_reset);
       if (ip_reset) {
         await add_to_online_queue(run_log, {
           id: system.id,

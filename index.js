@@ -41,7 +41,7 @@ async function runJob(run_log, run_group, schedule, manufacturer, modality) {
       await get_hhm_data(run_log, manufacturer, modality, capture_datetime);
       break;
     case "ip_reset":
-      await reset_tunnel(run_log, capture_datetime);
+      await reset_tunnel(run_log);
       break;
     case "offline_alert":
       await insertHeartbeat();

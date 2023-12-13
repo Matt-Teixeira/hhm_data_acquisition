@@ -13,7 +13,9 @@ async function list_new_phil_cv_files(
   previous_lod_file,
   user,
   pass,
-  system
+  system,
+  capture_datetime,
+  ip_reset = false
 ) {
   const daily_files_to_pull = await list_new_daily_files(
     run_log,
@@ -22,7 +24,9 @@ async function list_new_phil_cv_files(
     previous_daily_file,
     user,
     pass,
-    system
+    system,
+    capture_datetime,
+    ip_reset
   );
 
   const lod_files_to_pull = await list_new_lod_files(
@@ -32,7 +36,9 @@ async function list_new_phil_cv_files(
     previous_lod_file,
     user,
     pass,
-    system
+    system,
+    capture_datetime,
+    ip_reset
   );
 
   return { daily_files_to_pull, lod_files_to_pull };
@@ -45,16 +51,21 @@ async function list_new_daily_files(
   previous_daily_file,
   user,
   pass,
-  system
+  system,
+  capture_datetime,
+  ip_reset
 ) {
   const daily_re = /daily_\d{4}_\d{2}_\d{2}|daily_\d{4}\d{2}\d{2}/;
   const list_path = "./read/sh/Philips/phil_cv_file_list.sh";
-  const files_list = await exec_list_dirs(run_log, sme, list_path, system, [
-    ip_address,
-    user,
-    pass,
-    `${process.env.DEV_HHM_FILES}/Philips/CV/${sme}`
-  ]);
+  const files_list = await exec_list_dirs(
+    run_log,
+    sme,
+    list_path,
+    system,
+    [ip_address, user, pass, `${process.env.DEV_HHM_FILES}/Philips/CV/${sme}`],
+    capture_datetime,
+    ip_reset
+  );
 
   if (files_list === false) return null;
 
@@ -99,17 +110,22 @@ async function list_new_lod_files(
   previous_lod_file,
   user,
   pass,
-  system
+  system,
+  capture_datetime,
+  ip_reset
 ) {
   const list_path = "./read/sh/Philips/phil_cv_file_list.sh";
   const lod_re = /lod.*/;
 
-  const files_list = await exec_list_dirs(run_log, sme, list_path, system, [
-    ip_address,
-    user,
-    pass,
-    `${process.env.DEV_HHM_FILES}/Philips/CV/${sme}`
-  ]);
+  const files_list = await exec_list_dirs(
+    run_log,
+    sme,
+    list_path,
+    system,
+    [ip_address, user, pass, `${process.env.DEV_HHM_FILES}/Philips/CV/${sme}`],
+    capture_datetime,
+    ip_reset
+  );
 
   if (files_list === false) return null;
 
@@ -136,7 +152,7 @@ async function list_new_lod_files(
 
   // Group lod directories
 
-  const lod_dirs = ["lod_20231113_0953"];
+  const lod_dirs = [];
 
   for (let i = dirs.length - 1; i > 0; i--) {
     const matching_file = lod_re.test(dirs[i]);

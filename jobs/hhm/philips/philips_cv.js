@@ -9,9 +9,10 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_philips_cv_data(run_log, capture_datetime) {
-  await addLogEvent(I, run_log, "get_philips_cv_data", cal, null, null);
   const child_processes = [];
   try {
+    await addLogEvent(I, run_log, "get_philips_cv_data", cal, null, null);
+
     const manufacturer = "Philips";
     const modality = "CV/IR";
     const systems = await get_hhm([manufacturer, modality]);
@@ -72,14 +73,9 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
       last_lod_file,
       user,
       pass,
-      system
+      system,
+      capture_datetime
     );
-
-    console.log("\ndaily_files_to_pull");
-    console.log(daily_files_to_pull);
-
-    console.log("\nlod_files_to_pull");
-    console.log(lod_files_to_pull);
 
     if (daily_files_to_pull !== null) {
       for await (const file of daily_files_to_pull) {
