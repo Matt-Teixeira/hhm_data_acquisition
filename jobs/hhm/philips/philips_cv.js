@@ -40,71 +40,124 @@ async function get_philips_cv_data(run_log, capture_datetime) {
 }
 
 async function run_phil_cv(run_log, system, credentials, capture_datetime) {
-  if (system.host_ip && system.credentials_group) {
-    await addLogEvent(I, run_log, "run_phil_cv", cal, null, null);
-    const daily_dir_acqu_script = `./read/sh/Philips/${system.acquisition_script}`;
-    const lod_dir_acqu_script = `./read/sh/Philips/phil_cv_21_lod.sh`;
+  await addLogEvent(I, run_log, "run_phil_cv", cal, { system }, null);
+  const daily_dir_acqu_script = `./read/sh/Philips/${system.acquisition_script}`;
+  const lod_dir_acqu_script = `./read/sh/Philips/phil_cv_21_lod.sh`;
 
-    const system_creds = credentials.find(credential => {
-      if (credential.id == system.credentials_group) return true;
-    });
+  if (!system.host_ip || !system.credentials_group) {
+    let note = {
+      system: system.id,
+      host_ip: system.host_ip,
+      system: system.credentials_group,
+      message: "Missing host_ip and credentials_group"
+    };
+    await addLogEvent(I, run_log, "run_phil_cv", det, note, null);
+  }
 
-    const user = decryptString(system_creds.user_enc);
-    const pass = decryptString(system_creds.password_enc);
+  const system_creds = credentials.find(credential => {
+    if (credential.id == system.credentials_group) return true;
+  });
 
-    const last_aquired_dir = await get_previous_dir(
-      system.id,
-      "last_phil_cv_daily"
-    );
-    // Example: daily_2023_06_19 or daily_20230619
+  const user = decryptString(system_creds.user_enc);
+  const pass = decryptString(system_creds.password_enc);
 
-    const last_lod_file = await get_previous_dir(system.id, "last_phil_cv_lod");
-    // Example: lod_20231114_0953
+  const last_aquired_dir = await get_previous_dir(
+    system.id,
+    "last_phil_cv_daily"
+  );
+  // Example: daily_2023_06_19 or daily_20230619
 
-    // Pass last_aquired_dir to list new files post last_aquired_dir
-    const {
-      daily_files_to_pull,
-      lod_files_to_pull
-    } = await list_new_phil_cv_files(
-      run_log,
-      system.id,
-      system.host_ip,
-      last_aquired_dir,
-      last_lod_file,
-      user,
-      pass,
-      system,
-      capture_datetime
-    );
+  const last_lod_file = await get_previous_dir(system.id, "last_phil_cv_lod");
+  // Example: lod_20231114_0953
 
-    if (daily_files_to_pull !== null) {
-      for await (const file of daily_files_to_pull) {
-        await exec_phil_cv_data_grab(
-          run_log,
-          system.id,
-          daily_dir_acqu_script,
-          system,
-          [system.host_ip, user, pass, file],
-          "last_phil_cv_daily",
-          capture_datetime
-        );
-      }
-    }
+  // Pass last_aquired_dir to list new files post last_aquired_dir
+  const {
+    daily_files_to_pull,
+    lod_files_to_pull
+  } = await list_new_phil_cv_files(
+    run_log,
+    system.id,
+    system.host_ip,
+    last_aquired_dir,
+    last_lod_file,
+    user,
+    pass,
+    system,
+    capture_datetime
+  );
 
-    if (lod_files_to_pull !== null) {
-      for await (const file of lod_files_to_pull) {
-        await exec_phil_cv_data_grab(
-          run_log,
-          system.id,
-          lod_dir_acqu_script,
-          system,
-          [system.host_ip, user, pass, file],
-          "last_phil_cv_lod",
-          capture_datetime
-        );
-      }
+  console.log("\ndaily_files_to_pull");
+  console.log(daily_files_to_pull);
+
+  console.log("\nlod_files_to_pull");
+  console.log(lod_files_to_pull);
+
+  if (daily_files_to_pull !== null) {
+    for await (const file of daily_files_to_pull) {
+      await exec_phil_cv_data_grab(
+        run_log,
+        system.id,
+        daily_dir_acqu_script,
+        system,
+        [system.host_ip, user, pass, file],
+        "last_phil_cv_daily",
+        capture_datetime
+      );
     }
   }
+
+  if (lod_files_to_pull !== null) {
+    for await (const file of lod_files_to_pull) {
+      await exec_phil_cv_data_grab(
+        run_log,
+        system.id,
+        lod_dir_acqu_script,
+        system,
+        [system.host_ip, user, pass, file],
+        "last_phil_cv_lod",
+        capture_datetime
+      );
+    }
+  }
+
+  if (daily_files_to_pull !== null) {
+    for await (const file of daily_files_to_pull) {
+      await get_trace_files(
+        run_log,
+        system,
+        user,
+        pass,
+        file,
+        capture_datetime
+      );
+    }
+  }
+}
+
+async function get_trace_files(
+  run_log,
+  system,
+  user,
+  pass,
+  file,
+  capture_datetime
+) {
+  let note = {
+    system
+  };
+
+  await addLogEvent(I, run_log, "get_trace_files", cal, note, null);
+  const daily_dir_acqu_script = `./read/sh/Philips/phil_cv_21_trace.sh`;
+
+  await exec_phil_cv_data_grab(
+    run_log,
+    system.id,
+    daily_dir_acqu_script,
+    system,
+    [system.host_ip, user, pass, file],
+    "last_phil_cv_daily",
+    capture_datetime
+  );
 }
 
 module.exports = { get_philips_cv_data, run_phil_cv };

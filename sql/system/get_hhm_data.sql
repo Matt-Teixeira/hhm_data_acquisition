@@ -17,4 +17,4 @@ WHERE
     manufacturer = $1
     AND modality LIKE $2
     AND process_log = true
-    AND pc.id = 'SME00509';
+    AND pc.id = 'SME00444';
