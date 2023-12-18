@@ -59,6 +59,13 @@ const exec_list_dirs = async (
       return false;
     }
 
+    await add_to_online_queue(run_log, {
+      id: system.id,
+      capture_datetime,
+      successful_acquisition: true,
+      data_source: "hhm"
+    });
+
     return stdout;
   } catch (error) {
     console.log(error);

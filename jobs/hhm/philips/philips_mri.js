@@ -15,6 +15,9 @@ async function get_philips_mri_data(run_log, capture_datetime) {
   const systems = await get_phil_mri_host([manufacturer, modality]);
   const credentials = await getHhmCreds([manufacturer, modality]);
 
+  console.log("\nsystems");
+  console.log(systems);
+
   const child_processes = [];
   for (const system of systems) {
     let note = {
