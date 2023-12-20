@@ -9,4 +9,4 @@
 [ ! -d "$2" ] && mkdir $2
 curl -k -m 20 https://$1/service/autoreport/hold/EvtApplication_Today.txt >"$2/Application.log"
 
-# curl -m 20 $(echo -n "$POS_ARGS") "https://$1/service/autoreport/hold/EvtApplication_Today.txt" >"$2/Application.log"
+# curl -k -m 20 https://$1/service/autoreport/hold/EvtApplication_Today.txt >"$2/Application.log"

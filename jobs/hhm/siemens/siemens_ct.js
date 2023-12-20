@@ -13,6 +13,8 @@ async function get_siemens_ct_data(run_log, capture_datetime) {
   const modality = "%CT";
   const systems = await get_hhm([manufacturer, modality]);
 
+  console.log(systems)
+
   const child_processes = [];
   for (const system of systems) {
     let note = {

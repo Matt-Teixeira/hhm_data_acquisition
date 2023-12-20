@@ -1404,7 +1404,7 @@ VALUES
 		'lftp',
 		'/home/staging/hhm_data_acquisition/files/SME17371',
 		'1',
-		'ge_ct_22.sh',
+		'ge_ct_22_v2.sh',
 		1,
 		NULL,
 		NULL,
@@ -1446,6 +1446,27 @@ VALUES
 	(
 		'SME17371',
 		'gesys_nbls.log',
+		'gesys',
+		ARRAY ['block', 'sub_block'],
+		ARRAY ['ge_ct_gesys'],
+		NULL,
+		NULL
+	);
+
+	INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+	(
+		'SME17371',
+		'gesys_nbct1.log',
 		'gesys',
 		ARRAY ['block', 'sub_block'],
 		ARRAY ['ge_ct_gesys'],
