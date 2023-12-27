@@ -2,14 +2,15 @@ const initRedis = require("./redis_instance");
 const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../utils/logger/enums");
 
-async function add_to_online_queue(run_log, system) {
+async function add_to_online_queue(job_id, run_log, system) {
   //const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
   let note = {
-    system_id: system.system_id,
+    job_id,
+    system_id: system.system_id
   };
   await addLogEvent(I, run_log, "add_to_online_queue", cal, note, null);
 
@@ -24,22 +25,24 @@ async function add_to_online_queue(run_log, system) {
     await redisClient.sendCommand([
       "RPUSH",
       "online:queue",
-      JSON.stringify(system),
+      JSON.stringify(system)
     ]);
     await redisClient.quit();
     let note = {
+      job_id,
       system_id: system.id,
       queue: "online:queue",
-      message: "Sent to Redis queue",
+      message: "Sent to redis online queue"
     };
     await addLogEvent(I, run_log, "add_to_online_queue", det, note, null);
   } catch (error) {
     console.log(error);
     await redisClient.quit();
     let note = {
+      job_id,
       system_id: system.id,
       queue: "online:queue",
-      message: "Queue insert failed",
+      message: "Online queue insert failed"
     };
     await addLogEvent(E, run_log, "add_to_online_queue", cat, note, error);
   }
@@ -56,7 +59,7 @@ async function get_redis_online_queue() {
       "lrange",
       "online:queue",
       "0",
-      "1000",
+      "1000"
     ]);
     await redisClient.quit();
     const online_systems = [];
@@ -84,4 +87,8 @@ async function clear_redis_online_queue() {
   }
 }
 
-module.exports = { get_redis_online_queue, clear_redis_online_queue, add_to_online_queue };
+module.exports = {
+  get_redis_online_queue,
+  clear_redis_online_queue,
+  add_to_online_queue
+};

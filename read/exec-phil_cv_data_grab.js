@@ -3,15 +3,16 @@ const execFile = util.promisify(require("child_process").execFile);
 const {
   add_to_redis_queue,
   add_to_online_queue,
-  update_last_dir_date,
+  update_last_dir_date
 } = require("../redis");
 const [addLogEvent] = require("../utils/logger/log");
 const {
   type: { I, W, E },
-  tag: { cal, det, cat, seq, qaf },
+  tag: { cal, det, cat, seq, qaf }
 } = require("../utils/logger/enums");
 
 const exec_phil_cv_data_grab = async (
+  job_id,
   run_log,
   sme,
   execPath,
@@ -22,9 +23,10 @@ const exec_phil_cv_data_grab = async (
   ip_reset = false
 ) => {
   let note = {
+    job_id,
     system_id: system.id,
     execute_path: execPath,
-    args,
+    args
   };
   await addLogEvent(I, run_log, "exec_phil_cv_data_grab", cal, note, null);
 
@@ -57,9 +59,10 @@ const exec_phil_cv_data_grab = async (
     const { stdout, stderr } = await execFile(execPath, args);
 
     let note = {
+      job_id,
       system_id: system.id,
       stdout,
-      stderr,
+      stderr
     };
 
     await addLogEvent(I, run_log, "exec_phil_cv_data_grab", det, note, null);
@@ -67,9 +70,10 @@ const exec_phil_cv_data_grab = async (
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
       let note = {
+        job_id,
         system_id: system.id,
         stdout,
-        stderr,
+        stderr
       };
 
       await addLogEvent(E, run_log, "exec_phil_cv_data_grab", det, note, null);
@@ -77,11 +81,11 @@ const exec_phil_cv_data_grab = async (
       // Only runs for ip reset instance
       // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
       // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
-      
+
       console.log("\nip_reset");
       console.log(ip_reset);
       if (ip_reset) {
-        await add_to_online_queue(run_log, {
+        await add_to_online_queue(job_id, run_log, {
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
@@ -92,12 +96,12 @@ const exec_phil_cv_data_grab = async (
       }
 
       system.data_source = "hhm";
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
       return false;
     }
 
     await update_last_dir_date(sme, args[3], type);
-    await add_to_online_queue(run_log, {
+    await add_to_online_queue(job_id, run_log, {
       id: system.id,
       capture_datetime,
       successful_acquisition: true,
@@ -113,13 +117,13 @@ const exec_phil_cv_data_grab = async (
       connection_test_2.test(error.message)
     ) {
       let note = {
-        system_id: system.id,
+        system_id: system.id
       };
 
       await addLogEvent(E, run_log, "exec_phil_cv_data_grab", cat, note, error);
 
       if (ip_reset) {
-        await add_to_online_queue(run_log, {
+        await add_to_online_queue(job_id, run_log, {
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
@@ -130,7 +134,7 @@ const exec_phil_cv_data_grab = async (
       }
 
       system.data_source = "hhm";
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
 
       return false;
     }

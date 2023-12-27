@@ -6,6 +6,7 @@ const {
 } = require("../../utils/logger/enums");
 
 async function list_new_phil_cv_files(
+  job_id,
   run_log,
   sme,
   ip_address,
@@ -17,7 +18,17 @@ async function list_new_phil_cv_files(
   capture_datetime,
   ip_reset = false
 ) {
+  let note = {
+    job_id,
+    system_id: sme,
+    previous_daily_file,
+    previous_lod_file
+  };
+
+  await addLogEvent(I, run_log, "list_new_phil_cv_files", cal, note, null);
+
   const daily_files_to_pull = await list_new_daily_files(
+    job_id,
     run_log,
     sme,
     ip_address,
@@ -30,6 +41,7 @@ async function list_new_phil_cv_files(
   );
 
   const lod_files_to_pull = await list_new_lod_files(
+    job_id,
     run_log,
     sme,
     ip_address,
@@ -45,6 +57,7 @@ async function list_new_phil_cv_files(
 }
 
 async function list_new_daily_files(
+  job_id,
   run_log,
   sme,
   ip_address,
@@ -55,9 +68,18 @@ async function list_new_daily_files(
   capture_datetime,
   ip_reset
 ) {
+  let note = {
+    job_id,
+    system_id: sme,
+    previous_daily_file
+  };
+
+  await addLogEvent(I, run_log, "list_new_daily_files", cal, note, null);
+
   const daily_re = /daily_\d{4}_\d{2}_\d{2}|daily_\d{4}\d{2}\d{2}/;
   const list_path = "./read/sh/Philips/phil_cv_file_list.sh";
   const files_list = await exec_list_dirs(
+    job_id,
     run_log,
     sme,
     list_path,
@@ -91,12 +113,12 @@ async function list_new_daily_files(
 
   let reduced_files = dirs.slice(last_file_index + 1, dirs.length - 1);
 
-  const last_files = reduced_files.filter(file => file.match(daily_re));
+  const last_files = reduced_files.filter((file) => file.match(daily_re));
 
   // END: identifying daily directory to pull
 
   // BEGIN: determin wether or not to pull lod file
-
+    // ???
   // END: determin wether or not to pull lod file
 
   if (!last_files.length) return null;
@@ -104,6 +126,7 @@ async function list_new_daily_files(
 }
 
 async function list_new_lod_files(
+  job_id,
   run_log,
   sme,
   ip_address,
@@ -114,10 +137,20 @@ async function list_new_lod_files(
   capture_datetime,
   ip_reset
 ) {
+
+  let note = {
+    job_id,
+    system_id: sme,
+    previous_lod_file
+  };
+
+  await addLogEvent(I, run_log, "list_new_lod_files", cal, note, null);
+
   const list_path = "./read/sh/Philips/phil_cv_file_list.sh";
   const lod_re = /lod.*/;
 
   const files_list = await exec_list_dirs(
+    job_id,
     run_log,
     sme,
     list_path,
@@ -165,6 +198,7 @@ async function list_new_lod_files(
 
   if (prev_lod_index < 0) {
     let note = {
+      job_id,
       message: "Previous lod file not found",
       previous_lod_file
     };

@@ -1,6 +1,7 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { get_hhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
+const { v4: uuidv4 } = require("uuid");
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -17,7 +18,9 @@ async function get_ge_cv_data(run_log, capture_datetime) {
 
   const child_processes = [];
   for (const system of systems) {
+    const job_id = uuidv4();
     let note = {
+      job_id,
       system
     };
     try {
@@ -35,6 +38,7 @@ async function get_ge_cv_data(run_log, capture_datetime) {
         child_processes.push(
           async () =>
             await exec_hhm_data_grab(
+              job_id,
               run_log,
               system.id,
               cv_path,
@@ -45,17 +49,36 @@ async function get_ge_cv_data(run_log, capture_datetime) {
         );
       }
     } catch (error) {
+      let note = {
+        job_id: job_id,
+        system
+      };
       await addLogEvent(E, run_log, "get_ge_cv_data", cat, note, error);
     }
   }
   try {
+    await addLogEvent(
+      I,
+      run_log,
+      "get_ge_cv_data: run child_processes",
+      cal,
+      null,
+      null
+    );
     // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
     const promises = child_processes.map((child_process) => child_process());
 
     // AWAIT PROMISIS
     await Promise.all(promises);
   } catch (error) {
-    addLogEvent(E, run_log, "get_ge_cv_data", cat, null, error);
+    await addLogEvent(
+      E,
+      run_log,
+      "get_ge_cv_data: run child_processes",
+      cat,
+      null,
+      error
+    );
   }
 }
 

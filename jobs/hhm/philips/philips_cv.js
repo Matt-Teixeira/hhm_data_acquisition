@@ -2,6 +2,8 @@ const exec_phil_cv_data_grab = require("../../../read/exec-phil_cv_data_grab");
 const { get_hhm, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString, list_new_phil_cv_files } = require("../../../util");
 const { get_previous_dir } = require("../../../redis/redis_helpers");
+const { v4: uuidv4 } = require("uuid");
+
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -19,9 +21,16 @@ async function get_philips_cv_data(run_log, capture_datetime) {
     const credentials = await getHhmCreds([manufacturer, modality]);
 
     for (const system of systems) {
+      const job_id = uuidv4();
       child_processes.push(
         async () =>
-          await run_phil_cv(run_log, system, credentials, capture_datetime)
+          await run_phil_cv(
+            job_id,
+            run_log,
+            system,
+            credentials,
+            capture_datetime
+          )
       );
     }
   } catch (error) {
@@ -29,23 +38,30 @@ async function get_philips_cv_data(run_log, capture_datetime) {
   }
   try {
     // CREATE AN ARRAY OF PROMISES BY CALLING EACH child_process FUNCTION
-    const promises = child_processes.map(child_process => child_process());
+    const promises = child_processes.map((child_process) => child_process());
 
     // AWAIT PROMISIS
     await Promise.all(promises);
   } catch (error) {
     console.log(error);
-    addLogEvent(E, run_log, "get_ge_cv_data", cat, null, error);
+    await addLogEvent(E, run_log, "get_ge_cv_data", cat, null, error);
   }
 }
 
-async function run_phil_cv(run_log, system, credentials, capture_datetime) {
-  await addLogEvent(I, run_log, "run_phil_cv", cal, { system }, null);
+async function run_phil_cv(
+  job_id,
+  run_log,
+  system,
+  credentials,
+  capture_datetime
+) {
+  await addLogEvent(I, run_log, "run_phil_cv", cal, { job_id, system }, null);
   const daily_dir_acqu_script = `./read/sh/Philips/${system.acquisition_script}`;
   const lod_dir_acqu_script = `./read/sh/Philips/phil_cv_21_lod.sh`;
 
   if (!system.host_ip || !system.credentials_group) {
     let note = {
+      job_id,
       system: system.id,
       host_ip: system.host_ip,
       system: system.credentials_group,
@@ -54,7 +70,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
     await addLogEvent(I, run_log, "run_phil_cv", det, note, null);
   }
 
-  const system_creds = credentials.find(credential => {
+  const system_creds = credentials.find((credential) => {
     if (credential.id == system.credentials_group) return true;
   });
 
@@ -62,29 +78,35 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
   const pass = decryptString(system_creds.password_enc);
 
   const last_aquired_dir = await get_previous_dir(
+    job_id,
+    run_log,
     system.id,
     "last_phil_cv_daily"
   );
   // Example: daily_2023_06_19 or daily_20230619
 
-  const last_lod_file = await get_previous_dir(system.id, "last_phil_cv_lod");
+  const last_lod_file = await get_previous_dir(
+    job_id,
+    run_log,
+    system.id,
+    "last_phil_cv_lod"
+  );
   // Example: lod_20231114_0953
 
   // Pass last_aquired_dir to list new files post last_aquired_dir
-  const {
-    daily_files_to_pull,
-    lod_files_to_pull
-  } = await list_new_phil_cv_files(
-    run_log,
-    system.id,
-    system.host_ip,
-    last_aquired_dir,
-    last_lod_file,
-    user,
-    pass,
-    system,
-    capture_datetime
-  );
+  const { daily_files_to_pull, lod_files_to_pull } =
+    await list_new_phil_cv_files(
+      job_id,
+      run_log,
+      system.id,
+      system.host_ip,
+      last_aquired_dir,
+      last_lod_file,
+      user,
+      pass,
+      system,
+      capture_datetime
+    );
 
   console.log("\ndaily_files_to_pull");
   console.log(daily_files_to_pull);
@@ -95,6 +117,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
   if (daily_files_to_pull !== null) {
     for await (const file of daily_files_to_pull) {
       await exec_phil_cv_data_grab(
+        job_id,
         run_log,
         system.id,
         daily_dir_acqu_script,
@@ -109,6 +132,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
   if (lod_files_to_pull !== null) {
     for await (const file of lod_files_to_pull) {
       await exec_phil_cv_data_grab(
+        job_id,
         run_log,
         system.id,
         lod_dir_acqu_script,
@@ -123,6 +147,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
   if (daily_files_to_pull !== null) {
     for await (const file of daily_files_to_pull) {
       await get_trace_files(
+        job_id,
         run_log,
         system,
         user,
@@ -135,6 +160,7 @@ async function run_phil_cv(run_log, system, credentials, capture_datetime) {
 }
 
 async function get_trace_files(
+  job_id,
   run_log,
   system,
   user,
@@ -143,6 +169,7 @@ async function get_trace_files(
   capture_datetime
 ) {
   let note = {
+    job_id,
     system
   };
 
@@ -150,6 +177,7 @@ async function get_trace_files(
   const daily_dir_acqu_script = `./read/sh/Philips/phil_cv_21_trace.sh`;
 
   await exec_phil_cv_data_grab(
+    job_id,
     run_log,
     system.id,
     daily_dir_acqu_script,

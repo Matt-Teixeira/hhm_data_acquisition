@@ -1,6 +1,3 @@
--- >
--- >
-
 INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
 VALUES (
 	'SME00445',
@@ -23,6 +20,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00445',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -56,6 +64,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00446',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -81,6 +100,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00782',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -114,6 +144,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00786',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -139,6 +180,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01227',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -172,6 +224,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME02548',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -197,6 +260,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME02535',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -230,6 +304,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME02552',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -255,6 +340,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME07852',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -288,6 +384,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME07855',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -313,6 +420,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME07860',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -346,6 +464,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME07862',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -371,6 +500,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11259',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -404,6 +544,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11532',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -429,6 +580,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11925',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -462,6 +624,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11927',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -487,6 +660,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00886',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -520,6 +704,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00888',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -545,6 +740,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00892',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -578,6 +784,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11722',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -603,6 +820,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00508',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -636,6 +864,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00509',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -661,6 +900,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00510',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -694,6 +944,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00511',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -719,6 +980,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01387',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -752,6 +1024,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01388',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -777,6 +1060,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01389',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -810,6 +1104,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01391',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -835,6 +1140,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01392',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -868,6 +1184,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01393',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -893,6 +1220,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01394',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -926,6 +1264,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01396',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -951,6 +1300,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01397',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -984,6 +1344,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME02531',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1009,6 +1380,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME08325',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1042,6 +1424,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00444',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1067,6 +1460,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME07761',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1100,6 +1504,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11530',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1129,8 +1544,23 @@ VALUES(
 	NULL
 );
 
--- >
--- >
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME17160',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
+-->
+-->
+
+UPDATE config.acquisition 
+SET credentials_group = '12'
+WHERE system_id = 'SME13488';
 
 INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
 VALUES (
@@ -1154,6 +1584,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME13488',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1187,6 +1628,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME13529',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1216,17 +1668,28 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME13641',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
 INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
 VALUES (
 	'SME00467',
-	'192.168.236.5',
+	'192.168.51.60',
 	NULL,
 	'lftp',
 	'/home/prod/hhm_data_acquisition/files/SME00467',
-	'12',
+	'11',
 	'phil_cv_21.sh',
 	1,
 	NULL,
@@ -1241,6 +1704,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00467',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1274,6 +1748,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME14784',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1299,6 +1784,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00349',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1332,6 +1828,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00529',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1357,6 +1864,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00530',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1390,6 +1908,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00819',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1415,6 +1944,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME00848',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1448,6 +1988,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01390',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1473,6 +2024,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME01398',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1506,6 +2068,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11677',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1531,6 +2104,17 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11713',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );
@@ -1564,6 +2148,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11723',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1593,6 +2188,17 @@ VALUES(
 	NULL
 );
 
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME11724',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
 -- >
 -- >
 
@@ -1618,6 +2224,57 @@ VALUES(
 	'EventLog',
 	ARRAY['eventlog'], -- regex
 	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME14220',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
+	NULL,
+	NULL
+);
+
+-- >
+-- >
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
+VALUES (
+	'SME16076',
+	'10.144.233.17',
+	NULL,
+	'lftp',
+	'/home/prod/hhm_data_acquisition/files/SME16076',
+	'12',
+	'phil_cv_21.sh',
+	1,
+	NULL,
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16076',
+	'EventLog.txe',
+	'EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog'], -- tables
+	NULL,
+	NULL
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16076',
+	'lod_EventLog.txe',
+	'lod_EventLog',
+	ARRAY['eventlog'], -- regex
+	ARRAY['philips_cv_eventlog', 'lod'], -- tables
 	NULL,
 	NULL
 );

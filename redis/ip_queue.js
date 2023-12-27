@@ -5,10 +5,11 @@ const {
   tag: { cal, det, cat, seq, qaf },
 } = require("../utils/logger/enums");
 
-async function add_to_redis_queue(run_log, system) {
+async function add_to_redis_queue(job_id, run_log, system) {
   //const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
   let note = {
+    job_id,
     system_id: system.id,
   };
   await addLogEvent(I, run_log, "add_to_redis_queue", cal, note, null);
@@ -28,6 +29,7 @@ async function add_to_redis_queue(run_log, system) {
     ]);
     await redisClient.quit();
     let note = {
+      job_id,
       system_id: system.id,
       queue: "ip:queue",
       message: "Sent to Redis queue",
@@ -37,6 +39,7 @@ async function add_to_redis_queue(run_log, system) {
     console.log(error);
     await redisClient.quit();
     let note = {
+      job_id,
       system_id: system.id,
       queue: "ip:queue",
       message: "Queue insert failed",

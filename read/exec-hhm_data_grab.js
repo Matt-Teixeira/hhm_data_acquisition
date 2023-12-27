@@ -8,6 +8,7 @@ const {
 } = require("../utils/logger/enums");
 
 const exec_hhm_data_grab = async (
+  job_id,
   run_log,
   sme,
   execPath,
@@ -17,6 +18,7 @@ const exec_hhm_data_grab = async (
   ip_reset = false
 ) => {
   let note = {
+    job_id: job_id,
     system_id: system.id,
     execute_path: execPath,
     args
@@ -60,6 +62,7 @@ const exec_hhm_data_grab = async (
     console.log(stderr);
 
     let note = {
+      job_id: job_id,
       system_id: system.id,
       stdout,
       stderr
@@ -70,6 +73,7 @@ const exec_hhm_data_grab = async (
     // If connection is closed, return false. Any other error, return null.
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
       let note = {
+        job_id: job_id,
         system_id: system.id,
         stdout,
         stderr
@@ -81,7 +85,7 @@ const exec_hhm_data_grab = async (
       // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
       // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in heartbeat table
       if (ip_reset) {
-        await add_to_online_queue(run_log, {
+        await add_to_online_queue(job_id, run_log, {
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
@@ -92,12 +96,12 @@ const exec_hhm_data_grab = async (
       }
 
       system.data_source = "hhm";
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
 
       return false;
     }
 
-    await add_to_online_queue(run_log, {
+    await add_to_online_queue(job_id, run_log, {
       id: system.id,
       capture_datetime,
       successful_acquisition: true,
@@ -114,6 +118,7 @@ const exec_hhm_data_grab = async (
       connection_test_2.test(error.message)
     ) {
       let note = {
+        job_id,
         system_id: system.id
       };
 
@@ -121,7 +126,7 @@ const exec_hhm_data_grab = async (
 
       if (ip_reset) {
         console.log("In ip_reset");
-        await add_to_online_queue(run_log, {
+        await add_to_online_queue(job_id, run_log, {
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
@@ -132,7 +137,7 @@ const exec_hhm_data_grab = async (
       }
 
       system.data_source = "hhm";
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
 
       return false;
     }

@@ -8,6 +8,7 @@ const {
 } = require("../utils/logger/enums");
 
 const exec_list_dirs = async (
+  job_id,
   run_log,
   sme,
   path,
@@ -17,6 +18,7 @@ const exec_list_dirs = async (
   ip_reset
 ) => {
   let note = {
+    job_id,
     system_id: sme,
     args
   };
@@ -37,6 +39,7 @@ const exec_list_dirs = async (
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
       let note = {
+        job_id,
         system_id: sme,
         stdout,
         stderr
@@ -45,7 +48,7 @@ const exec_list_dirs = async (
       system.data_source = "hhm";
 
       if (ip_reset) {
-        await add_to_online_queue(run_log, {
+        await add_to_online_queue(job_id, run_log, {
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
@@ -55,11 +58,11 @@ const exec_list_dirs = async (
         return false;
       }
 
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
       return false;
     }
 
-    await add_to_online_queue(run_log, {
+    await add_to_online_queue(job_id, run_log, {
       id: system.id,
       capture_datetime,
       successful_acquisition: true,
@@ -75,11 +78,12 @@ const exec_list_dirs = async (
       connection_test_2.test(error.message)
     ) {
       let note = {
+        job_id,
         system_id: sme
       };
       await addLogEvent(E, run_log, "exec_list_dirs", cat, note, error);
       system.data_source = "hhm";
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
       return false;
     }
     return null;
