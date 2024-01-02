@@ -16,5 +16,4 @@ FROM
 WHERE
     manufacturer = $1
     AND modality LIKE $2
-    AND process_log = true
-    --AND pc.id IN ('SME00865', 'SME01442');
+    AND process_log = true;

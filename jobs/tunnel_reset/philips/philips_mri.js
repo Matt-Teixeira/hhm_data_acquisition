@@ -8,12 +8,13 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_philips_mri_data(
+  job_id,
   run_log,
   system,
   capture_datetime,
   ip_reset
 ) {
-  let note = { system: system };
+  let note = { job_id, system: system };
   try {
     addLogEvent(I, run_log, "get_philips_mri_data", cal, note, null);
 
@@ -32,6 +33,7 @@ async function get_philips_mri_data(
     const pass = decryptString(system_creds.password_enc);
 
     await exec_hhm_data_grab(
+      job_id,
       run_log,
       system.id,
       mri_path,

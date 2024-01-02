@@ -1,6 +1,8 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { get_phil_mri_host, getHhmCreds } = require("../../../sql/qf-provider");
 const { decryptString } = require("../../../util");
+const { v4: uuidv4 } = require("uuid");
+
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -20,7 +22,9 @@ async function get_philips_mri_data(run_log, capture_datetime) {
 
   const child_processes = [];
   for (const system of systems) {
+    const job_id = uuidv4();
     let note = {
+      job_id,
       system
     };
 
@@ -40,6 +44,7 @@ async function get_philips_mri_data(run_log, capture_datetime) {
         child_processes.push(
           async () =>
             await exec_hhm_data_grab(
+              job_id,
               run_log,
               system.id,
               mri_path,

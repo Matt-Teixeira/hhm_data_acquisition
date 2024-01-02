@@ -6,18 +6,20 @@ const {
 } = require("../../../utils/logger/enums");
 
 async function get_siemens_mri_data(
+  job_id,
   run_log,
   system,
   capture_datetime,
   ip_reset
 ) {
-  let note = { system: system };
+  let note = { job_id, system: system };
   try {
     addLogEvent(I, run_log, "get_siemens_mri_data", cal, note, null);
 
     const mri_path = `./read/sh/Siemens/${system.acquisition_script}`;
 
     await exec_hhm_data_grab(
+      job_id,
       run_log,
       system.id,
       mri_path,

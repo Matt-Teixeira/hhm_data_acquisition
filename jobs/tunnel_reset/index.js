@@ -16,7 +16,6 @@ const { v4: uuidv4 } = require("uuid");
 
 async function reset_tunnel(run_log) {
   const capture_datetime = captureDatetime();
-  const job_id = uuidv4();
   try {
     // Get Redis systems that need tunnel resets
     const ip_queue = await get_redis_ip_queue();
@@ -24,11 +23,11 @@ async function reset_tunnel(run_log) {
     // End if no systems in redis queue
     if (!ip_queue.length) {
       let note = { message: "No IP addresses in queue" };
-      addLogEvent(I, run_log, "reset_tunnel", det, note, null);
+      await addLogEvent(I, run_log, "reset_tunnel", det, note, null);
       return;
     }
 
-    addLogEvent(I, run_log, "reset_tunnel", cal, { ip_queue }, null);
+    await addLogEvent(I, run_log, "reset_tunnel", cal, { ip_queue }, null);
 
     // Parse system data to get array of ip addresses and ids
     const parsed_data = extract_ip(ip_queue);
@@ -38,7 +37,7 @@ async function reset_tunnel(run_log) {
       run_log,
       parsed_data.ip_addresses
     );
-    addLogEvent(
+    await addLogEvent(
       I,
       run_log,
       "reset_tunnel",
@@ -52,7 +51,7 @@ async function reset_tunnel(run_log) {
         message: "No tunnels assocciated with systems",
         systems: parsed_data.id
       };
-      addLogEvent(W, run_log, "reset_tunnel", det, note, null);
+      await addLogEvent(W, run_log, "reset_tunnel", det, note, null);
       return;
     }
     // Reset tunnels
@@ -70,6 +69,7 @@ async function reset_tunnel(run_log) {
     const jobs = [];
 
     for (const system of ip_queue) {
+      const job_id = uuidv4();
       // Check for possible duplicates in queue and prevent double runs
       // let is_duplicate = ran_systems.indexOf(system.id);
       // if (is_duplicate !== -1) continue;
@@ -97,19 +97,19 @@ async function reset_tunnel(run_log) {
         case "GE":
           jobs.push(
             async () =>
-              await get_ge_data(run_log, system, capture_datetime, true)
+              await get_ge_data(job_id, run_log, system, capture_datetime, true)
           );
           break;
         case "Philips":
           jobs.push(
             async () =>
-              await get_philips_data(run_log, system, capture_datetime, true)
+              await get_philips_data(job_id, run_log, system, capture_datetime, true)
           );
           break;
         case "Siemens":
           jobs.push(
             async () =>
-              await get_siemens_data(run_log, system, capture_datetime, true)
+              await get_siemens_data(job_id, run_log, system, capture_datetime, true)
           );
           break;
         default:

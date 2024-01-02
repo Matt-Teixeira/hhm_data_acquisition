@@ -1,5 +1,7 @@
 const exec_hhm_data_grab = require("../../../read/exec-hhm_data_grab");
 const { get_hhm } = require("../../../sql/qf-provider");
+const { v4: uuidv4 } = require("uuid");
+
 const [addLogEvent] = require("../../../utils/logger/log");
 const {
   type: { I, W, E },
@@ -15,7 +17,9 @@ async function get_siemens_mri_data(run_log, capture_datetime) {
 
   const child_processes = [];
   for await (const system of systems) {
+    const job_id = uuidv4();
     let note = {
+      job_id,
       system,
     };
     try {
@@ -26,6 +30,7 @@ async function get_siemens_mri_data(run_log, capture_datetime) {
         child_processes.push(
           async () =>
             await exec_hhm_data_grab(
+              job_id,
               run_log,
               system.id,
               mri_path,

@@ -14,7 +14,6 @@ async function get_philips_cv_data(run_log, capture_datetime) {
   const child_processes = [];
   try {
     await addLogEvent(I, run_log, "get_philips_cv_data", cal, null, null);
-
     const manufacturer = "Philips";
     const modality = "CV/IR";
     const systems = await get_hhm([manufacturer, modality]);
@@ -107,6 +106,8 @@ async function run_phil_cv(
       system,
       capture_datetime
     );
+
+  return;
 
   console.log("\ndaily_files_to_pull");
   console.log(daily_files_to_pull);
