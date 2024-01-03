@@ -19,8 +19,9 @@ async function reset_tunnel(run_log) {
   try {
     // Get Redis systems that need tunnel resets
     const ip_queue = await get_redis_ip_queue();
-    console.log(ip_queue);
+    
     // End if no systems in redis queue
+    
     if (!ip_queue.length) {
       let note = { message: "No IP addresses in queue" };
       await addLogEvent(I, run_log, "reset_tunnel", det, note, null);
@@ -31,6 +32,8 @@ async function reset_tunnel(run_log) {
 
     // Parse system data to get array of ip addresses and ids
     const parsed_data = extract_ip(ip_queue);
+
+    parsed_data.ip_addresses.push('172.18.41.23');
 
     // Group IP by tunnel id
     const tunnels_by_ip = await getTunnelsByIP(

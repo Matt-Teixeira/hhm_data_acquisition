@@ -3952,7 +3952,7 @@ VALUES(
 -- >
 -- >
 
-INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point)
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, alt_data_source)
 VALUES (
 	'SME16414',
 	'172.16.205.30',
@@ -3964,7 +3964,8 @@ VALUES (
 	1,
 	NULL,
 	NULL,
-	'host'
+	'host',
+	'[{"type": "he_level", "pg_table": "stt_magnet"}]'
 );
 
 INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)

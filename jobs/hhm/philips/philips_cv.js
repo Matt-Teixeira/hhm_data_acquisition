@@ -107,8 +107,6 @@ async function run_phil_cv(
       capture_datetime
     );
 
-  return;
-
   console.log("\ndaily_files_to_pull");
   console.log(daily_files_to_pull);
 
