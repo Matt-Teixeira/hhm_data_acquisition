@@ -1090,5 +1090,175 @@ VALUES
 { "ssh": { "host": "SME15810",
 "user_id": "avante",
 "ip_address": "172.31.3.34" },
-"rpp_configs": [{"pgTable": "mmb_edu2", "schedule": 6, "mmbScript": "v2_edu2", "regexModels": ["RE_EDU2_ROOM_PROBE_HUM_TEMP", "RE_EDU2_TEMP_PROBE_TEMPS"] } ] }
+"rpp_configs": [{"pgTable": "mmb_edu2", "schedule": 6, "mmbScript": "v2_edu2", "regexModels": ["RE_EDU2_ROOM_PROBE_HUM_TEMP", "RE_EDU2_TEMP_PROBE_TEMPS"] } ] } -->
 
+-->
+-->
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16268',
+		NULL,
+		'172.31.2.56',
+		'rsync',
+		'/home/staging/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME16268',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME16268',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_A'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		5,
+		NULL
+	);
+
+-->
+-->
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16270',
+		NULL,
+		'172.31.2.62',
+		'rsync',
+		'/home/staging/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME16270',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME16270',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_A'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		5,
+		NULL
+	);
+
+-->
+-->
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16266',
+		NULL,
+		'172.31.2.21',
+		'rsync',
+		'/home/staging/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME16266',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME16266',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_B'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		5,
+		NULL
+	);
