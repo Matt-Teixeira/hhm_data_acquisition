@@ -972,3 +972,282 @@ VALUES
 		5,
 		NULL
 	);
+
+-->
+-->
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16267',
+		NULL,
+		'172.31.2.49',
+		'rsync',
+		'/home/prod/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME16267',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME16267',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_A'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		5,
+		NULL
+	);
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME16267',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		-- regex
+		ARRAY ['mmb_edu2'],
+		-- tables
+		7
+	);
+
+-->
+-->
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16272',
+		NULL,
+		'172.31.0.20',
+		'rsync',
+		'/home/prod/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME16272',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME16272',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_B'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		5,
+		NULL
+	);
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME16272',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		-- regex
+		ARRAY ['mmb_edu2'],
+		-- tables
+		7
+	);
+
+-->
+-->
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16266',
+		NULL,
+		'172.31.2.21',
+		'rsync',
+		'/home/prod/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME16266',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME16266',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_A'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		5,
+		NULL
+	);
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME16266',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		-- regex
+		ARRAY ['mmb_edu2'],
+		-- tables
+		7
+	);
+
+-- >
+-- >
+
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME16932',
+		'10.46.211.160',
+		NULL,
+		'ssh',
+		'/home/prod/hhm_data_acquisition/files/SME16932',
+		'7',
+		'ge_cv_22.sh',
+		1,
+		NULL,
+		NULL,
+		NULL
+	);
+
+INSERT INTO
+	config.log (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+(
+		'SME16932',
+		'sysError.log',
+		'sysError',
+		ARRAY ['sys_error'],
+		ARRAY ['ge_cv_syserror'],
+		NULL,
+		NULL
+	);
