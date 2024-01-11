@@ -70,12 +70,10 @@ const onBoot = async () => {
     const manufacturer = process.argv[4] || null;
     const modality = process.argv[5] || null;
 
-    console.log(run_group, schedule, manufacturer, modality);
-
     // Supply one or more SMEs in first arg array, but must be same manufac. & modality
     if (run_group === "manual") {
       const capture_datetime = captureDatetime();
-      await run_system_manual(run_log, ["SME01392"], ["Philips", "CV/IR"], capture_datetime);
+      await run_system_manual(run_log, ["SME17372"], ["Philips", "CT"], capture_datetime);
     }
     if (run_group === "ip_sec") {
       await get_ip_sec_table();
@@ -90,6 +88,7 @@ const onBoot = async () => {
   } catch (error) {
     console.log(error);
     await addLogEvent(E, run_log, "onBoot", cat, null, error);
+    await writeLogEvents(run_log);
   }
 };
 
