@@ -1,4 +1,3 @@
-const { log } = require("../../../logger");
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const { add_to_redis_queue, add_to_online_queue } = require("../../../redis");
@@ -55,7 +54,7 @@ const execRsync = async (
     await addLogEvent(I, run_log, "execRsync", det, note, null);
 
     if (capture_datetime !== "ip_reset") {
-      await add_to_online_queue(run_log, {
+      await add_to_online_queue(job_id, run_log, {
         id: sme,
         capture_datetime,
         successful_acquisition: true,
@@ -88,7 +87,7 @@ const execRsync = async (
       // Reason: In initial data pull, if connection issue occurs, just send to ip:queue and make second attempt.
       // If connection issue occurs on second attempt (ip reset job), place in online:queue to then place in alert.offline table
       if (ip_reset) {
-        await add_to_online_queue(run_log, {
+        await add_to_online_queue(job_id, run_log, {
           id: system.id,
           capture_datetime,
           successful_acquisition: false,
@@ -98,7 +97,7 @@ const execRsync = async (
         return null;
       }
 
-      await add_to_redis_queue(run_log, system);
+      await add_to_redis_queue(job_id, run_log, system);
 
       return null;
     }

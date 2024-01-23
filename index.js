@@ -1,5 +1,6 @@
 ("use strict");
 require("dotenv").config();
+const pgp = require("pg-promise")();
 const rsync_philips_mri = require("./jobs/philips_mri/rsync_philips-mri");
 const onBootMMB = require("./jobs/mmb");
 const get_hhm_data = require("./jobs/hhm");
@@ -81,13 +82,14 @@ const onBoot = async () => {
 
     await runJob(run_log, run_group, schedule, manufacturer, modality);
 
-    //await setTimeout(60_000);
+    await dbInsertLogEvents(pgp, run_log);
     await writeLogEvents(run_log);
     console.log("\n********** END **********");
     console.timeEnd("App Run Time");
   } catch (error) {
     console.log(error);
     await addLogEvent(E, run_log, "onBoot", cat, null, error);
+    await dbInsertLogEvents(pgp, run_log);
     await writeLogEvents(run_log);
   }
 };
