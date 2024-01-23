@@ -1336,7 +1336,6 @@ VALUES
 
 -->
 -->
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1412,7 +1411,6 @@ VALUES
 
 -->
 -->
-
 INSERT INTO
 	config.acquisition(
 		system_id,
@@ -1484,4 +1482,112 @@ VALUES
 		ARRAY ['mmb_edu2'],
 		-- tables
 		7
+	);
+
+-->
+-->
+INSERT INTO
+	config.acquisition(
+		system_id,
+		host_ip,
+		mmb_ip,
+		protocal,
+		debian_server_path,
+		credentials_group,
+		acquisition_script,
+		run_group,
+		host,
+		user_id,
+		acqu_point
+	)
+VALUES
+	(
+		'SME10815',
+		NULL,
+		'170.232.106.98',
+		'rsync',
+		'/home/staging/hhm_data_acquisition/files',
+		NULL,
+		NULL,
+		NULL,
+		'SME10815',
+		'avante',
+		NULL
+	);
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME10815',
+		'v2_rdu_9600',
+		NULL,
+		ARRAY [
+        'RE_SIEMENS_MSUP_META',
+        'RE_SIEMENS_OR_CODE',
+        'RE_SIEMENS_FIELD_CURRENT',
+        'RE_SIEMENS_HOST_TIME_DATE',
+        'RE_SIEMENS_TEST_TIME',
+        'RE_SIEMENS_LVQD',
+        'RE_SIEMENS_HE_PARAMS',
+        'RE_SIEMENS_HE_VALUES_UNIFIED',
+        'RE_SIEMENS_HE_STATUS',
+        'RE_SIEMENS_EIS_STATUS',
+        'RE_SIEMENS_FIELD',
+        'RE_SIEMENS_SELF_TEST',
+        'RE_SIEMENS_BATTERY_STATUS',
+        'RE_SIEMENS_SH_STATUS',
+        'RE_SIEMENS_BATTERY_VOLTS',
+        'RE_SIEMENS_PRESS_HTR',
+        'RE_SIEMENS_COMPRESSOR_STATUS',
+        'RE_SIEMENS_COMPRESSOR_VALUE',
+        'RE_SIEMENS_PRESS_SW_STATUS',
+        'RE_SIEMENS_COLDHEAD',
+        'RE_SIEMENS_SHIELD_LINK_BORE',
+        'RE_SIEMENS_TURRET',
+        'RE_SIEMENS_CCR_S1_S2',
+        'RE_SIEMENS_CCR_S3_S4',
+        'RE_SIEMENS_SWT_HTR',
+        'RE_SIEMENS_QUH_HTR',
+        'RE_SIEMENS_MAG_PSI_A',
+        'RE_SIEMENS_AVG_PWR',
+        'RE_SIEMENS_ERDU_STATUS',
+        'RE_SIEMENS_ERDU_STATUS_ARRAY',
+        'RE_SIEMENS_TESTS',
+        'RE_SIEMENS_I_BTN'
+      ],
+		-- regex
+		ARRAY ['mmb_siemens'],
+		-- tables
+		NULL,
+		1,
+		NULL
+	);
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10815',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		-- regex
+		ARRAY ['mmb_edu2'],
+		-- tables
+		6
 	);
