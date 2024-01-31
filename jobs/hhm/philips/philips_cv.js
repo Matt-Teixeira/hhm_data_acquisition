@@ -107,12 +107,6 @@ async function run_phil_cv(
       capture_datetime
     );
 
-  console.log("\ndaily_files_to_pull");
-  console.log(daily_files_to_pull);
-
-  console.log("\nlod_files_to_pull");
-  console.log(lod_files_to_pull);
-
   if (daily_files_to_pull !== null) {
     for await (const file of daily_files_to_pull) {
       await exec_phil_cv_data_grab(
@@ -128,7 +122,9 @@ async function run_phil_cv(
     }
   }
 
-  if (lod_files_to_pull !== null) {
+
+
+  if (lod_files_to_pull !== null && system.id !== "SME14220") {
     for await (const file of lod_files_to_pull) {
       await exec_phil_cv_data_grab(
         job_id,
@@ -143,7 +139,7 @@ async function run_phil_cv(
     }
   }
 
-  if (daily_files_to_pull !== null) {
+  if (daily_files_to_pull !== null && system.id !== "SME14220") {
     for await (const file of daily_files_to_pull) {
       await get_trace_files(
         job_id,
