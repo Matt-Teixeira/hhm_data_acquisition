@@ -80,5 +80,4 @@ async function get_ge_ct_data(run_log, capture_datetime) {
     );
   }
 }
-
 module.exports = get_ge_ct_data;

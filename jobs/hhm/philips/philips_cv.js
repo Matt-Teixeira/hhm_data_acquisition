@@ -124,7 +124,7 @@ async function run_phil_cv(
 
 
 
-  if (lod_files_to_pull !== null && system.id !== "SME14220") {
+  if (lod_files_to_pull !== null) {
     for await (const file of lod_files_to_pull) {
       await exec_phil_cv_data_grab(
         job_id,
@@ -139,7 +139,7 @@ async function run_phil_cv(
     }
   }
 
-  if (daily_files_to_pull !== null && system.id !== "SME14220") {
+  if (daily_files_to_pull !== null) {
     for await (const file of daily_files_to_pull) {
       await get_trace_files(
         job_id,
