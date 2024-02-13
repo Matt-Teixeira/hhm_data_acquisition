@@ -1,5 +1,5 @@
-INSERT INTO
-	config.acquisition(
+INSERT
+	INTOSME15819 config.acquisition(
 		system_id,
 		host_ip,
 		mmb_ip,
@@ -1590,4 +1590,411 @@ VALUES
 		ARRAY ['mmb_edu2'],
 		-- tables
 		6
+	);
+
+-->
+-->
+UPDATE
+	config.acquisition
+SET
+	mmb_ip = '10.254.15.228',
+	host = 'SME10229',
+	user_id = 'avante'
+WHERE
+	system_id = 'SME10229';
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10229',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		6
+	);
+
+-->
+-->
+UPDATE
+	config.edu
+SET
+	file_name = 'v2_edu2',
+	regex_models = ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+	pg_tables = ARRAY ['mmb_edu2'],
+WHERE
+	system_id = 'SME10230';
+
+
+
+-->
+-->
+UPDATE
+	config.acquisition
+SET
+	mmb_ip = '10.254.7.228',
+	host = 'SME10232',
+	user_id = 'avante'
+WHERE
+	system_id = 'SME10232';
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10232',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		7
+	);
+
+-->
+-->
+UPDATE
+	config.acquisition
+SET
+	mmb_ip = '10.2.103.228',
+	host = 'SME10239',
+	user_id = 'avante'
+WHERE
+	system_id = 'SME10239';
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10239',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		6
+	);
+
+
+-->
+-->
+UPDATE
+	config.edu
+SET
+	file_name = 'v2_edu2',
+	regex_models = ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+	pg_tables = ARRAY ['mmb_edu2'],
+WHERE
+	system_id = 'SME10242';
+
+-->
+-->
+UPDATE
+	config.edu
+SET
+	file_name = 'v2_edu2',
+	regex_models = ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+	pg_tables = ARRAY ['mmb_edu2'],
+WHERE
+	system_id = 'SME10243';
+
+-->
+-->
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10252',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		7
+	);
+
+-->
+-->
+UPDATE
+	config.edu
+SET
+	file_name = 'v2_edu2',
+	regex_models = ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+	pg_tables = ARRAY ['mmb_edu2']
+WHERE
+	system_id = 'SME10253';
+
+
+-->
+-->
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10254',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		7
+	);
+
+-->
+-->
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME10255',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		6
+	);
+
+-->
+-->
+UPDATE
+	config.edu
+SET
+	file_name = 'v2_edu2',
+	regex_models = ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+	pg_tables = ARRAY ['mmb_edu2']
+WHERE
+	system_id = 'SME12489';
+
+-->
+-->
+UPDATE
+	config.acquisition
+SET
+	mmb_ip = '10.73.61.101',
+	protocal = 'rsync',
+	host = 'SME12631',
+	user_id = 'avante'
+WHERE
+	system_id = 'SME12631'
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME12631',
+		'v3_ge_mm3',
+		NULL,
+		ARRAY ['RE_GE_MM3_A'],
+		-- regex
+		ARRAY ['mmb_ge_mm3'],
+		-- tables
+		NULL,
+		1,
+		NULL
+	);
+
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME12631',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		6
+	);
+
+-->
+-->
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME16268',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		7
+	);
+
+-->
+-->
+INSERT INTO
+	config.edu (
+		system_id,
+		file_name,
+		regex_models,
+		pg_tables,
+		schedule
+	)
+VALUES
+	(
+		'SME16270',
+		'v2_edu2',
+		ARRAY ['RE_EDU2_COMP_VIB', 'RE_EDU2_ROOM_PROBE_HUM_TEMP', 'RE_EDU2_TEMP_PROBE_TEMPS'],
+		ARRAY ['mmb_edu2'],
+		7
+	);
+
+-->
+-->
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME11246',
+		'v2_rdu_9600',
+		NULL,
+		ARRAY [
+        	'RE_SIEMENS_MSUP_META',
+            'RE_SIEMENS_HOST_TIME_DATE',
+            'RE_SIEMENS_TEST_TIME',
+            'RE_SIEMENS_LVQD',
+            'RE_SIEMENS_MAG_SN',
+            'RE_SIEMENS_HE_PARAMS',
+            'RE_SIEMENS_FIELD',
+            'RE_SIEMENS_SELF_TEST',
+            'RE_SIEMENS_SH_STATUS',
+            'RE_SIEMENS_BATTERY_VOLTS',
+            'RE_SIEMENS_COMPRESSOR_STATUS',
+            'RE_SIEMENS_COMPRESSOR_VALUE',
+            'RE_SIEMENS_PRESS_SW_STATUS',
+            'RE_SIEMENS_ERDU_STATUS',
+            'RE_SIEMENS_EPM',
+            'RE_SIEMENS_AVG_PWR',
+            'RE_SIEMENS_MAG_PSI_A',
+            'RE_SIEMENS_SWT_HTR',
+            'RE_SIEMENS_CCR_S3_S4',
+            'RE_SIEMENS_TURRET',
+            'RE_SIEMENS_SHIELD_LINK_BORE',
+            'RE_SIEMENS_I_BTN',
+            'RE_SIEMENS_QUH_HTR',
+            'RE_SIEMENS_ERDU_STATUS_ARRAY',
+            'RE_SIEMENS_OR_CODE',
+            'RE_SIEMENS_FIELD_CURRENT',
+            'RE_SIEMENS_MSUP',
+            'RE_SIEMENS_CCR_S1_S2',
+            'RE_SIEMENS_HE_VALUES_UNIFIED'
+      ],
+		-- regex
+		ARRAY ['mmb_siemens'],
+		-- tables
+		NULL,
+		1,
+		NULL
+	);
+
+-->
+-->
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		schedule,
+		agg
+	)
+VALUES
+	(
+		'SME10844',
+		'v2_rdu_9600',
+		NULL,
+		ARRAY [
+        	'RE_SIEMENS_MSUP_META',
+            'RE_SIEMENS_HOST_TIME_DATE',
+            'RE_SIEMENS_TEST_TIME',
+            'RE_SIEMENS_LVQD',
+            'RE_SIEMENS_MAG_SN',
+            'RE_SIEMENS_HE_PARAMS',
+            'RE_SIEMENS_HE_STATUS',
+            'RE_SIEMENS_FIELD',
+            'RE_SIEMENS_SELF_TEST',
+            'RE_SIEMENS_SH_STATUS',
+            'RE_SIEMENS_BATTERY_VOLTS',
+            'RE_SIEMENS_COMPRESSOR_STATUS',
+            'RE_SIEMENS_COMPRESSOR_VALUE',
+            'RE_SIEMENS_PRESS_SW_STATUS',
+            'RE_SIEMENS_SHIELD_LINK_BORE',
+            'RE_SIEMENS_TURRET',
+            'RE_SIEMENS_CCR_S3_S4',
+            'RE_SIEMENS_SWT_HTR',
+            'RE_SIEMENS_MAG_PSI_A',
+            'RE_SIEMENS_AVG_PWR',
+            'RE_SIEMENS_EPM',
+            'RE_SIEMENS_ERDU_STATUS',
+            'RE_SIEMENS_I_BTN',
+            'RE_SIEMENS_QUH_HTR',
+            'RE_SIEMENS_ERDU_STATUS_ARRAY',
+            'RE_SIEMENS_OR_CODE',
+            'RE_SIEMENS_MSUP',
+            'RE_SIEMENS_FIELD_CURRENT',
+            'RE_SIEMENS_CCR_S1_S2',
+            'RE_SIEMENS_HE_VALUES_UNIFIED'
+      ],
+		-- regex
+		ARRAY ['mmb_siemens'],
+		-- tables
+		NULL,
+		1,
+		NULL
 	);

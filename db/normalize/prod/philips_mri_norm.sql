@@ -16,6 +16,29 @@ VALUES (
 	'host'
 );
 
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+(
+		'SME01138',
+		'STT_MAGNET.txt',
+		'stt_magnet',
+		ARRAY ['stt_magnet'],
+		-- regex
+		ARRAY ['stt_magnet'],
+		-- tables
+		NULL,
+		NULL
+	);
+
 INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
 VALUES(
 	'SME01138',
@@ -5544,4 +5567,195 @@ VALUES(
 	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
 	'quenched_state',
 	'bool'
+);
+
+-->
+-->
+
+UPDATE
+	config.acquisition
+SET
+	system_id = 'SME16432',
+	host_ip = '172.16.38.111',
+	debian_server_path = '/home/prod/hhm_data_acquisition/files/SME16432',
+	credentials_group = '15',
+	acquisition_script = 'phil_mri_data_grab_3.sh',
+	run_group = 1,
+	acqu_point = 'host'
+WHERE 
+	system_id = 'SME16432';
+
+INSERT INTO
+	config.mag (
+		system_id,
+		file_name,
+		dir_name,
+		regex_models,
+		pg_tables,
+		column_name,
+		agg
+	)
+VALUES
+(
+		'SME16432',
+		'STT_MAGNET.txt',
+		'stt_magnet',
+		ARRAY ['stt_magnet'],
+		-- regex
+		ARRAY ['stt_magnet'],
+		-- tables
+		NULL,
+		NULL
+	);
+
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'rmmu_magnet',
+	'rmmu_magnet',
+	ARRAY['rmmu_magnet_re', 'rmmu_meta_data'], -- regex
+	ARRAY['philips_mri_rmmu_magnet'], -- tables
+	NULL,
+	NULL
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'rmmu_short',
+	'rmmu_short',
+	ARRAY['rmmu_short_re', 'rmmu_meta_data'], -- regex
+	ARRAY['philips_mri_rmmu_short'], -- tables
+	NULL,
+	NULL
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'rmmu_long',
+	'rmmu_long',
+	ARRAY['rmmu_long_re', 'rmmu_meta_data'], -- regex
+	ARRAY['philips_mri_rmmu_long'], -- tables
+	NULL,
+	NULL
+);
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'logcurrent.log',
+	'logcurrent',
+	ARRAY['mri_logcurrent'], -- regex
+	ARRAY['philips_mri_logcurrent'], -- tables
+	NULL,
+	NULL
+);
+-- > MONITORING
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_System_HumTechRoom.dat',
+	'monitoring',
+	ARRAY['monitor_System_HumTechRoom'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'tech_room_humidity_value',
+	'max'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_System_TempTechRoom.dat',
+	'monitoring',
+	ARRAY['monitor_System_TempTechRoom'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'tech_room_temp_value',
+	'max'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_cryocompressor_cerr.dat',
+	'monitoring',
+	ARRAY['monitor_cryocompressor_cerr'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'cryo_comp_comm_error_state',
+	'bool'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_cryocompressor_palm.dat',
+	'monitoring',
+	ARRAY['monitor_cryocompressor_palm'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'cryo_comp_press_alarm_state',
+	'bool'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_cryocompressor_talm.dat',
+	'monitoring',
+	ARRAY['monitor_cryocompressor_talm'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'cryo_comp_temp_alarm_state',
+	'bool'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_cryocompressor_time_status.dat',
+	'monitoring',
+	ARRAY['monitor_cryocompressor_time_status'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'cryo_comp_malf_value',
+	'max'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_magnet_helium_level_value.dat',
+	'monitoring',
+	ARRAY['monitor_magnet_helium_level_value'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'helium_level_value',
+	'min'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_magnet_lt_boiloff.dat',
+	'monitoring',
+	ARRAY['monitor_magnet_lt_boiloff'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'long_term_boil_off_value',
+	'max'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_magnet_pressure_dps.dat',
+	'monitoring',
+	ARRAY['monitor_magnet_pressure_dps'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'mag_dps_status_value',
+	'max'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_magnet_quench.dat',
+	'monitoring',
+	ARRAY['monitor_magnet_quench'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'quenched_state',
+	'bool'
+);
+INSERT INTO config.mag (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME16432',
+	'monitor_magnet_pressure_avg.dat',
+	'monitoring',
+	ARRAY['monitor_magnet_pressure_avg'], -- regex
+	ARRAY['philips_mri_json', 'philips_mri_monitoring_data'], -- tables
+	'he_psi_avg_value',
+	'max'
 );
