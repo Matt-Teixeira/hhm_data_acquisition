@@ -232,7 +232,7 @@ async function list_new_lod_files(
 
   if (!new_lod_file.length) return null;
 
-  return [new_lod_file];
+  return new_lod_file;
 }
 
 module.exports = list_new_phil_cv_files;
