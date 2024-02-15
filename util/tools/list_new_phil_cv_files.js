@@ -225,7 +225,7 @@ async function list_new_lod_files(
   // prev_lod_index < 0 MEANS PREVIOUS FILE NOT FOUND - We want to pull something so 
   if (prev_lod_index < 0) {
     const new_lod_file = lod_dirs[lod_dirs.length - 1];
-    return new_lod_file;
+    return [new_lod_file];
   }
 
   const new_lod_file = lod_dirs.slice(prev_lod_index + 1);
