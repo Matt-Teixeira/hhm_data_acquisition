@@ -30,12 +30,6 @@ const exec_list_dirs = async (
   try {
     const { stdout, stderr } = await execFile(path, args);
 
-    console.log("\n ************* stdout");
-    console.log(stdout);
-
-    console.log("\n ************* stderr");
-    console.log(stderr);
-
     // If connection is closed, return false
     if (connection_test_1.test(stderr) || connection_test_2.test(stderr)) {
       let note = {

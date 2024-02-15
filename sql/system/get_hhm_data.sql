@@ -1,7 +1,7 @@
 SELECT
-    pc.id,
-    pc.manufacturer,
-    pc.modality,
+    sys.id,
+    sys.manufacturer,
+    sys.modality,
     ac.host_ip,
     ac.vpn,
     ac.acqu_point,
@@ -11,8 +11,8 @@ SELECT
     ac.host_path,
     ac.cerb_file
 FROM
-    systems pc
-    JOIN config.acquisition ac ON pc.id = ac.system_id
+    systems sys
+    JOIN config.acquisition ac ON sys.id = ac.system_id
 WHERE
     manufacturer = $1
     AND modality LIKE $2

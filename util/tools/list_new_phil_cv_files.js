@@ -118,7 +118,7 @@ async function list_new_daily_files(
   // END: identifying daily directory to pull
 
   // BEGIN: determin wether or not to pull lod file
-    // ???
+  // ???
   // END: determin wether or not to pull lod file
 
   if (!last_files.length) return null;
@@ -137,7 +137,6 @@ async function list_new_lod_files(
   capture_datetime,
   ip_reset
 ) {
-
   let note = {
     job_id,
     system_id: sme,
@@ -165,9 +164,9 @@ async function list_new_lod_files(
   const dirs = files_list.split(" ");
   if (!dirs) return null;
 
-  // Runs if block if no Redis reference - returns last (newest) valid dir for this system
+  // Runs if block if no Redis reference - returns oldest valid lod dir for this system
   if (!previous_lod_file) {
-    let last_file = "";
+    /* let last_file = "";
     for (let i = dirs.length - 1; i > 0; i--) {
       const matching_file = lod_re.test(dirs[i]);
       if (matching_file) {
@@ -180,14 +179,29 @@ async function list_new_lod_files(
     // account for no lod dir
     if (last_file === "") return null;
 
-    return [last_file];
+    return [last_file]; */
+
+    let first_lod_file = "";
+    for (let i = 0; i < dirs.length; i++) {
+      const matching_file = lod_re.test(dirs[i]);
+      if (matching_file) {
+        first_lod_file = dirs[i];
+        first_lod_file = first_lod_file.trim();
+        break;
+      }
+    }
+
+    // account for no lod dir
+    if (first_lod_file === "") return null;
+
+    return [first_lod_file];
   }
 
   // Group lod directories
 
   const lod_dirs = [];
 
-  for (let i = dirs.length - 1; i > 0; i--) {
+  for (let i = 0; i < dirs.length; i++) {
     const matching_file = lod_re.test(dirs[i]);
     if (matching_file) {
       lod_dirs.push(dirs[i]);
@@ -196,7 +210,8 @@ async function list_new_lod_files(
 
   let prev_lod_index = lod_dirs.indexOf(previous_lod_file);
 
-  if (prev_lod_index < 0) {
+  // Account for not found previous lod dir
+  if (prev_lod_index < 0 || lod_dirs.length <= 1) {
     let note = {
       job_id,
       message: "Previous lod file not found",
@@ -206,11 +221,11 @@ async function list_new_lod_files(
     return null;
   }
 
-  const new_lod_files = lod_dirs.slice(prev_lod_index + 1);
+  const new_lod_file = lod_dirs.slice(prev_lod_index + 1);
 
-  if (!new_lod_files.length) return null;
+  if (!new_lod_file.length) return null;
 
-  return new_lod_files;
+  return new_lod_file;
 }
 
 module.exports = list_new_phil_cv_files;

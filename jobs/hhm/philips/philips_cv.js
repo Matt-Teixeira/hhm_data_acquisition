@@ -10,6 +10,9 @@ const {
   tag: { cal, det, cat, seq, qaf }
 } = require("../../../utils/logger/enums");
 
+// New lod directory grab implemented STAGING: 2/15/2024
+// New lod directory grab implemented PROD: 
+
 async function get_philips_cv_data(run_log, capture_datetime) {
   const child_processes = [];
   try {
@@ -18,6 +21,8 @@ async function get_philips_cv_data(run_log, capture_datetime) {
     const modality = "CV/IR";
     const systems = await get_hhm([manufacturer, modality]);
     const credentials = await getHhmCreds([manufacturer, modality]);
+
+    console.log(systems);
 
     for (const system of systems) {
       const job_id = uuidv4();
@@ -76,23 +81,23 @@ async function run_phil_cv(
   const user = decryptString(system_creds.user_enc);
   const pass = decryptString(system_creds.password_enc);
 
+  // GET PREVIOUS DAILY DIR PULLED FROM HOST STORED IN REDIS - Example: daily_2023_06_19 or daily_20230619
   const last_aquired_dir = await get_previous_dir(
     job_id,
     run_log,
     system.id,
     "last_phil_cv_daily"
   );
-  // Example: daily_2023_06_19 or daily_20230619
 
+  // GET PREVIOUS LOD DIR PULLED FROM HOST STORED IN REDIS - Example: lod_20231114_0953
   const last_lod_file = await get_previous_dir(
     job_id,
     run_log,
     system.id,
     "last_phil_cv_lod"
   );
-  // Example: lod_20231114_0953
 
-  // Pass last_aquired_dir to list new files post last_aquired_dir
+  // PASS IN PREVIOUS FILE NAMES AND RETURN 1 OR MORE LOD OR DAILY DIRs TO PULL
   const { daily_files_to_pull, lod_files_to_pull } =
     await list_new_phil_cv_files(
       job_id,
@@ -121,8 +126,6 @@ async function run_phil_cv(
       );
     }
   }
-
-
 
   if (lod_files_to_pull !== null) {
     for await (const file of lod_files_to_pull) {
