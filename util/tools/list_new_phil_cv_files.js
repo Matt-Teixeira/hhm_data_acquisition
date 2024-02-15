@@ -210,8 +210,8 @@ async function list_new_lod_files(
 
   let prev_lod_index = lod_dirs.indexOf(previous_lod_file);
 
-  // Account for not found previous lod dir
-  if (prev_lod_index < 0 || lod_dirs.length <= 1) {
+  // Account no lod
+  if(lod_dirs.length < 1) {
     let note = {
       job_id,
       message: "Previous lod file not found",
@@ -221,11 +221,18 @@ async function list_new_lod_files(
     return null;
   }
 
+  // Account for not found previous lod dir
+  // prev_lod_index < 0 MEANS PREVIOUS FILE NOT FOUND - We want to pull something so 
+  if (prev_lod_index < 0) {
+    const new_lod_file = lod_dirs[lod_dirs.length - 1];
+    return new_lod_file;
+  }
+
   const new_lod_file = lod_dirs.slice(prev_lod_index + 1);
 
   if (!new_lod_file.length) return null;
 
-  return new_lod_file;
+  return [new_lod_file];
 }
 
 module.exports = list_new_phil_cv_files;
