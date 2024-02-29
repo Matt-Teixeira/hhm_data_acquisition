@@ -1045,3 +1045,30 @@ VALUES(
 
 -->
 -->
+
+INSERT INTO config.acquisition(system_id, host_ip, mmb_ip, protocal, debian_server_path, credentials_group, acquisition_script, run_group, host, user_id, acqu_point, file_version)
+VALUES (
+	'SME18032',
+	'192.168.1.229',
+	NULL,
+	'lftp',
+	'/home/staging/hhm_data_acquisition/files/SME18032',
+	NULL,
+	'siemens_80_data_grab.sh',
+	1,
+	NULL,
+	NULL,
+	NULL,
+	'win_10'
+);
+
+INSERT INTO config.log (system_id, file_name, dir_name, regex_models, pg_tables, column_name, agg)
+VALUES(
+	'SME18032',
+	'Application.log',
+	'Application',
+	ARRAY['re_v1'], -- regex
+	ARRAY['siemens_ct'], -- tables
+	NULL,
+	NULL
+);
