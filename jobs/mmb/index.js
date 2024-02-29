@@ -46,7 +46,7 @@ const runJob = async (run_log, config, capture_datetime) => {
 
     // **************************************************** READ ****************************************************
     // RSYNC FILE FROM REMOTE TO LOCAL AND GET THE NEWLY SYNC FILE SIZE
-    console.log(`./files/${sme}.${mmbScript}.log`);
+    // console.log(`./files/${sme}.${mmbScript}.log`);
     const rsyncShPath = `./jobs/mmb/read/sh/rsync_mmb.sh`;
     const rsyncLocalPath = `./files/${sme}.${mmbScript}.log`; // EX. /home/prod/mmb-rpp/files/SME01113/v2_rdu_9600.log
     const rsyncRemotePath = `${mmbScript}.log`; // EX. v2_rdu_9600.log -> ~/v2_rdu_9600.log -> /home/avante/v2_rdu_9600.log
@@ -68,8 +68,8 @@ const runJob = async (run_log, config, capture_datetime) => {
       config.vpn
     );
 
-    console.log("\nFile Size After Rsync");
-    console.log(fileSizeAfterRsync);
+    // console.log("\nFile Size After Rsync");
+    // console.log(fileSizeAfterRsync);
 
     // HALT JOB DUE TO BAD fileSizeAfterRsync
     if (fileSizeAfterRsync === null) {
