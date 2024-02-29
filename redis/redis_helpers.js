@@ -23,9 +23,7 @@ async function get_previous_dir(job_id, run_log, sme, type) {
   );
   try {
     const getKey = `${sme}.${type}`;
-    console.log("\ngetKey: get_previous_dir");
-    console.log(getKey);
-    console.log("\n");
+
     const directory = await redisClient.get(getKey);
     await redisClient.quit();
 

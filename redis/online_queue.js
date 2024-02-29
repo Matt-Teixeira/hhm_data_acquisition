@@ -14,8 +14,8 @@ async function add_to_online_queue(job_id, run_log, system) {
   };
   await addLogEvent(I, run_log, "add_to_online_queue", cal, note, null);
 
-  console.log("System sent to online:queue");
-  console.log(system);
+  // console.log("System sent to online:queue");
+  // console.log(system);
 
   const redisClient = await initRedis(
     process.env.REDIS_PORT,
