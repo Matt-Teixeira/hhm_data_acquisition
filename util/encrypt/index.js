@@ -16,12 +16,10 @@ function decryptString(encryptedText) {
   return decrypted;
 }
 
-/*
-let user = decryptString("5ca00ad0c8ac54d2746e9afaa0df329f");
-let pass = decryptString("7f7fc85e3ae2943738b6f0f9659c63e7");
+/* let user = decryptString("d0abf2ee77ab55cf3399c4803dad8cb9");
+let pass = decryptString("e916c81b9abf1adeb79ba47a5ac64364");
 
 console.log("USER: " + user);
-console.log("PASS: " + pass);
-*/
+console.log("PASS: " + pass); */
 
 module.exports = { encryptString, decryptString };
