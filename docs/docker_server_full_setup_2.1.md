@@ -108,14 +108,15 @@ a dev server, `STAGING_docker`/`STAGING` on staging (shown), `PROD_docker` when 
 exists. The `main` repos are the same branch on every server.
 
 **Every migrated repo's checkout lives at `~/apps/<app>`; `/opt/apps/<app>` is
-`build-release.sh` output, NOT a repo.** Only imprivata-poc and acquisition-v2
-are still checkouts under `/opt/apps`.
+`build-release.sh` output, NOT a repo.** Only imprivata-poc is still a
+checkout under `/opt/apps` (acquisition-v2, the other one, was removed
+2026-09-01 — see below).
 
 | Repo | Branch on acq-vm-0 (staging) |
 |---|---|
 | data_acquisition, monday, part-source-pipeline, acumatica_sync, hhm_rpp_ge, hhm_rpp_philips, hhm_rpp_siemens, reports (**all migrated** — clone in `~/apps`) | `STAGING_docker` |
 | redis-admin, pg_manage_v2 (**migrated** — clone in `~/apps`) | `STAGING` |
-| incident-engine, ops-dashboard (**migrated** — clone in `~/apps`); acquisition-v2, imprivata-poc (checkouts in `/opt/apps`) | `main` (no env branches) |
+| incident-engine, ops-dashboard (**migrated** — clone in `~/apps`); imprivata-poc (checkout in `/opt/apps`) | `main` (no env branches) |
 | odd-jobs | **not a git checkout on this box** — Jonathan deploys it; see PARTITION MAINTENANCE |
 
 Other standing conventions:
@@ -1140,7 +1141,7 @@ ORDER BY 1, 2;
 ```bash
 APPS="data_acquisition hhm_rpp_ge hhm_rpp_philips hhm_rpp_siemens \
 acumatica_sync monday reports part-source-pipeline incident-engine ops-dashboard \
-acquisition-v2 odd-jobs mmb-rpp alert-processor alert-notify"
+odd-jobs mmb-rpp alert-processor alert-notify"
 
 sudo mkdir -p /opt/resources/acqu_files
 sudo chgrp -R docker /opt/resources/acqu_files
@@ -1163,10 +1164,15 @@ deps in-tree, per copy) — do NOT create it on a new server. On acq-vm-0 the ol
 per-app cache dirs still exist as orphans awaiting cleanup (follow-up 15).
 
 App status notes:
-- **acquisition-v2** — strangler-fig replacement for data_acquisition; **paused**
-  (its totalizer cron line is commented out — re-verified 2026-08-18 after it was
-  found accidentally re-enabled; its `.env` deliberately holds a stale DB password
-  until revival).
+- **acquisition-v2** — **REMOVED from this server 2026-09-01** (owner decision:
+  leftover from a refactor, not coming back here). It was the paused strangler-fig
+  replacement for data_acquisition; its totalizer line had been commented out since
+  the 2026-07-13 rollback and data_acquisition has owned that job since. Deleted:
+  the `/opt/apps/acquisition-v2` checkout, `/opt/run-logs/acquisition-v2`, the
+  `node_mod_cache` dir, and the `acquisition-v2:staging` image. The code still
+  lives at `git@github.com:Matt-Teixeira/data_acquisition-v2.git` — nothing was
+  lost, the checkout was clean and in sync with `origin/main`. Do not recreate it
+  here without a new decision.
 - **odd-jobs** — Jonathan's app, **out of scope, never modify** — but it owns
   partition maintenance (next section), so it must exist and run on any server that
   hosts the database.
@@ -1982,8 +1988,8 @@ resolve before any production use.
 # STEP 9: SCHEDULES
 
 The complete, live crontab (owner: `matt-teixeira`) with the stagger design, the
-incident-engine deploy-worktree requirement, the acquisition-v2 pause note, and
-install/rollback commands lives in **`docs/schedules.md`** — treat that file as the
+incident-engine deploy-worktree requirement, and install/rollback commands
+lives in **`docs/schedules.md`** — treat that file as the
 manifest: **a schedule that is not in it does not exist**, and it must be kept in
 sync with `crontab -l`.
 

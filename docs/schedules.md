@@ -65,9 +65,9 @@ other's DB/Redis load peaks:
 - **Not cron-shaped:** `ops-dashboard` (long-running service),
   `pg_manage_v2` (its two jobs ARE the maintenance lines below),
   `redis-admin` (no jobs), `imprivata-poc` (manual PoC).
-- **acquisition-v2** — paused strangler-fig; its totalizer line stays
-  commented for re-cutover (rolled back 2026-07-13); data_acquisition owns
-  the job meanwhile.
+- **acquisition-v2** — **removed from this server 2026-09-01**; it has no
+  schedule and will not return without a new decision. data_acquisition owns
+  the totalizer.
 
 ## incident-engine runs from its release copy (worktree retired 2026-08-26)
 
@@ -148,8 +148,9 @@ crontab /opt/resources/backups/crontab-<date>.txt                     # rollback
 # (Missed in the first restore install — caught 2026-08-24 21:05 by the baseline
 #  comparison: 24 legacy entries, 23 hardened. Re-install this file to pick it up.)
 18,48 * * * * cd /opt/apps/data_acquisition && /usr/bin/flock -n /tmp/data_acquisition.totalizer.lock /usr/bin/docker compose run --rm -T app_tools node index.js system_reset_totalizer >/opt/run-logs/data_acquisition/cron.system_reset_totalizer.out 2>&1
-# ROLLED BACK 2026-07-13 — acquisition-v2 paused; totalizer runs from data_acquisition (line above). v2 line kept commented for re-cutover.
-# 18,48 * * * * cd /opt/apps/acquisition-v2 && docker compose run --rm app_tools bash -lc "npm run system_reset_totalizer"
+# (data_acquisition owns the totalizer outright since 2026-07-13; the
+#  acquisition-v2 line that used to sit here was dropped when that app was
+#  removed from this server, 2026-09-01.)
 
 # VPN reset (three historical slots, ONE shared lock so resets never overlap) + offline alert
 10,40 * * * * cd /opt/apps/data_acquisition && /usr/bin/flock -n /tmp/data_acquisition.ip_reset.lock /usr/bin/docker compose run --rm -T app_tools node index.js ip_reset >/opt/run-logs/data_acquisition/cron.ip_reset.1040.out 2>&1
