@@ -7,7 +7,12 @@ const {
   update_last_dir_date
 } = require("../redis");
 const { extractConnectionError, connection_regexes } = require("../util");
-const { redactArgsForLog } = require("../util/log_shapes");
+const {
+  redactArgsForLog,
+  secretsFromArgs,
+  scrubSecrets,
+  redactError,
+} = require("../util/log_shapes");
 const [
   addLogEvent,
   ,
@@ -53,6 +58,11 @@ const exec_phil_cv_data_grab = async (
     args: redactArgsForLog(args)
   };
   await addLogEvent(I, run_log, "exec_phil_cv_data_grab", cal, note, null);
+
+  // SEC-002: credential positions match redactArgsForLog above. Used to
+  // scrub the execFile rejection -- which embeds the full command line --
+  // at every sink it reaches (console, run log, DB, alert table).
+  const secrets = secretsFromArgs(args);
 
   const fallback = path.join(process.cwd(), "files");
 
@@ -199,7 +209,7 @@ const exec_phil_cv_data_grab = async (
     return stdout;
   } catch (error) {
     console.log("\n*********** Catch Error *****************");
-    console.log(error);
+    console.log(redactError(error, secrets));
 
     // Classify against everything we have: node's error wrapper (error.message),
     // plus the child's captured stdout/stderr at the moment of failure.
@@ -222,7 +232,14 @@ const exec_phil_cv_data_grab = async (
         system_id: system.id
       };
 
-      await addLogEvent(E, run_log, "exec_phil_cv_data_grab", cat, note, error);
+      await addLogEvent(
+        E,
+        run_log,
+        "exec_phil_cv_data_grab",
+        cat,
+        note,
+        redactError(error, secrets)
+      );
 
       // IF IP RESET, JUST SEND TO QUEUE TO NOT RUN RESET AGAIN
       // TEST FOR THE PRESENCE OF extracted_err_message (present means connectivity, but file pull issue. Not connectivity)
@@ -281,14 +298,24 @@ const exec_phil_cv_data_grab = async (
 
     // UNKNOWN EXCEPTION - surface it to the DB as error_category="unknown"
     // so it is visible for manual review rather than silently returning null.
-    await addLogEvent(E, run_log, "exec_phil_cv_data_grab", cat, note, error);
+    await addLogEvent(
+      E,
+      run_log,
+      "exec_phil_cv_data_grab",
+      cat,
+      note,
+      redactError(error, secrets)
+    );
     await add_to_online_queue(job_id, run_log, {
       id: system.id,
       capture_datetime,
       successful_acquisition: false,
       data_source: system.data_source,
       host_intervention: false,
-      connection_error: (error?.message || "unknown error").slice(0, 500),
+      connection_error: scrubSecrets(
+        error?.message || "unknown error",
+        secrets
+      ).slice(0, 500),
       conn_err: true,
       error_category: "unknown",
       phase: PHASE
