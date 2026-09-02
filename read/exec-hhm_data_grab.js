@@ -28,6 +28,9 @@ const {
 } = require("../util/log_shapes");
 
 const PHASE = "grab";
+// Positional slot the HHM shell-script convention reserves for the password
+// ([host_ip, user, password, dest]) -- the same layout redactArgsForLog masks.
+const PASSWORD_ARG_INDEX = 2;
 // Shell-level timeout fires first (coreutils `timeout`, clean exit 124, preserves
 // stdout/stderr); the Node backstop fires for scripts that trap TERM. Callers
 // can override the shell timeout per-call via the last argument; the Node
@@ -82,6 +85,20 @@ const exec_hhm_data_grab = async (
   // at every sink it reaches (console, run log, DB, alert table).
   const secrets = secretsFromArgs(args);
 
+  // SEC-004 (dual-supply migration): hand the credential to the child through
+  // the ENVIRONMENT as well as argv. Converted scripts read the env var and
+  // ignore their positional password; unconverted ones keep using argv, so
+  // families can be migrated one at a time without a flag day. The argv copy
+  // is removed in the final step, once every family is converted.
+  // NOTE: `env` REPLACES the child environment -- process.env must be spread
+  // in, or the child loses PATH and fails in a way that looks unrelated.
+  const credential = args[PASSWORD_ARG_INDEX];
+  const child_env = { ...process.env };
+  if (typeof credential === "string" && credential) {
+    child_env.SSHPASS = credential; // sshpass -e
+    child_env.LFTP_PASSWORD = credential; // lftp --env-password
+  }
+
   args.push(data_store_path);
 
   const timer_label = `exec.${system.id}`;
@@ -95,6 +112,7 @@ const exec_hhm_data_grab = async (
         timeout: resolvedExecMs,
         killSignal: "SIGKILL",
         maxBuffer: EXEC_MAX_BUFFER,
+        env: child_env,
       }
     );
 

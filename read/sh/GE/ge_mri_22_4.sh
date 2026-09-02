@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# SEC-004: the password arrives via SSHPASS (sshpass -e), never on the command
+# line. $3 remains a positional placeholder until every family is converted.
+: "${SSHPASS:?SSHPASS must be set by the caller}"
+
 host="$1"
 user="$2"
-pass="$3"
 dest="$4"
 
 mkdir -p "$dest"
@@ -19,7 +22,7 @@ SSH_OPTS=(
 
 # Get file list and FILTER OUT remote banner noise
 file_list="$(
-  timeout 240 sshpass -p "$pass" ssh "${SSH_OPTS[@]}" "$user@$host" \
+  timeout 240 sshpass -e ssh "${SSH_OPTS[@]}" "$user@$host" \
     "/bin/sh -c 'for f in /usr/g/service/log/gesys*.log; do [ -f \"\$f\" ] && echo \"\$f\"; done'" \
   | tr -d '\r' \
   | grep -E '^/usr/g/service/log/gesys.*\.log$' \
@@ -44,7 +47,7 @@ while IFS= read -r remote_file; do
 
   echo "Downloading $remote_file -> $out"
 
-  if timeout 240 sshpass -p "$pass" ssh "${SSH_OPTS[@]}" "$user@$host" \
+  if timeout 240 sshpass -e ssh "${SSH_OPTS[@]}" "$user@$host" \
     "/bin/sh -c 'cat \"$remote_file\"'" < /dev/null \
     | sed '/^DICTIONARYDIR is not set/d;
            /^ODINA_DICTIONARY is not set/d;
