@@ -176,6 +176,18 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
   connection. (b) matters more than (a): it is what let (a) hide for months.
 - **Found:** during SEC-004 family-1 verification, by comparing acquired-file
   mtimes against the run record rather than trusting the run outcome.
+- **STATUS 2026-09-02: FIXED** (both halves). (a) `HostKeyAlgorithms=+ssh-rsa`
+  and `PubkeyAcceptedAlgorithms=+ssh-rsa` added, mirroring the working sibling
+  — verified against both live hosts: negotiation now completes (probe reaches
+  `Permission denied` for a bogus user instead of `Unable to negotiate`).
+  (b) The ssh exit status is now checked separately from the banner filter, so
+  a failed connection exits non-zero and is classified. Stub-tested before/after:
+  connection-fails rc 0 -> 255, while both success paths are byte-identical.
+  Whether AUTH then succeeds for these two systems is visible on the next
+  cycle; either way the outcome is now honest. `connection_regex.js` already
+  had the matching entry (`Unable to negotiate ...` -> `key_exchange`,
+  `manual_intervention: true`) — it simply never got consulted, because the
+  script exited 0.
 - **Severity:** HIGH · **Confidence:** High (live data, before/after identical)
 
 ### DB-001 — `db/pgPool.js` lacks the fleet connection timeout: an unreachable DB hangs half the run groups forever
