@@ -76,6 +76,9 @@ If a single entry on the notepad is malformed, the reading step gives up entirel
 **BUG-008 (MEDIUM) — One pickup type reports "success" even when it failed.**
 The "althea" pickup job, when it can't reach its server, quietly reuses the *previous* run's file and reports success with an old timestamp. A machine could be unreachable for days while the dashboard shows it healthy. And if it fails on its very first attempt ever, nothing gets recorded at all.
 
+**BUG-021 (HIGH) — Two machines have been reporting "healthy" while collecting nothing at all.**
+Found on 2026-09-02 while verifying unrelated work. Two GE MRI machines (SME21914, SME21932) cannot connect at all — their equipment only speaks an old security standard that modern software refuses by default. That connection has failed on **every single run for the entire 13 days of records we keep** (411 and 375 runs). Yet the dashboard shows both as healthy with a current timestamp, because the collection script treats "couldn't connect" the same as "connected fine, nothing new" and reports success either way. Their storage folders are empty. Two fixes: tell the script to accept the older standard (its sibling script already does — that's why the other machines work), and separately stop the script reporting success when it never connected. The second matters more: it's what let the first hide.
+
 **BUG-014 (MEDIUM) — The failure counters don't mean what they say.**
 The table that counts "how many times has this machine needed a reset" has a *daily* counter that is never reset to zero (so it's just a second lifetime total), can miss a count when a machine fails in two ways at once, and silently drops the count for brand-new machines. The counters people might be making decisions from are quietly wrong.
 
@@ -204,6 +207,7 @@ Nothing in this plan needs downtime beyond the normal release process, and Phase
 | BUG-005 | HIGH | If Redis is down, every job freezes forever instead of reporting an error. |
 | BUG-006 | HIGH | The VPN address-book job reports success even when it completely fails. |
 | DB-001 | HIGH | One database connector never gives up waiting — hung runs, silently skipped schedules. |
+| BUG-021 | HIGH | Two machines report healthy while collecting nothing — failed every run for 13+ days, dashboard shows green. |
 | BUG-007 | MEDIUM | One garbled notepad entry destroys the whole batch. |
 | BUG-008 | MEDIUM | The althea pickup reports "success" with an old timestamp when it actually failed. |
 | BUG-009 | MEDIUM | The retry job erases its list before it's ready — an early failure loses everything queued. |

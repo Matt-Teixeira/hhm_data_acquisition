@@ -145,6 +145,39 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
 - **Recommendation:** declare `note` before the `try`; log type `E` in both catches; null-guard the regex match.
 - **Confidence:** High (verified first-hand).
 
+### BUG-021 — `ge_mri_22_4.sh` reports SUCCESS on a total connection failure: two systems dark for 400+ runs while monitoring shows them healthy
+- **Location:** [read/sh/GE/ge_mri_22_4.sh](read/sh/GE/ge_mri_22_4.sh) — the `file_list=$( ... || true )` command substitution followed by `if [[ -z ... ]]; then echo "No matching files found..." >&2; exit 0; fi`; consumed by [read/exec-hhm_data_grab.js](read/exec-hhm_data_grab.js) (exit 0 + no connection-error regex match => `successful_acquisition: true`).
+- **Evidence (live, 2026-09-02):** SME21914 and SME21932 have logged
+  `Unable to negotiate with <ip> port 22: no matching host key type found.
+  Their offer: ssh-rsa,ssh-dss` on **411 and 375 runs respectively**, spanning
+  the entire retained history (08-20 15:02 -> 09-02 16:34, i.e. every run).
+  Their acquisition directories under `/opt/resources/acqu_files/` are EMPTY
+  with a directory mtime of Jun 2. Meanwhile `alert.offline_hhm_conn` reports
+  both as `successful_acquisition = t`, `capture_datetime = 09-02 16:00`,
+  `error_category = NULL` — i.e. green on the dashboard.
+- **Two independent defects:**
+  1. **The masking (systemic).** `|| true` swallows the ssh failure, the empty
+     result is treated as "no new files", and `exit 0` tells the wrapper the
+     run succeeded. ANY failure of this script — auth, network, host key —
+     is reported as success. This is the concrete, live instance of BUG-019.
+  2. **The proximate cause.** `ge_mri_22_4.sh`'s `SSH_OPTS` lacks
+     `-o HostKeyAlgorithms=+ssh-rsa` and `-o PubkeyAcceptedAlgorithms=+ssh-rsa`,
+     which its sibling `ge_mri_22_1.sh` carries and which are exactly what these
+     legacy hosts (offering only `ssh-rsa,ssh-dss`) require. 22_1's systems
+     acquire normally; 22_4's cannot connect at all.
+- **Impact:** two imaging systems have acquired nothing for at least the full
+  13 days of retained history while reporting healthy — the failure is
+  invisible to ops-dashboard, incident-engine, and the offline-alert path
+  because the alert row says success with a current timestamp.
+- **Recommendation:** (a) add the two missing algorithm options to 22_4's
+  `SSH_OPTS`, matching 22_1; (b) separately, make the no-files path
+  distinguish "connected, nothing new" from "never connected" — fail loudly
+  (or set `run_log.outcome = "skipped"`) instead of exiting 0 on a dead
+  connection. (b) matters more than (a): it is what let (a) hide for months.
+- **Found:** during SEC-004 family-1 verification, by comparing acquired-file
+  mtimes against the run record rather than trusting the run outcome.
+- **Severity:** HIGH · **Confidence:** High (live data, before/after identical)
+
 ### DB-001 — `db/pgPool.js` lacks the fleet connection timeout: an unreachable DB hangs half the run groups forever
 - **Location:** [db/pgPool.js:34-43](db/pgPool.js#L34-L43) — config ends at `application_name`; no `max`, `idleTimeoutMillis`, or `connectionTimeoutMillis`. Its sibling [utils/db/pg-pool.js:42-49](utils/db/pg-pool.js#L42-L49) carries the fleet standard (decided 2026-08-27) with the rationale in-code: *"a hung connect must ERROR by 10s — with no timeout, an unreachable DB hangs the run forever and the empty cron .out reads as 'never ran'."*
 - **Evidence:** verified first-hand. Pool A is the first query for `mmb`, `demo_systems`, `hhm` (config/creds reads via `sql/qf-provider`), and `ip_sec`.
@@ -482,6 +515,7 @@ Fix as **one deliberate change**: `npm rm cron ioredis lodash pm2 short-uuid && 
 | BUG-005 | HIGH | Bug | Redis connect can hang any run forever (unbounded connect/reconnect) | redis/redis_instance.js:28 | High | Bounded connectTimeout + reconnectStrategy |
 | BUG-006 | HIGH | Bug | `update_ipsec` failures masked (ReferenceError in catch + INFO-typed error) → job exits 0 on total failure | utils/vpn/ipsec-update-util.js:35,48,59; update-pg-ipsec-table.js:47 | High | Fix scope; log type E; null-guard regex |
 | DB-001 | HIGH | Database | `db/pgPool.js` missing fleet connection timeout — unreachable DB hangs half the run groups | db/pgPool.js:34-43 | High | Apply fleet pool block (or delete pool via DB-002) |
+| BUG-021 | HIGH | Bug | ge_mri_22_4.sh reports success on total connection failure; 2 systems dark 400+ runs while dashboard shows green | read/sh/GE/ge_mri_22_4.sh | High | Add missing HostKeyAlgorithms opts; stop exiting 0 on a dead connection |
 | BUG-007 | MEDIUM | Bug | One corrupt queue entry → getter returns undefined, clear still destroys batch | redis/online_queue.js:76-82 + consumers | High | Per-element parse, skip-and-log |
 | BUG-008 | MEDIUM | Bug | althea_env logs success + stale timestamp on failed pull; first-ever failure invisible | util/tools/list_new_files_althea_env.js:31-57 | High | Success flag; failure rows; ERROR on ENOENT |
 | BUG-009 | MEDIUM | Bug | reset_tunnel clears queue before creds fetch/job build — failure window loses retries | jobs/tunnel_reset/index.js:74 vs :92 | High | Clear after job construction / claim key |
