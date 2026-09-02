@@ -190,6 +190,37 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
   script exited 0.
 - **Severity:** HIGH · **Confidence:** High (live data, before/after identical)
 
+### BUG-022 — `ge_mri_22_3.sh` (expect) hangs at an unanswered host-key prompt, times out, exits 0, and is recorded as a successful acquisition
+- **Location:** [read/sh/GE/ge_mri_22_3.sh](read/sh/GE/ge_mri_22_3.sh) — `set timeout 45`, `spawn timeout 240 bash -c "ssh ... "`, and an `expect` block handling only `"*assword:*"` and `eof`.
+- **Evidence (live, 2026-09-02, SME16377):** captured stdout ends at
+  `The authenticity of host '10.14.1.177' can't be established. ... Are you
+  sure you want to continue connecting (yes/no/[fingerprint])?` — ssh is
+  waiting for an answer that the expect block has no pattern for. expect hits
+  its 45s timeout, the script ends, and exits 0. stderr is EMPTY (expect routes
+  the child's output through a pty into stdout). The wrapper therefore sees
+  exit 0 and no classified error, and writes
+  `alert.offline_hhm_conn: successful_acquisition = true,
+  capture_datetime = 2026-09-02 19:30:12, error_category = NULL`, while
+  `/opt/resources/acqu_files/SME16377/` is EMPTY.
+- **Why the classifier cannot save it:** `extractConnectionError` IS applied to
+  stdout, but no entry in `connection_regexes` matches the authenticity /
+  "continue connecting" prompt — verified directly against the live table
+  (the `Unable to negotiate ...` control matched `key_exchange`; this text
+  matched nothing).
+- **Root cause of the prompt itself:** unlike every sibling GE script,
+  `ge_mri_22_3.sh` passes NO `StrictHostKeyChecking` option at all, so ssh
+  falls back to `ask`. With the ssh bundle mounted read-only the key could
+  never be persisted even if accepted.
+- **Impact:** third variant of the same class as BUG-021 and BUG-019 — a total
+  failure reported as success. One system dark and green.
+- **Recommendation:** (a) add `-o StrictHostKeyChecking=accept-new` (or
+  pre-seed the key via `scripts/known_hosts_migrate.sh`, the better fix given
+  SEC-005); (b) add an expect branch for the authenticity prompt that FAILS
+  loudly, and make the script exit non-zero on timeout instead of falling off
+  the end; (c) add a `connection_regexes` entry for the prompt so this class is
+  classified even when a script exits 0.
+- **Severity:** HIGH · **Confidence:** High (live stdout + alert row)
+
 ### DB-001 — `db/pgPool.js` lacks the fleet connection timeout: an unreachable DB hangs half the run groups forever
 - **Location:** [db/pgPool.js:34-43](db/pgPool.js#L34-L43) — config ends at `application_name`; no `max`, `idleTimeoutMillis`, or `connectionTimeoutMillis`. Its sibling [utils/db/pg-pool.js:42-49](utils/db/pg-pool.js#L42-L49) carries the fleet standard (decided 2026-08-27) with the rationale in-code: *"a hung connect must ERROR by 10s — with no timeout, an unreachable DB hangs the run forever and the empty cron .out reads as 'never ran'."*
 - **Evidence:** verified first-hand. Pool A is the first query for `mmb`, `demo_systems`, `hhm` (config/creds reads via `sql/qf-provider`), and `ip_sec`.
@@ -528,6 +559,7 @@ Fix as **one deliberate change**: `npm rm cron ioredis lodash pm2 short-uuid && 
 | BUG-006 | HIGH | Bug | `update_ipsec` failures masked (ReferenceError in catch + INFO-typed error) → job exits 0 on total failure | utils/vpn/ipsec-update-util.js:35,48,59; update-pg-ipsec-table.js:47 | High | Fix scope; log type E; null-guard regex |
 | DB-001 | HIGH | Database | `db/pgPool.js` missing fleet connection timeout — unreachable DB hangs half the run groups | db/pgPool.js:34-43 | High | Apply fleet pool block (or delete pool via DB-002) |
 | BUG-021 | HIGH | Bug | ge_mri_22_4.sh reports success on total connection failure; 2 systems dark 400+ runs while dashboard shows green | read/sh/GE/ge_mri_22_4.sh | High | Add missing HostKeyAlgorithms opts; stop exiting 0 on a dead connection |
+| BUG-022 | HIGH | Bug | expect script hangs at unanswered host-key prompt, exits 0, recorded as success (SME16377 dark + green) | read/sh/GE/ge_mri_22_3.sh | High | accept-new/seed key; fail loudly on prompt; add classifier entry |
 | BUG-007 | MEDIUM | Bug | One corrupt queue entry → getter returns undefined, clear still destroys batch | redis/online_queue.js:76-82 + consumers | High | Per-element parse, skip-and-log |
 | BUG-008 | MEDIUM | Bug | althea_env logs success + stale timestamp on failed pull; first-ever failure invisible | util/tools/list_new_files_althea_env.js:31-57 | High | Success flag; failure rows; ERROR on ENOENT |
 | BUG-009 | MEDIUM | Bug | reset_tunnel clears queue before creds fetch/job build — failure window loses retries | jobs/tunnel_reset/index.js:74 vs :92 | High | Clear after job construction / claim key |

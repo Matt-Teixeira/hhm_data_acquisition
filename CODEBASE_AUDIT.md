@@ -80,6 +80,9 @@ The "althea" pickup job, when it can't reach its server, quietly reuses the *pre
 Found on 2026-09-02 while verifying unrelated work. Two GE MRI machines (SME21914, SME21932) cannot connect at all — their equipment only speaks an old security standard that modern software refuses by default. That connection has failed on **every single run for the entire 13 days of records we keep** (411 and 375 runs). Yet the dashboard shows both as healthy with a current timestamp, because the collection script treats "couldn't connect" the same as "connected fine, nothing new" and reports success either way. Their storage folders are empty. Two fixes: tell the script to accept the older standard (its sibling script already does — that's why the other machines work), and separately stop the script reporting success when it never connected. The second matters more: it's what let the first hide.
 **Fixed 2026-09-02.** Both halves. The connection fix was confirmed against the real machines — they now negotiate successfully. The reporting fix was proven with a before/after test: a failed connection used to report success and now reports failure, while both normal outcomes are unchanged.
 
+**BUG-022 (HIGH) — A third machine is dark while showing green, for a different reason.**
+Found 2026-09-02 by a fleet-wide sweep comparing every "healthy" claim against what is actually on disk. SME16377's collection script is waiting at a security prompt ("are you sure you want to connect?") that nothing ever answers. It waits 45 seconds, gives up, and reports success. Its storage folder is empty. This is the same *shape* as BUG-021 — a failure reported as success — but a different cause, and the error-classifying dictionary cannot catch it either, because the prompt's wording matches none of its patterns. Three fixes: tell the script to accept the machine's identity (every sibling script already does), make it fail loudly instead of quietly timing out, and teach the dictionary this wording.
+
 **BUG-014 (MEDIUM) — The failure counters don't mean what they say.**
 The table that counts "how many times has this machine needed a reset" has a *daily* counter that is never reset to zero (so it's just a second lifetime total), can miss a count when a machine fails in two ways at once, and silently drops the count for brand-new machines. The counters people might be making decisions from are quietly wrong.
 
@@ -209,6 +212,7 @@ Nothing in this plan needs downtime beyond the normal release process, and Phase
 | BUG-006 | HIGH | The VPN address-book job reports success even when it completely fails. |
 | DB-001 | HIGH | One database connector never gives up waiting — hung runs, silently skipped schedules. |
 | BUG-021 | HIGH | Two machines report healthy while collecting nothing — failed every run for 13+ days, dashboard shows green. |
+| BUG-022 | HIGH | A third machine dark while showing green — stuck at an unanswered security prompt, reports success. |
 | BUG-007 | MEDIUM | One garbled notepad entry destroys the whole batch. |
 | BUG-008 | MEDIUM | The althea pickup reports "success" with an old timestamp when it actually failed. |
 | BUG-009 | MEDIUM | The retry job erases its list before it's ready — an early failure loses everything queued. |
