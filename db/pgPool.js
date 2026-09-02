@@ -39,6 +39,16 @@ const config = {
   user: process.env.PGUSER || "postgres",
   password: process.env.PGPASSWORD,
   ssl: buildSsl(),
+  // DB-001 -- fleet pool standard (decided 2026-08-27), previously applied to
+  // utils/db/pg-pool.js only. A hung connect must ERROR by 10s: with no
+  // timeout an unreachable DB hangs the run FOREVER, the run never reaches
+  // finalizeRun so no row lands in util.app_run_logs, the empty cron .out
+  // reads as "never ran", and `flock -n` then silently skips every later
+  // cycle of that job. This pool is the first query for mmb, demo_systems,
+  // the hhm config/credential reads and ip_sec.
+  max: 15,
+  idleTimeoutMillis: 60000,
+  connectionTimeoutMillis: 10000,
   application_name: process.env.PG_APP_NAME || "pg_manage",
 };
 
