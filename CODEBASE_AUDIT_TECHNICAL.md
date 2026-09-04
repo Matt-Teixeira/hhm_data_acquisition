@@ -233,6 +233,15 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
   prompt text to `host_key_unknown` (same category as the strict-mode variant
   — same fix action — with a message that names the variant); seven-case
   ordering test green. The script also moved to `SSHPASS` (SEC-004 family 3).
+- **VALIDATED IN PRODUCTION 2026-09-04 13:04 (`33d838e`):** SME16377 appears on
+  the failed list for the first time in the retained history. The pty capture
+  shows the whole chain working: no host-key prompt (strict check passed
+  against the bundle), `Password:` answered from `SSHPASS`, then the REMOTE
+  side's `tar: No match.` — i.e. authentication succeeded and the machine has
+  no `gesys*.log` under `/usr/g/service/log`. Exit 1 (ssh's status, via
+  PIPESTATUS), classified `file_missing`. Not a false green any more; the
+  residual is a per-machine config question (wrong script/path, or a
+  decommissioned system) for the owner.
 - **Severity:** HIGH · **Confidence:** High (live stdout + alert row)
 
 ### DB-001 — `db/pgPool.js` lacks the fleet connection timeout: an unreachable DB hangs half the run groups forever
@@ -298,6 +307,13 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
 - **Recommendation:** attach a boot-time `'error'` handler that stashes the error for `writeLogEvents` to report.
 - **Confidence:** High. **Severity:** MEDIUM.
 
+### BUG-023 — `host_key_new` is a catch-all mislabel: on `accept-new` scripts it swallows wrong-password, timeout, and generic ssh failures
+- **Location:** [util/tools/connection_regex.js](util/tools/connection_regex.js) — the `host_key_new` entry (`re: /Warning:\sPermanently\sadded\s'…'…known\shosts/`); and [read/exec-hhm_data_grab.js](read/exec-hhm_data_grab.js) catch ordering — regex classification runs BEFORE the `error.code === 124 || error.killed` timeout check, so any regex match preempts `hanging_exec`.
+- **Evidence (live, 2026-09-04 13:04 GE MRI run, from the cron `.out`):** every failure on `ge_mri_22_1.sh` carried a stderr consisting solely of `Warning: Permanently added '<ip>' (RSA) to the list of known hosts.` — and got labeled `host_key_new` regardless of the real exit code: **SME21917 and SME21923 exit 5** (sshpass: *incorrect password*), **SME16380 exit 124** (timeout — a flapping host, ok/FAILED alternating across three SHAs since 09-02), **SME19647 exit 255**. The warning is present on EVERY run of an `accept-new` script because the ssh bundle is mounted read-only, so the accepted key is never persisted and is "new" every time. The entry's own comment reasons that "a Permanently-added warning with a non-zero exit is a signal the key changed" — true only if keys persisted; under `:ro` it is false on every run.
+- **Impact:** three distinct root causes collapse into one wrong label with the wrong remediation text ("verify fingerprint"). Credential failures — which need a human to fix the password — are invisible as such; timeouts on these scripts can never reach `hanging_exec`. **Corrects an earlier claim:** SME21917/SME21923's persistent `host_key_new` had been cited as live evidence for SEC-005; they are wrong-password failures. A genuinely changed key is already caught, higher in the table, by `host_key_changed`, so `host_key_new` adds no true positives.
+- **Recommendation:** (1) in the wrapper, check timeout (`code 124` / `killed`) BEFORE regex classification; (2) demote or remove `host_key_new` — treat the warning as noise; (3) map sshpass exit codes explicitly — 5 → `credentials`, 6 → `host_key_unknown` — since sshpass suppresses ssh's own "Permission denied" text; (4) verify `hhm_credentials` for SME21917/SME21923's credentials group.
+- **Severity:** MEDIUM (triage/insight quality; failures ARE flagged for a human, but with the wrong instruction) · **Confidence:** High (exit codes read directly from the run's captured error objects)
+
 ### DB-002 — Two live pools to the same database, with divergent and dangerous fallback defaults
 - **Location:** [db/pgPool.js](db/pgPool.js) (Pool A: `index.js`, all three qf-providers, `ip_sec`, `old_to_new_process`) vs [utils/db/pg-pool.js](utils/db/pg-pool.js) (Pool B: logger, offline_alert, totalizer, vpn modules). `buildSsl()` is line-for-line identical in both.
 - **Evidence:** Pool A silently defaults to `host: "pg_db"`, `database: "dev"`, `user: "postgres"`, `application_name: "pg_manage"` (another app's name) when env is missing — a missing `.env` sends half the app toward a different database while the other half errors. Up to 25 sockets for a single-process cron app; DB-side attribution split across two names.
@@ -362,6 +378,8 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
 - [docker/Dockerfile:29-32](docker/Dockerfile#L29-L32): image-wide `set sftp:auto-confirm yes` in `/etc/lftp.conf` — every lftp connection blind-trusts.
 - Pervasive `accept-new` in GE/Philips scripts with the ssh bundle mounted `:ro` — accepted keys never persist, so every run is a blind first contact (the exact problem BACKLOG 1d fixed for the rsync path only).
 Extend the `rsync_mmb.sh` hardening pattern (`-F /opt/resources/ssh/config`, central known_hosts, `known_hosts_migrate.sh` seeding) to the sshpass/lftp scripts. *Confidence: High.*
+
+**Note (2026-09-04):** do not read the alert table's persistent `host_key_new` rows as evidence of key problems — see BUG-023; they are credential and timeout failures wearing the wrong label.
 
 ### SEC-006 — VNS3 API: TLS verification disabled while sending Basic auth (MEDIUM)
 [utils/vpn/ipsec-update-util.js:18-27](utils/vpn/ipsec-update-util.js#L18-L27) and [utils/vpn/reset-tunnels.js:19-30](utils/vpn/reset-tunnels.js#L19-L30): `rejectUnauthorized: false` + `Authorization: Basic …VNS3_PW…`. Pin the appliance cert/CA instead. Fix before ip_reset re-enablement. *Confidence: High.*
@@ -575,6 +593,7 @@ Fix as **one deliberate change**: `npm rm cron ioredis lodash pm2 short-uuid && 
 | DB-001 | HIGH | Database | `db/pgPool.js` missing fleet connection timeout — unreachable DB hangs half the run groups | db/pgPool.js:34-43 | High | Apply fleet pool block (or delete pool via DB-002) |
 | BUG-021 | HIGH | Bug | ge_mri_22_4.sh reports success on total connection failure; 2 systems dark 400+ runs while dashboard shows green | read/sh/GE/ge_mri_22_4.sh | High | Add missing HostKeyAlgorithms opts; stop exiting 0 on a dead connection |
 | BUG-022 | HIGH | Bug | expect script hangs at unanswered host-key prompt, exits 0, recorded as success (SME16377 dark + green) — **FIXED 2026-09-02** (strict `-F config`, exit-status propagation, tripwire, classifier entry) | read/sh/GE/ge_mri_22_3.sh | High | Verify on next cycle: SME16377 acquires or reports an honest category |
+| BUG-023 | MEDIUM | Bug | `host_key_new` mislabels wrong-password (exit 5), timeout (124) and generic ssh failures on accept-new scripts; warning is always present under the :ro bundle | connection_regex.js host_key_new; exec-hhm_data_grab.js catch order | High | Timeout check before regex; demote/remove entry; map sshpass exit 5/6; verify creds for SME21917/SME21923 |
 | BUG-007 | MEDIUM | Bug | One corrupt queue entry → getter returns undefined, clear still destroys batch | redis/online_queue.js:76-82 + consumers | High | Per-element parse, skip-and-log |
 | BUG-008 | MEDIUM | Bug | althea_env logs success + stale timestamp on failed pull; first-ever failure invisible | util/tools/list_new_files_althea_env.js:31-57 | High | Success flag; failure rows; ERROR on ENOENT |
 | BUG-009 | MEDIUM | Bug | reset_tunnel clears queue before creds fetch/job build — failure window loses retries | jobs/tunnel_reset/index.js:74 vs :92 | High | Clear after job construction / claim key |
