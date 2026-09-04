@@ -178,6 +178,25 @@ const connection_regexes = [
     successful_acquisition: false,
     re: /No \S+ host key is known for|Host key verification failed/i
   },
+  // Same root cause as host_key_unknown, seen from the INTERACTIVE side: ssh
+  // was given no StrictHostKeyChecking setting, fell back to =ask, and is
+  // sitting at "Are you sure you want to continue connecting?" -- a prompt
+  // nothing will ever answer. It reaches the log via STDOUT (expect routes the
+  // child's pty output there), so stderr-only reasoning never saw it. Same
+  // category on purpose: same fix action (verify/import the key and use
+  // -F /opt/resources/ssh/config); the message keeps the variant visible.
+  // Found 2026-09-02 (BUG-022): SME16377 sat at this prompt on every run,
+  // timed out, exited 0, and was recorded as a successful acquisition.
+  {
+    connection_error: false,
+    extraction_error: true,
+    error_type: "key",
+    error_category: "host_key_unknown",
+    message: "ssh waiting at the unknown-host-key prompt (StrictHostKeyChecking=ask) - verify/import the host key and use -F /opt/resources/ssh/config",
+    manual_intervention: true,
+    successful_acquisition: false,
+    re: /authenticity of host .+ can't be established|Are you sure you want to continue connecting/i
+  },
   {
     connection_error: false,
     extraction_error: true,
