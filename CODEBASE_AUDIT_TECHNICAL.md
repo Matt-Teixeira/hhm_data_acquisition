@@ -307,11 +307,32 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
 - **Recommendation:** attach a boot-time `'error'` handler that stashes the error for `writeLogEvents` to report.
 - **Confidence:** High. **Severity:** MEDIUM.
 
+### DX-012 — Honest failures reached the run log without their reason: CATCH path persisted only the stack
+- **Location:** the three HHM exec wrappers' `catch` blocks; sink [utils/logger/log.js:62](utils/logger/log.js#L62) (`err_msg = err.stack ? err.stack : err`).
+- **Evidence:** once scripts started exiting non-zero (BUG-021/022), every failure took the CATCH path, whose ERROR notes were `{job_id, system_id}` only. Node's `execFile` message embeds stderr in the stack, but **stdout and the exit code were not persisted anywhere** — for expect-style scripts (whose child output arrives on stdout via the pty) the reason was invisible in `util.app_run_logs`, and the BUG-023 investigation had to recover exit codes by hand from the cron `.out`.
+- **STATUS 2026-09-04: FIXED.** `truncateStream` moved to `util/log_shapes.js` (shared, 4 KB tail) and each wrapper now builds one `catch_note` — `job_id, system_id, exit_code, killed, stdout, stderr` — from the scrubbed error copy and uses it at every CATCH sink (classified, timeout, unknown). Verified in the wrapper harness: `exit_code` present, stderr tail present, password scrubbed to `***` in both note and stack. The rsync twins already carried stderr in their notes and were left alone.
+- **Severity:** LOW (observability) · **Confidence:** High
+
 ### BUG-023 — `host_key_new` is a catch-all mislabel: on `accept-new` scripts it swallows wrong-password, timeout, and generic ssh failures
 - **Location:** [util/tools/connection_regex.js](util/tools/connection_regex.js) — the `host_key_new` entry (`re: /Warning:\sPermanently\sadded\s'…'…known\shosts/`); and [read/exec-hhm_data_grab.js](read/exec-hhm_data_grab.js) catch ordering — regex classification runs BEFORE the `error.code === 124 || error.killed` timeout check, so any regex match preempts `hanging_exec`.
 - **Evidence (live, 2026-09-04 13:04 GE MRI run, from the cron `.out`):** every failure on `ge_mri_22_1.sh` carried a stderr consisting solely of `Warning: Permanently added '<ip>' (RSA) to the list of known hosts.` — and got labeled `host_key_new` regardless of the real exit code: **SME21917 and SME21923 exit 5** (sshpass: *incorrect password*), **SME16380 exit 124** (timeout — a flapping host, ok/FAILED alternating across three SHAs since 09-02), **SME19647 exit 255**. The warning is present on EVERY run of an `accept-new` script because the ssh bundle is mounted read-only, so the accepted key is never persisted and is "new" every time. The entry's own comment reasons that "a Permanently-added warning with a non-zero exit is a signal the key changed" — true only if keys persisted; under `:ro` it is false on every run.
 - **Impact:** three distinct root causes collapse into one wrong label with the wrong remediation text ("verify fingerprint"). Credential failures — which need a human to fix the password — are invisible as such; timeouts on these scripts can never reach `hanging_exec`. **Corrects an earlier claim:** SME21917/SME21923's persistent `host_key_new` had been cited as live evidence for SEC-005; they are wrong-password failures. A genuinely changed key is already caught, higher in the table, by `host_key_changed`, so `host_key_new` adds no true positives.
 - **Recommendation:** (1) in the wrapper, check timeout (`code 124` / `killed`) BEFORE regex classification; (2) demote or remove `host_key_new` — treat the warning as noise; (3) map sshpass exit codes explicitly — 5 → `credentials`, 6 → `host_key_unknown` — since sshpass suppresses ssh's own "Permission denied" text; (4) verify `hhm_credentials` for SME21917/SME21923's credentials group.
+- **STATUS 2026-09-04: FIXED.** (1) The `host_key_new` entry is removed (a
+  comment records why, so it is not re-added); a genuinely changed key is
+  still caught by `host_key_changed`. (2) The two sshpass scripts translate
+  sshpass's silent exit codes into text — `sshpass: incorrect password
+  (exit 5)` / `sshpass: host public key is unknown (exit 6)` — and the
+  existing `credentials` / `host_key_unknown` entries recognise those
+  phrases, so classification stays text-based and tool-agnostic. (3) The
+  wrapper was deliberately NOT reordered: with the noise gone, a timeout
+  whose stderr carries only the warning falls through to `hanging_exec`,
+  while a timeout carrying a real cause (e.g. `Connection timed out`) keeps
+  its more specific category — reordering would have discarded that. Tested:
+  11-case classifier suite (noise → no match; sshpass 5/6 → credentials /
+  host_key_unknown; refused/timeout still win over the warning; all prior
+  cases unchanged), script stubs for both sshpass scripts at every call
+  site, and the real wrapper against fake scripts with Redis stubbed.
 - **Severity:** MEDIUM (triage/insight quality; failures ARE flagged for a human, but with the wrong instruction) · **Confidence:** High (exit codes read directly from the run's captured error objects)
 
 ### DB-002 — Two live pools to the same database, with divergent and dangerous fallback defaults
@@ -593,7 +614,8 @@ Fix as **one deliberate change**: `npm rm cron ioredis lodash pm2 short-uuid && 
 | DB-001 | HIGH | Database | `db/pgPool.js` missing fleet connection timeout — unreachable DB hangs half the run groups | db/pgPool.js:34-43 | High | Apply fleet pool block (or delete pool via DB-002) |
 | BUG-021 | HIGH | Bug | ge_mri_22_4.sh reports success on total connection failure; 2 systems dark 400+ runs while dashboard shows green | read/sh/GE/ge_mri_22_4.sh | High | Add missing HostKeyAlgorithms opts; stop exiting 0 on a dead connection |
 | BUG-022 | HIGH | Bug | expect script hangs at unanswered host-key prompt, exits 0, recorded as success (SME16377 dark + green) — **FIXED 2026-09-02** (strict `-F config`, exit-status propagation, tripwire, classifier entry) | read/sh/GE/ge_mri_22_3.sh | High | Verify on next cycle: SME16377 acquires or reports an honest category |
-| BUG-023 | MEDIUM | Bug | `host_key_new` mislabels wrong-password (exit 5), timeout (124) and generic ssh failures on accept-new scripts; warning is always present under the :ro bundle | connection_regex.js host_key_new; exec-hhm_data_grab.js catch order | High | Timeout check before regex; demote/remove entry; map sshpass exit 5/6; verify creds for SME21917/SME21923 |
+| BUG-023 | MEDIUM | Bug | `host_key_new` mislabeled wrong-password (exit 5), timeout (124) and generic ssh failures on accept-new scripts — **FIXED 2026-09-04** (entry removed; sshpass scripts translate exit codes; classifier extended) | connection_regex.js; ge_mri_22_1.sh / 22_4.sh | High | Verify next cycle: SME21917/SME21923 → `credentials`; SME16380 → `hanging_exec`. Creds for those two still need fixing |
+| DX-012 | LOW | DX | CATCH-path notes lacked stdout/exit code — honest failures unexplained in the run log — **FIXED 2026-09-04** | read/exec-*.js catch blocks; util/log_shapes.js | High | Verify next cycle: ERROR notes carry exit_code/stderr/stdout |
 | BUG-007 | MEDIUM | Bug | One corrupt queue entry → getter returns undefined, clear still destroys batch | redis/online_queue.js:76-82 + consumers | High | Per-element parse, skip-and-log |
 | BUG-008 | MEDIUM | Bug | althea_env logs success + stale timestamp on failed pull; first-ever failure invisible | util/tools/list_new_files_althea_env.js:31-57 | High | Success flag; failure rows; ERROR on ENOENT |
 | BUG-009 | MEDIUM | Bug | reset_tunnel clears queue before creds fetch/job build — failure window loses retries | jobs/tunnel_reset/index.js:74 vs :92 | High | Clear after job construction / claim key |

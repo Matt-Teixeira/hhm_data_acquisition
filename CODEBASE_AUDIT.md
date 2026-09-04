@@ -87,6 +87,7 @@ Found 2026-09-02 by a fleet-wide sweep comparing every "healthy" claim against w
 
 **BUG-023 (MEDIUM) — One error label is quietly wrong for a whole family of machines.**
 Found 2026-09-04. For the machines whose scripts "trust on first sight," every single run prints a harmless notice ("added this machine to the trusted list") — because the trusted list is read-only, it's "first sight" every time. The error dictionary treats that harmless notice as the *reason* for any failure it appears next to. Result: two machines whose real problem is a **wrong password** (SME21917, SME21923), and one whose real problem is a **hang** (SME16380), all show the same label — "host key changed, verify fingerprint" — which sends whoever investigates down the wrong path. The fix is to stop treating the notice as a cause, check for hangs before pattern-matching, and read the transfer tool's own exit code (it says "wrong password" in plain terms). This also corrects an earlier note in this audit that took those two labels at face value.
+**Fixed 2026-09-04.** The harmless notice is no longer treated as a cause; the two password-based scripts now say in plain words when the password is wrong or the machine's identity is unknown; and every failure report now carries the exact exit code and the last few lines of output, so the *why* is in the record rather than only in a log file on the server. On the next cycle the two wrong-password machines should show "update credentials" — which is the real instruction.
 
 **BUG-014 (MEDIUM) — The failure counters don't mean what they say.**
 The table that counts "how many times has this machine needed a reset" has a *daily* counter that is never reset to zero (so it's just a second lifetime total), can miss a count when a machine fails in two ways at once, and silently drops the count for brand-new machines. The counters people might be making decisions from are quietly wrong.
@@ -218,7 +219,7 @@ Nothing in this plan needs downtime beyond the normal release process, and Phase
 | DB-001 | HIGH | One database connector never gives up waiting — hung runs, silently skipped schedules. |
 | BUG-021 | HIGH | Two machines report healthy while collecting nothing — failed every run for 13+ days, dashboard shows green. |
 | BUG-022 | HIGH | A third machine dark while showing green — stuck at an unanswered security prompt, reports success. **Fixed 2026-09-02.** |
-| BUG-023 | MEDIUM | One error label is wrong for a whole family: wrong-password and hang failures both show as "host key changed." |
+| BUG-023 | MEDIUM | One error label is wrong for a whole family: wrong-password and hang failures both show as "host key changed." **Fixed 2026-09-04.** |
 | BUG-007 | MEDIUM | One garbled notepad entry destroys the whole batch. |
 | BUG-008 | MEDIUM | The althea pickup reports "success" with an old timestamp when it actually failed. |
 | BUG-009 | MEDIUM | The retry job erases its list before it's ready — an early failure loses everything queued. |
