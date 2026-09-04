@@ -176,7 +176,7 @@ const connection_regexes = [
     message: "host key not in known_hosts (strict checking) - verify/import the host key",
     manual_intervention: true,
     successful_acquisition: false,
-    re: /No \S+ host key is known for|Host key verification failed/i
+    re: /No \S+ host key is known for|Host key verification failed|sshpass: host public key is unknown/i
   },
   // Same root cause as host_key_unknown, seen from the INTERACTIVE side: ssh
   // was given no StrictHostKeyChecking setting, fell back to =ask, and is
@@ -197,24 +197,18 @@ const connection_regexes = [
     successful_acquisition: false,
     re: /authenticity of host .+ can't be established|Are you sure you want to continue connecting/i
   },
-  {
-    connection_error: false,
-    extraction_error: true,
-    error_type: "key",
-    error_category: "host_key_new",
-    // Container's ssh has lax StrictHostKeyChecking and silently auto-accepts
-    // new host keys. A "Permanently added" warning with a non-zero exit is a
-    // signal that the host's key changed - admin should verify the fingerprint
-    // against the real host (it may indicate a legitimate reinstall, or a real
-    // MITM / identification-has-changed scenario the container masked away).
-    message: "host key changed - container auto-accepted new key, verify fingerprint",
-    manual_intervention: true,
-    successful_acquisition: false,
-    // NOTE: the former "|Error:\sCommand failed" branch was removed - it matched
-    // every execFile rejection (Node wraps shell failures as "Command failed: ...")
-    // and produced false-positive "key" classifications on unrelated errors.
-    re: /Warning:\sPermanently\sadded\s'\d+\.\d+\.\d+\.\d+'.+to\sthe\slist\sof\sknown\shosts/
-  },
+  // REMOVED 2026-09-04 (BUG-023): the former "host_key_new" entry matched
+  // `Warning: Permanently added '<ip>' ... to the list of known hosts` and
+  // treated it as a ROOT CAUSE. Under the read-only ssh bundle an accept-new
+  // script can never persist a key, so that warning appears on EVERY run of
+  // those scripts -- it is noise, not a signal -- and because regex
+  // classification runs before the exit-code checks, it swallowed
+  // wrong-password (sshpass exit 5), timeout (124) and generic ssh (255)
+  // failures alike, all labeled "verify fingerprint". A genuinely CHANGED key
+  // is already caught above by host_key_changed (ssh refuses with the
+  // identification-changed banner), so nothing true was lost. Do not re-add
+  // a pattern for that warning; let the real cause -- or the timeout branch
+  // -- classify the run.
   {
     connection_error: false,
     extraction_error: true,
@@ -233,7 +227,9 @@ const connection_regexes = [
     message: "update credentials",
     manual_intervention: true,
     successful_acquisition: false,
-    re: /Login failed|Login incorrect/i
+    // "sshpass: incorrect password" is emitted by the sshpass scripts themselves
+    // (BUG-023): sshpass exits 5 silently, so the script translates the code.
+    re: /Login failed|Login incorrect|sshpass: incorrect password/i
   },
   {
     connection_error: false,

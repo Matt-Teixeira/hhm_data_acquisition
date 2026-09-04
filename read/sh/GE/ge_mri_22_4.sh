@@ -11,6 +11,18 @@ dest="$4"
 
 mkdir -p "$dest"
 
+# BUG-023: sshpass is SILENT on its own failures, so the only stderr the caller
+# sees is ssh's benign "Permanently added" warning -- which used to get
+# classified as a host-key problem whatever the real cause was. Translate
+# sshpass's exit codes into text the classifier recognises.
+# sshpass(1): 5 = invalid/incorrect password, 6 = host public key is unknown.
+explain_sshpass_rc() {
+  case "$1" in
+    5) echo "sshpass: incorrect password (exit 5)" >&2 ;;
+    6) echo "sshpass: host public key is unknown (exit 6)" >&2 ;;
+  esac
+}
+
 SSH_OPTS=(
   -T
   -o StrictHostKeyChecking=accept-new
@@ -45,6 +57,7 @@ if [[ $ssh_rc -ne 0 ]]; then
   # connection_regex.js classifies it (e.g. "Unable to negotiate ..." ->
   # key_exchange, manual_intervention). Exiting non-zero is what lets it be
   # classified at all.
+  explain_sshpass_rc "$ssh_rc"
   echo "ssh file-list failed (rc=$ssh_rc)" >&2
   exit "$ssh_rc"
 fi
@@ -90,6 +103,7 @@ while IFS= read -r remote_file; do
   then
     mv -f "$tmp" "$out"
   else
+    explain_sshpass_rc "${PIPESTATUS[0]}"
     echo "WARNING: Failed to download $remote_file" >&2
     rm -f "$tmp"
     errors=$((errors + 1))

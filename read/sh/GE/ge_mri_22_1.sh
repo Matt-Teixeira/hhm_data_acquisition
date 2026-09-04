@@ -7,6 +7,18 @@
 
 mkdir -p "$4"
 
+# BUG-023: sshpass is SILENT on its own failures, so the only stderr the caller
+# sees is ssh's benign "Permanently added" warning -- which used to get
+# classified as a host-key problem whatever the real cause was. Translate
+# sshpass's exit codes into text the classifier recognises.
+# sshpass(1): 5 = invalid/incorrect password, 6 = host public key is unknown.
+explain_sshpass_rc() {
+  case "$1" in
+    5) echo "sshpass: incorrect password (exit 5)" >&2 ;;
+    6) echo "sshpass: host public key is unknown (exit 6)" >&2 ;;
+  esac
+}
+
 SSH_OPTS="
   -o StrictHostKeyChecking=accept-new \
   -o KexAlgorithms=+diffie-hellman-group14-sha1  \
@@ -21,3 +33,6 @@ SSH_OPTS="
 # on word splitting. The remote spec IS quoted so the glob is expanded by the
 # remote shell, not locally.
 timeout 240 sshpass -e scp $SSH_OPTS "$2@$1:/usr/g/service/log/gesys*.log" "$4"
+rc=$?
+explain_sshpass_rc "$rc"
+exit "$rc"
