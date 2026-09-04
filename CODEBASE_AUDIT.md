@@ -82,6 +82,7 @@ Found on 2026-09-02 while verifying unrelated work. Two GE MRI machines (SME2191
 
 **BUG-022 (HIGH) — A third machine is dark while showing green, for a different reason.**
 Found 2026-09-02 by a fleet-wide sweep comparing every "healthy" claim against what is actually on disk. SME16377's collection script is waiting at a security prompt ("are you sure you want to connect?") that nothing ever answers. It waits 45 seconds, gives up, and reports success. Its storage folder is empty. This is the same *shape* as BUG-021 — a failure reported as success — but a different cause, and the error-classifying dictionary cannot catch it either, because the prompt's wording matches none of its patterns. Three fixes: tell the script to accept the machine's identity (every sibling script already does), make it fail loudly instead of quietly timing out, and teach the dictionary this wording.
+**Fixed 2026-09-02, all three.** Better than "accept": the machine's identity was already on file in the shared trusted list, so the script now *verifies* it strictly instead of trusting blindly (confirmed against the real machine). It now reports the real outcome instead of always "success", and refuses instantly if it ever sees that prompt again. The dictionary recognizes the wording. Its password now also travels the hidden way (the SEC-004 change), making this the second family converted.
 
 **BUG-014 (MEDIUM) — The failure counters don't mean what they say.**
 The table that counts "how many times has this machine needed a reset" has a *daily* counter that is never reset to zero (so it's just a second lifetime total), can miss a count when a machine fails in two ways at once, and silently drops the count for brand-new machines. The counters people might be making decisions from are quietly wrong.
@@ -212,7 +213,7 @@ Nothing in this plan needs downtime beyond the normal release process, and Phase
 | BUG-006 | HIGH | The VPN address-book job reports success even when it completely fails. |
 | DB-001 | HIGH | One database connector never gives up waiting — hung runs, silently skipped schedules. |
 | BUG-021 | HIGH | Two machines report healthy while collecting nothing — failed every run for 13+ days, dashboard shows green. |
-| BUG-022 | HIGH | A third machine dark while showing green — stuck at an unanswered security prompt, reports success. |
+| BUG-022 | HIGH | A third machine dark while showing green — stuck at an unanswered security prompt, reports success. **Fixed 2026-09-02.** |
 | BUG-007 | MEDIUM | One garbled notepad entry destroys the whole batch. |
 | BUG-008 | MEDIUM | The althea pickup reports "success" with an old timestamp when it actually failed. |
 | BUG-009 | MEDIUM | The retry job erases its list before it's ready — an early failure loses everything queued. |

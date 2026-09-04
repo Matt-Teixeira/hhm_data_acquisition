@@ -219,6 +219,20 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
   loudly, and make the script exit non-zero on timeout instead of falling off
   the end; (c) add a `connection_regexes` entry for the prompt so this class is
   classified even when a script exits 0.
+- **STATUS 2026-09-02: FIXED, all three parts.** (a) `-F /opt/resources/ssh/config`
+  (strict checking against the central bundle, where this host's ecdsa key was
+  already present) with `-o BatchMode=no` to keep keyboard-interactive auth —
+  probed live: reaches `Permission denied` for a bogus user with NO
+  "Permanently added" warning, i.e. verified against the known key, not
+  blind-accepted. (b) expect now propagates the child's exit status via
+  `wait` (ssh's own status preferred through `PIPESTATUS`), fails loudly on
+  the prompt (tripwire, exit 3) and on its own timer (exit 124, raised to 250s
+  so the coreutils 240s bound fires first instead of clipping live transfers).
+  Stub-tested old vs new: refused 0→255, prompt 45s/0→instant/3, auth-ok
+  identical (1 file). (c) `connection_regex.js` gained an entry mapping the
+  prompt text to `host_key_unknown` (same category as the strict-mode variant
+  — same fix action — with a message that names the variant); seven-case
+  ordering test green. The script also moved to `SSHPASS` (SEC-004 family 3).
 - **Severity:** HIGH · **Confidence:** High (live stdout + alert row)
 
 ### DB-001 — `db/pgPool.js` lacks the fleet connection timeout: an unreachable DB hangs half the run groups forever
@@ -341,6 +355,7 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
 
 ### SEC-004 — Passwords on command lines: `sshpass -p` and `sftp://user:pass@host` (MEDIUM)
 ~40 scripts under `read/sh/` pass credentials as argv (e.g. [read/sh/GE/ge_ct_22.sh:14](read/sh/GE/ge_ct_22.sh#L14), [read/sh/Philips/phil_cv_22.sh:7](read/sh/Philips/phil_cv_22.sh#L7)) — visible in `/proc/*/cmdline` for the transfer's duration (same-UID container processes + host root/svc), and unquoted, so a password containing a space or glob breaks auth. Fix together with SEC-002: `sshpass -e` / env-passed secrets, quote all expansions. *Confidence: High.*
+**PROGRESS (dual-supply migration; wrapper sets `SSHPASS`/`LFTP_PASSWORD` alongside argv until all families convert):** family 1 GE MRI sshpass (2 scripts, 16 systems) — done, validated in production 2026-09-02; family 3 expect (`ge_mri_22_3.sh`, 1 system) — done 2026-09-02. Remaining: curl (2 scripts), lftp `ftp://` (4), lftp `sftp://` (7), then drop the argv copy.
 
 ### SEC-005 — Host-key verification gaps beyond the accepted-risk baseline (MEDIUM)
 - [read/sh/Philips/phil_ct_v2.sh:4](read/sh/Philips/phil_ct_v2.sh#L4): `StrictHostKeyChecking=no` + `UserKnownHostsFile=/dev/null` — zero verification. **CORRECTED 2026-09-01: this script is LIVE (1 system in `config.acquisition`), not dead as originally reported.** It must be FIXED, not deleted.
@@ -559,7 +574,7 @@ Fix as **one deliberate change**: `npm rm cron ioredis lodash pm2 short-uuid && 
 | BUG-006 | HIGH | Bug | `update_ipsec` failures masked (ReferenceError in catch + INFO-typed error) → job exits 0 on total failure | utils/vpn/ipsec-update-util.js:35,48,59; update-pg-ipsec-table.js:47 | High | Fix scope; log type E; null-guard regex |
 | DB-001 | HIGH | Database | `db/pgPool.js` missing fleet connection timeout — unreachable DB hangs half the run groups | db/pgPool.js:34-43 | High | Apply fleet pool block (or delete pool via DB-002) |
 | BUG-021 | HIGH | Bug | ge_mri_22_4.sh reports success on total connection failure; 2 systems dark 400+ runs while dashboard shows green | read/sh/GE/ge_mri_22_4.sh | High | Add missing HostKeyAlgorithms opts; stop exiting 0 on a dead connection |
-| BUG-022 | HIGH | Bug | expect script hangs at unanswered host-key prompt, exits 0, recorded as success (SME16377 dark + green) | read/sh/GE/ge_mri_22_3.sh | High | accept-new/seed key; fail loudly on prompt; add classifier entry |
+| BUG-022 | HIGH | Bug | expect script hangs at unanswered host-key prompt, exits 0, recorded as success (SME16377 dark + green) — **FIXED 2026-09-02** (strict `-F config`, exit-status propagation, tripwire, classifier entry) | read/sh/GE/ge_mri_22_3.sh | High | Verify on next cycle: SME16377 acquires or reports an honest category |
 | BUG-007 | MEDIUM | Bug | One corrupt queue entry → getter returns undefined, clear still destroys batch | redis/online_queue.js:76-82 + consumers | High | Per-element parse, skip-and-log |
 | BUG-008 | MEDIUM | Bug | althea_env logs success + stale timestamp on failed pull; first-ever failure invisible | util/tools/list_new_files_althea_env.js:31-57 | High | Success flag; failure rows; ERROR on ENOENT |
 | BUG-009 | MEDIUM | Bug | reset_tunnel clears queue before creds fetch/job build — failure window loses retries | jobs/tunnel_reset/index.js:74 vs :92 | High | Clear after job construction / claim key |
