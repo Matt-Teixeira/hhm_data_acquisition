@@ -15,6 +15,7 @@ const {
   secretsFromArgs,
   scrubSecrets,
   redactError,
+  truncateStream,
 } = require("../util/log_shapes");
 const {
   type: { I, W, E },
@@ -155,8 +156,22 @@ const exec_list_dirs = async (
 
     return stdout;
   } catch (error) {
+    // BUG-022 follow-up: on the CATCH path the logger persists only the error's
+    // stack, so the child's stderr/stdout -- the actual reason -- never reached
+    // util.app_run_logs (it lived only in the cron .out). Build one scrubbed,
+    // bounded note here and use it at every sink below. exit_code/killed are
+    // what the BUG-023 investigation had to dig out of the .out by hand.
+    const safe = redactError(error, secrets);
+    const catch_note = {
+      job_id,
+      system_id: system.id,
+      exit_code: error.code ?? null,
+      killed: error.killed === true,
+      stdout: truncateStream(safe.stdout),
+      stderr: truncateStream(safe.stderr),
+    };
     console.log("\n*********** Catch Error *****************");
-    console.log(redactError(error, secrets));
+    console.log(safe);
 
     // Classify against everything we have: node's error wrapper (error.message),
     // plus the child's captured stdout/stderr at the moment of failure.
@@ -174,18 +189,14 @@ const exec_list_dirs = async (
       extracted_err_message?.connection_error ||
       extracted_err_message?.extraction_error
     ) {
-      let note = {
-        job_id,
-        system_id: system.id
-      };
 
       await addLogEvent(
         E,
         run_log,
         "exec_list_dirs",
         cat,
-        note,
-        redactError(error, secrets)
+        catch_note,
+        safe
       );
 
       // IF IP RESET, JUST SEND TO QUEUE TO NOT RUN RESET AGAIN
@@ -250,8 +261,8 @@ const exec_list_dirs = async (
       run_log,
       "exec_list_dirs",
       cat,
-      { job_id, system_id: system.id },
-      redactError(error, secrets)
+      catch_note,
+      safe
     );
     await add_to_online_queue(job_id, run_log, {
       id: system.id,

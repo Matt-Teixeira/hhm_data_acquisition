@@ -73,6 +73,16 @@ const redactError = (err, secrets) => {
   return safe;
 };
 
+// Preserve the TAIL of a long stream (errors usually live at the end) and
+// prepend a marker saying how many chars were dropped. Shared by the exec
+// wrappers so every captured stdout/stderr -- success path or CATCH path --
+// is bounded the same way before it lands in util.app_run_logs.
+const MAX_STREAM_CHARS = 4096;
+const truncateStream = (s) => {
+  if (typeof s !== "string" || s.length <= MAX_STREAM_CHARS) return s;
+  return `...[truncated ${s.length - MAX_STREAM_CHARS} chars]\n${s.slice(-MAX_STREAM_CHARS)}`;
+};
+
 // Compact subset of a `systems`-table row for log notes. The full row is
 // ~300 chars and repeats per-system per-event; the subset keeps enough for
 // debugging across HHM / MMB / philips_mri row shapes. Unknown columns drop.
@@ -100,5 +110,6 @@ module.exports = {
   secretsFromArgs,
   scrubSecrets,
   redactError,
+  truncateStream,
   systemLogShape,
 };
