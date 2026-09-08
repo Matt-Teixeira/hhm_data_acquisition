@@ -67,6 +67,14 @@ Acquisition **cursors** (Philips CV daily/lod directory positions) are plain Red
 
 1. The **split-batch variant references `split_array`, which does not exist anywhere in the repo** — uncommenting lines 66-70 throws `ReferenceError`. Only line 72 is viable. Recommend deleting the dead block and keeping line 72 as the documented re-enable switch.
 2. **`util.ip_sec` is going stale**: the `update_ipsec` job that feeds it is not cron-scheduled (npm script only), is **additions-only** (changed `endpoint_id`/`tunnel_id` never updated, removed tunnels never deleted — [utils/vpn/ipsec-update-util.js:85-104](utils/vpn/ipsec-update-util.js#L85-L104)), and its failure path is completely masked (BUG-006). Re-enabled resets would bounce stale/wrong tunnel IDs. Fix BUG-006, make the sync an upsert-and-prune, and schedule it before re-enabling.
+   **Live data point (2026-09-08):** a ~50-minute path outage (≈14:05–14:55 UTC)
+   took **21 systems dark, 20 of them GE modality hosts** across a dozen sites,
+   while the same sites' MMB collectors stayed reachable and the VPN gateway was
+   up. **20 of those 21 `host_ip` values are absent from `util.ip_sec`** — the
+   tunnel map could not have identified what dropped, let alone reset it. It
+   recovered on its own; the app reported it honestly every cycle (DX-012 made
+   the diagnosis a two-minute read). Not a code finding; recorded here because it
+   is exactly the scenario a re-enabled `ip_reset` would be expected to handle.
 3. **Philips-MRI systems would never get their tunnel bounced**: `read/exec-remote_rsync.js:112-118` queues them without an `mmb_ip` field, so `extract_ip` yields `undefined` → SQL NULL → "no tunnel found" (part of BUG-003).
 4. `resetTunnels` itself (`utils/vpn/reset-tunnels.js`) is intact and imported; `VNS3_IP`/`VNS3_PW` remain documented in `.env.example` and CLAUDE.md. Fix SEC-006/SEC-007 (TLS verification, error logging) in the same pass.
 
@@ -321,6 +329,11 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
 - **Location:** the three HHM exec wrappers' `catch` blocks; sink [utils/logger/log.js:62](utils/logger/log.js#L62) (`err_msg = err.stack ? err.stack : err`).
 - **Evidence:** once scripts started exiting non-zero (BUG-021/022), every failure took the CATCH path, whose ERROR notes were `{job_id, system_id}` only. Node's `execFile` message embeds stderr in the stack, but **stdout and the exit code were not persisted anywhere** — for expect-style scripts (whose child output arrives on stdout via the pty) the reason was invisible in `util.app_run_logs`, and the BUG-023 investigation had to recover exit codes by hand from the cron `.out`.
 - **STATUS 2026-09-04: FIXED.** `truncateStream` moved to `util/log_shapes.js` (shared, 4 KB tail) and each wrapper now builds one `catch_note` — `job_id, system_id, exit_code, killed, stdout, stderr` — from the scrubbed error copy and uses it at every CATCH sink (classified, timeout, unknown). Verified in the wrapper harness: `exit_code` present, stderr tail present, password scrubbed to `***` in both note and stack. The rsync twins already carried stderr in their notes and were left alone.
+- **VALIDATED IN PRODUCTION 2026-09-08:** every CATCH note on `db89466` carries
+  `exit_code`, `killed`, `stdout`, `stderr`. Used live the same afternoon: a
+  transient outage (below) was diagnosed to root cause from the run log alone in
+  minutes — exit codes and stderr for 21 systems read directly, no cron `.out`
+  spelunking.
 - **Severity:** LOW (observability) · **Confidence:** High
 
 ### BUG-023 — `host_key_new` is a catch-all mislabel: on `accept-new` scripts it swallows wrong-password, timeout, and generic ssh failures
@@ -343,6 +356,12 @@ Dev clone → `build.sh` (in-tree `npm install` + image build) → `build-releas
   host_key_unknown; refused/timeout still win over the warning; all prior
   cases unchanged), script stubs for both sshpass scripts at every call
   site, and the real wrapper against fake scripts with Redis stubbed.
+- **VALIDATED IN PRODUCTION 2026-09-08 15:00 (`db89466`):** SME21917 and SME21923
+  exited 5 and were classified **`credentials` — "update credentials"** (queue-bound
+  note; alert rows follow at the 15:15 drain). Their DX-012 notes show the reason in
+  plain text: the scanners' SSH banner followed by `Permission denied`. SME16380
+  (server timeout, exit 255) was routed to `ip:queue` as a connection-class failure
+  — no longer mislabeled, correctly retried. `host_key_new` no longer appears anywhere.
 - **Severity:** MEDIUM (triage/insight quality; failures ARE flagged for a human, but with the wrong instruction) · **Confidence:** High (exit codes read directly from the run's captured error objects)
 
 ### DB-002 — Two live pools to the same database, with divergent and dangerous fallback defaults
@@ -625,8 +644,8 @@ Fix as **one deliberate change**: `npm rm cron ioredis lodash pm2 short-uuid && 
 | DB-001 | HIGH | Database | `db/pgPool.js` missing fleet connection timeout — unreachable DB hangs half the run groups | db/pgPool.js:34-43 | High | Apply fleet pool block (or delete pool via DB-002) |
 | BUG-021 | HIGH | Bug | ge_mri_22_4.sh reports success on total connection failure; 2 systems dark 400+ runs while dashboard shows green | read/sh/GE/ge_mri_22_4.sh | High | Add missing HostKeyAlgorithms opts; stop exiting 0 on a dead connection |
 | BUG-022 | HIGH | Bug | expect script hangs at unanswered host-key prompt, exits 0, recorded as success (SME16377 dark + green) — **FIXED 2026-09-02** (strict `-F config`, exit-status propagation, tripwire, classifier entry) | read/sh/GE/ge_mri_22_3.sh | High | Verify on next cycle: SME16377 acquires or reports an honest category |
-| BUG-023 | MEDIUM | Bug | `host_key_new` mislabeled wrong-password (exit 5), timeout (124) and generic ssh failures on accept-new scripts — **FIXED 2026-09-04** (entry removed; sshpass scripts translate exit codes; classifier extended) | connection_regex.js; ge_mri_22_1.sh / 22_4.sh | High | Verify next cycle: SME21917/SME21923 → `credentials`; SME16380 → `hanging_exec`. Creds for those two still need fixing |
-| DX-012 | LOW | DX | CATCH-path notes lacked stdout/exit code — honest failures unexplained in the run log — **FIXED 2026-09-04** | read/exec-*.js catch blocks; util/log_shapes.js | High | Verify next cycle: ERROR notes carry exit_code/stderr/stdout |
+| BUG-023 | MEDIUM | Bug | `host_key_new` mislabeled wrong-password (exit 5), timeout (124) and generic ssh failures on accept-new scripts — **FIXED 2026-09-04, VALIDATED IN PRODUCTION 2026-09-08** (SME21917/23 → `credentials`) | connection_regex.js; ge_mri_22_1.sh / 22_4.sh | High | Verify next cycle: SME21917/SME21923 → `credentials`; SME16380 → `hanging_exec`. Creds for those two still need fixing |
+| DX-012 | LOW | DX | CATCH-path notes lacked stdout/exit code — honest failures unexplained in the run log — **FIXED 2026-09-04, VALIDATED 2026-09-08** | read/exec-*.js catch blocks; util/log_shapes.js | High | Verify next cycle: ERROR notes carry exit_code/stderr/stdout |
 | BUG-007 | MEDIUM | Bug | One corrupt queue entry → getter returns undefined, clear still destroys batch | redis/online_queue.js:76-82 + consumers | High | Per-element parse, skip-and-log |
 | BUG-008 | MEDIUM | Bug | althea_env logs success + stale timestamp on failed pull; first-ever failure invisible | util/tools/list_new_files_althea_env.js:31-57 | High | Success flag; failure rows; ERROR on ENOENT |
 | BUG-009 | MEDIUM | Bug | reset_tunnel clears queue before creds fetch/job build — failure window loses retries | jobs/tunnel_reset/index.js:74 vs :92 | High | Clear after job construction / claim key |
