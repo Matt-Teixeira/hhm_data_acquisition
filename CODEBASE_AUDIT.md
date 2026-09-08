@@ -53,6 +53,9 @@ Inside one of the code files there's a leftover note containing a real service p
 **SEC-002 (HIGH) — Failed pickups can write passwords into logs and the database.**
 The system normally masks passwords when it writes its diary (this was done thoughtfully). But when a pickup *fails* in an unexpected way, the automatic error message includes the entire command that was run — machine address, username, and password, unmasked. That error message then gets saved in the run report, the operations database, and in one case even the "why is this machine offline" table on the dashboard. Fix: pass passwords to scripts through a hidden channel instead of the command line, and scrub error messages before saving them.
 
+**SEC-011 (HIGH) — The old leak left passwords behind in three places, and one of them is on a screen.**
+Found 2026-09-08 while checking that the SEC-002 fix held up. It did — completely: every error written since it shipped is masked, tens of thousands of them, zero exceptions. But the two weeks *before* it shipped (08-19 to 09-02) are still stored: in the run-record database (about 55,000 error entries), in a second database the incident system keeps its own copies in (the same 55,000, plus 317 "incident summaries"), and in daily archive files on the server that any user with a login can read. Worse, the operations dashboard shows those incident summaries as expandable text, and it has no login screen of its own. Four actions: run the prepared clean-up script (it rehearses first and only applies when explicitly told to), lock down and delete the archive files, **change the passwords involved** (listed by ID in the technical document), and put the dashboard behind a login.
+
 **SEC-003 (HIGH) — One admin job prints every password to the screen.**
 The one-time job that converts stored passwords from the old scrambling to the new one prints the entire list — in readable form — as it works. That output gets captured in log files. It already served its purpose (the conversion was done in August); the printing should be removed, or better, the whole obsolete job deleted.
 
@@ -208,7 +211,8 @@ Nothing in this plan needs downtime beyond the normal release process, and Phase
 | ID | Severity | In one sentence |
 |---|---|---|
 | SEC-001 | CRITICAL | A real equipment password is written in the code, on a personal GitHub account — change it and scrub the history. |
-| SEC-002 | HIGH | Failed pickups copy passwords into logs and the database via error messages. |
+| SEC-011 | HIGH | Two weeks of pre-fix passwords still sit in three stores and on the dashboard — clean up, lock down, rotate. |
+| SEC-002 | HIGH | Failed pickups copy passwords into logs and the database via error messages. **Fixed; verified 100% effective over 6 days.** |
 | SEC-003 | HIGH | An admin job prints the whole password list to the screen/logs. |
 | BUG-001 | HIGH | Status results are erased before they're safely stored — a hiccup loses them forever. |
 | BUG-002 | HIGH | The retry list's wipe-everything habit destroys entries added mid-run (and any backlog past ~1,000). |
